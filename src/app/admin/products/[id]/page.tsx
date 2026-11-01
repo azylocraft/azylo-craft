@@ -8,7 +8,7 @@ import { AdminTitle, Panel } from "@/components/admin/AdminShell";
 import { MediaManager, type Img, type Vid } from "@/components/admin/MediaManager";
 import { ComparisonEditor } from "@/components/admin/ComparisonEditor";
 import { MarkdownField } from "@/components/admin/MarkdownField";
-import { MaterialPricing } from "@/components/admin/MaterialPricing";
+import { VariantOptions } from "@/components/admin/VariantOptions";
 import { ProductReviews } from "@/components/admin/ProductReviews";
 import { OfferEditor } from "@/components/admin/OfferEditor";
 import { Btn, BtnLink } from "@/components/ui/primitives";
@@ -202,9 +202,14 @@ export default function ProductEditor() {
       <ComparisonEditor productId={id} />
       <ProductReviews productId={id} productName={p.name_en ?? "This product"} />
 
-      <MaterialPricing productId={id} variants={variants} setVariants={setVariants} />
+      <VariantOptions productSlug={p.slug} variants={variants} setVariants={setVariants} onSave={save} saving={saving} />
 
-      <Panel title="Variants & inventory" className="mt-5" actions={<Btn size="sm" kind="light" iconL={Plus} onClick={() => setVariants([...variants, { model_en: "", color_en: "", color_hex: "#C9B48F", material: "fabric", price_inr: "", compare_at_inr: "", stock: "", sku: "", is_active: true }])}>Add variant</Btn>}>
+      <details className="group mt-5 rounded-block border border-line2 bg-white">
+        <summary className="cursor-pointer list-none p-5 text-sm font-bold md:px-6">
+          Advanced: edit each option one by one (stock, SKU, MRP) · {variants.filter((v) => !v._delete).length} options
+          <span className="ml-2 text-xs font-normal text-muted group-open:hidden">— show</span>
+        </summary>
+      <Panel title="Variants & inventory" className="!rounded-t-none !border-0 !shadow-none" actions={<Btn size="sm" kind="light" iconL={Plus} onClick={() => setVariants([...variants, { model_en: "", color_en: "", color_hex: "#C9B48F", material: "fabric", price_inr: "", compare_at_inr: "", stock: "", sku: "", is_active: true }])}>Add variant</Btn>}>
         <p className="mb-3 text-xs text-muted">Price in INR (empty = MISSING: price, can&apos;t be bought). MRP / was price is optional and shown struck through — it must be a genuine earlier or regular price. Stock empty = made to order; 0 = out of stock.</p>
         <div className="overflow-x-auto">
           <table className="w-full min-w-[900px] text-sm">
@@ -233,6 +238,7 @@ export default function ProductEditor() {
         </div>
         <div className="mt-4 flex justify-end"><Btn iconL={Save} onClick={save} disabled={saving}>{saving ? "Saving…" : "Save product"}</Btn></div>
       </Panel>
+      </details>
     </>
   );
 }
