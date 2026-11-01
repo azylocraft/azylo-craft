@@ -197,22 +197,22 @@ export function Divider({ className }: { className?: string }) {
  * matching the logo on the product photography. `size` sets the cap height scale.
  */
 export function Logo({ className, light, size = 20 }: { className?: string; light?: boolean; size?: number }) {
-  const h = Math.round(size * 1.05);
+  const h = Math.round(size * 1.3);
   return (
     <svg
       role="img"
       aria-label="AZYLO"
-      viewBox="0 0 344 64"
+      viewBox="-6 -10 356 84"
       height={h}
-      width={Math.round((h * 344) / 64)}
+      width={Math.round((h * 356) / 84)}
       className={clsx("az-logo inline-block flex-none", light ? "text-white" : "text-ink", className)}
       fill="none"
       stroke="currentColor"
-      strokeWidth={7}
+      strokeWidth={10}
       strokeLinejoin="miter"
       strokeMiterlimit={10}
     >
-      <path pathLength={1} d="M2 62 L30 2 L58 62" />
+      <path pathLength={1} d="M3 62 L30 6 L57 62" />
       <path pathLength={1} d="M80 5 H128 L80 59 H130" />
       <path pathLength={1} d="M150 2 L176 33 L202 2 M176 33 V62" />
       <path pathLength={1} d="M227 2 V59 H262" />
