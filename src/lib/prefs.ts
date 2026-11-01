@@ -6,7 +6,7 @@ import { createJSONStorage, persist } from "zustand/middleware";
 export const LANGS = ["en", "fr"] as const;
 export type Lang = (typeof LANGS)[number];
 
-export const CURRENCIES = ["CAD", "USD", "EUR", "GBP", "AUD"] as const;
+export const CURRENCIES = ["INR"] as const;
 export type Currency = (typeof CURRENCIES)[number];
 
 type PrefsState = {
@@ -21,7 +21,7 @@ export const usePrefs = create<PrefsState>()(
   persist(
     (set) => ({
       lang: "en",
-      currency: "CAD",
+      currency: "INR",
       setLang: (lang) => {
         if (typeof document !== "undefined") document.documentElement.lang = lang;
         set({ lang });
@@ -31,6 +31,9 @@ export const usePrefs = create<PrefsState>()(
     {
       name: "azylo-prefs",
       storage: createJSONStorage(() => localStorage),
+      version: 2,
+      // v2: INR-only store — drop any previously saved foreign currency.
+      migrate: (state) => ({ ...(state as PrefsState), currency: "INR" }),
       onRehydrateStorage: () => (state) => {
         if (state && typeof document !== "undefined") document.documentElement.lang = state.lang;
       },

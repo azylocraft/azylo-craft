@@ -10,9 +10,9 @@ import { mediaUrl } from "@/lib/media";
 import { supabaseBrowser } from "@/lib/supabase/client";
 
 type Order = {
-  order_number: number; status: string; email: string; total_cad: number; subtotal_cad: number; discount_cad: number; shipping_cad: number; tax_cad: number;
+  order_number: number; status: string; email: string; total_inr: number; subtotal_inr: number; discount_inr: number; shipping_inr: number; tax_inr: number;
   shipping_address: Record<string, string>;
-  order_items: { product_name: string; variant_label: string; quantity: number; unit_price_cad: number; image_path: string | null }[];
+  order_items: { product_name: string; variant_label: string; quantity: number; unit_price_inr: number; image_path: string | null }[];
 };
 
 /** Order confirmation (design screen 44). Polls until the payment is recorded. */
@@ -65,16 +65,16 @@ export function Confirmation() {
             <li key={k} className="flex items-center gap-4 py-3">
               <Media src={mediaUrl(i.image_path)} alt="" className="size-16 flex-none rounded-xl" />
               <span className="flex-1 text-sm"><b>{i.product_name}</b><br /><span className="text-muted">{i.variant_label} · ×{i.quantity}</span></span>
-              <b className="text-sm"><Price cad={i.unit_price_cad * i.quantity} /></b>
+              <b className="text-sm"><Price cad={i.unit_price_inr * i.quantity} /></b>
             </li>
           ))}
         </ul>
         <dl className="mt-4 flex flex-col gap-1.5 border-t border-line pt-4 text-sm">
-          <div className="flex justify-between"><dt className="text-muted">Subtotal</dt><dd><Price cad={order.subtotal_cad} /></dd></div>
-          {order.discount_cad > 0 && <div className="flex justify-between"><dt className="text-muted">Discount</dt><dd>−<Price cad={order.discount_cad} /></dd></div>}
-          <div className="flex justify-between"><dt className="text-muted">Shipping</dt><dd>{order.shipping_cad > 0 ? <Price cad={order.shipping_cad} /> : "Free"}</dd></div>
-          <div className="flex justify-between"><dt className="text-muted">Taxes</dt><dd>{order.tax_cad > 0 ? <Price cad={order.tax_cad} /> : "Included"}</dd></div>
-          <div className="flex justify-between text-lg font-extrabold"><dt>Total</dt><dd><Price cad={order.total_cad} /></dd></div>
+          <div className="flex justify-between"><dt className="text-muted">Subtotal</dt><dd><Price cad={order.subtotal_inr} /></dd></div>
+          {order.discount_inr > 0 && <div className="flex justify-between"><dt className="text-muted">Discount</dt><dd>−<Price cad={order.discount_inr} /></dd></div>}
+          <div className="flex justify-between"><dt className="text-muted">Shipping</dt><dd>{order.shipping_inr > 0 ? <Price cad={order.shipping_inr} /> : "Free"}</dd></div>
+          <div className="flex justify-between"><dt className="text-muted">Taxes</dt><dd>{order.tax_inr > 0 ? <Price cad={order.tax_inr} /> : "Included"}</dd></div>
+          <div className="flex justify-between text-lg font-extrabold"><dt>Total</dt><dd><Price cad={order.total_inr} /></dd></div>
         </dl>
         <p className="mt-4 text-sm text-muted">Delivering to {a.first_name} {a.last_name}, {a.line1}, {a.city} {a.province} {a.postal_code}</p>
       </div>

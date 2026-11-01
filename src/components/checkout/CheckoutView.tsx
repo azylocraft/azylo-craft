@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronDown, CircleAlert, Lock, ShieldCheck, Truck } from "lucide-react";
-import { CA_POSTAL, PROVINCES } from "@/components/account/AccountPortal";
+import { IN_PIN, STATES } from "@/components/account/AccountPortal";
 import { Field } from "@/components/product/ProductView";
 import { Media } from "@/components/shop/Media";
 import { Price, T, useHydrated } from "@/components/shop/ShopContext";
@@ -23,8 +23,7 @@ type Quote = {
   tax: number; taxBreakdown: { label: string; rate: number; amount: number }[]; taxesIncluded: boolean; total: number; error?: string;
 };
 
-const EMPTY: Addr = { first_name: "", last_name: "", line1: "", line2: "", city: "", province: "", postal_code: "", country: "CA", phone: "" };
-const COUNTRIES = [["CA", "Canada"], ["US", "United States"], ["GB", "United Kingdom"], ["FR", "France"], ["AU", "Australia"], ["DE", "Germany"]];
+const EMPTY: Addr = { first_name: "", last_name: "", line1: "", line2: "", city: "", province: "", postal_code: "", country: "IN", phone: "" };
 
 function addrErrors(a: Addr) {
   const e: Record<string, string> = {};
@@ -32,9 +31,9 @@ function addrErrors(a: Addr) {
   if (!a.last_name.trim()) e.last_name = "Enter a last name.";
   if (!a.line1.trim()) e.line1 = "Enter an address.";
   if (!a.city.trim()) e.city = "Enter a city.";
-  if (!a.postal_code.trim()) e.postal_code = "Enter a postal code.";
-  else if (a.country === "CA" && !CA_POSTAL.test(a.postal_code.trim())) e.postal_code = "Use the format A1A 1A1.";
-  if (a.country === "CA" && !a.province) e.province = "Select a province.";
+  if (!IN_PIN.test(a.postal_code.trim())) e.postal_code = "Enter a 6-digit PIN code.";
+  if (!a.province) e.province = "Select a state.";
+  if (a.phone && !/^(\+91[\s-]?)?[6-9]\d{9}$/.test(a.phone.replace(/\s/g, ""))) e.phone = "Enter a 10-digit mobile number.";
   return e;
 }
 
@@ -43,30 +42,20 @@ function AddressFields({ a, set, errors, show, prefix }: { a: Addr; set: (a: Add
   const on = (k: keyof Addr) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => set({ ...a, [k]: e.target.value });
   return (
     <div className="grid gap-3 sm:grid-cols-2">
-      <div className="sm:col-span-2">
-        <Field label="Country / region">
-          <select className="field" value={a.country} onChange={(e) => set({ ...a, country: e.target.value, province: "" })} autoComplete={`${prefix} country`}>
-            {COUNTRIES.map(([c, n]) => <option key={c} value={c}>{n}</option>)}
-          </select>
-        </Field>
-      </div>
+      <div className="sm:col-span-2 rounded-field border border-line bg-bg2 px-4 py-3 text-sm">Delivering within <b>India</b></div>
       <Field label="First name" error={err("first_name")}><input className="field" value={a.first_name} onChange={on("first_name")} autoComplete={`${prefix} given-name`} /></Field>
       <Field label="Last name" error={err("last_name")}><input className="field" value={a.last_name} onChange={on("last_name")} autoComplete={`${prefix} family-name`} /></Field>
       <div className="sm:col-span-2"><Field label="Address" error={err("line1")}><input className="field" value={a.line1} onChange={on("line1")} autoComplete={`${prefix} address-line1`} /></Field></div>
       <div className="sm:col-span-2"><Field label="Apartment, suite, etc. (optional)"><input className="field" value={a.line2} onChange={on("line2")} autoComplete={`${prefix} address-line2`} /></Field></div>
       <Field label="City" error={err("city")}><input className="field" value={a.city} onChange={on("city")} autoComplete={`${prefix} address-level2`} /></Field>
-      {a.country === "CA" ? (
-        <Field label="Province" error={err("province")}>
-          <select className="field" value={a.province} onChange={on("province")} autoComplete={`${prefix} address-level1`}>
-            <option value="">Select…</option>
-            {PROVINCES.map((p) => <option key={p}>{p}</option>)}
-          </select>
-        </Field>
-      ) : (
-        <Field label="State / region"><input className="field" value={a.province} onChange={on("province")} autoComplete={`${prefix} address-level1`} /></Field>
-      )}
-      <Field label="Postal code" error={err("postal_code")}><input className="field uppercase" value={a.postal_code} onChange={on("postal_code")} autoComplete={`${prefix} postal-code`} /></Field>
-      <Field label="Phone (for delivery)"><input className="field" type="tel" value={a.phone} onChange={on("phone")} autoComplete={`${prefix} tel`} /></Field>
+      <Field label="State" error={err("province")}>
+        <select className="field" value={a.province} onChange={on("province")} autoComplete={`${prefix} address-level1`}>
+          <option value="">Select…</option>
+          {STATES.map((p) => <option key={p}>{p}</option>)}
+        </select>
+      </Field>
+      <Field label="PIN code" error={err("postal_code")}><input className="field" inputMode="numeric" maxLength={6} value={a.postal_code} onChange={on("postal_code")} autoComplete={`${prefix} postal-code`} /></Field>
+      <Field label="Mobile number (for delivery)" error={err("phone")}><input className="field" type="tel" value={a.phone} onChange={on("phone")} autoComplete={`${prefix} tel`} /></Field>
     </div>
   );
 }
@@ -195,7 +184,7 @@ export function CheckoutView() {
               <b className="line-clamp-1">{l.detail ? <T text={l.detail.name} field="product name" fallback /> : "…"}</b>
               <span className="text-xs text-muted">{l.detail ? <><T text={l.detail.color} field="colour" fallback /> / <T text={l.detail.model} field="model" fallback /></> : null}{l.customColor ? " · Custom color" : ""}</span>
             </span>
-            <span className="text-sm font-bold">{l.detail ? <Price cad={l.detail.priceCad == null ? null : l.detail.priceCad * l.quantity} withCode={false} /> : null}</span>
+            <span className="text-sm font-bold">{l.detail ? <Price cad={l.detail.priceInr == null ? null : l.detail.priceInr * l.quantity} withCode={false} /> : null}</span>
           </li>
         ))}
       </ul>
@@ -214,7 +203,7 @@ export function CheckoutView() {
           {quote.discount > 0 && <div className="flex justify-between text-green"><dt>Discount ({quote.discountCode})</dt><dd>−<Price cad={quote.discount} /></dd></div>}
           <div className="flex justify-between"><dt className="text-muted">Shipping</dt><dd>{addressValid ? (quote.shipping === 0 ? "Free" : <Price cad={quote.shipping} />) : <span className="text-muted">Enter address</span>}</dd></div>
           {quote.taxesIncluded ? (
-            <div className="flex justify-between"><dt className="text-muted">Taxes & duties</dt><dd className="text-muted">Included</dd></div>
+            <div className="flex justify-between"><dt className="text-muted">GST</dt><dd className="text-muted">Included</dd></div>
           ) : quote.taxBreakdown.length ? (
             quote.taxBreakdown.map((t) => <div key={t.label} className="flex justify-between"><dt className="text-muted">{t.label} ({t.rate}%)</dt><dd><Price cad={t.amount} /></dd></div>)
           ) : (
@@ -222,9 +211,9 @@ export function CheckoutView() {
           )}
           <div className="mt-2 flex items-baseline justify-between border-t border-line pt-3 text-lg font-extrabold">
             <dt>Total</dt>
-            <dd><span className="mr-1.5 text-xs font-bold text-muted">CAD</span><Price cad={quote.total} withCode={false} /></dd>
+            <dd><span className="mr-1.5 text-xs font-bold text-muted">INR</span><Price cad={quote.total} /></dd>
           </div>
-          <p className="text-[11.5px] text-faint">Orders are charged in CAD.</p>
+          <p className="text-[11.5px] text-faint">All prices are in INR and include GST.</p>
         </dl>
       )}
     </div>

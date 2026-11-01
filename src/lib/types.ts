@@ -11,7 +11,7 @@ export type ProductCardData = {
   slug: string;
   name: I18nText;
   eyebrow: I18nText;
-  fromPriceCad: number | null;
+  fromPriceInr: number | null;
   isNew: boolean;
   isBestSeller: boolean;
   reviewCount: number;
@@ -29,7 +29,7 @@ export type Variant = {
   color: I18nText;
   colorHex: string | null;
   material: string | null;
-  priceCad: number | null;
+  priceInr: number | null;
   stock: number | null;
 };
 
@@ -78,7 +78,7 @@ export type StoreSettings = {
   mapUrl: string | null;
   openingHours: I18nText;
   playStoreUrl: string | null;
-  shippingMethods: { code: string; label_en?: string; label_fr?: string; price_cad: number; days_min?: number; days_max?: number }[];
+  shippingMethods: { code: string; label_en?: string; label_fr?: string; price_inr: number; days_min?: number; days_max?: number }[];
 };
 
 export type Rates = Record<string, number | null>;

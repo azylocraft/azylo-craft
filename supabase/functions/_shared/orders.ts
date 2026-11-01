@@ -43,15 +43,15 @@ export async function finalizeOrder(razorpayOrderId: string, razorpayPaymentId: 
   if (order.marketing_opt_in) await db.from("newsletter_subscribers").upsert({ email: order.email, subscribed: true, source: "checkout" }, { onConflict: "email" });
 
   const rows = order.order_items
-    .map((i: { product_name: string; variant_label: string; quantity: number; unit_price_cad: number }) =>
-      `<tr><td>${escapeHtml(i.product_name)}<br><small>${escapeHtml(i.variant_label ?? "")}</small></td><td>×${i.quantity}</td><td align="right">$${(Number(i.unit_price_cad) * i.quantity).toFixed(2)}</td></tr>`)
+    .map((i: { product_name: string; variant_label: string; quantity: number; unit_price_inr: number }) =>
+      `<tr><td>${escapeHtml(i.product_name)}<br><small>${escapeHtml(i.variant_label ?? "")}</small></td><td>×${i.quantity}</td><td align="right">₹${(Number(i.unit_price_inr) * i.quantity).toLocaleString("en-IN")}</td></tr>`)
     .join("");
   await sendEmail(
     order.email,
     `Your AZYLO order #${order.order_number} is confirmed`,
     `<h2>Thank you for your order.</h2><p>Order <b>#${order.order_number}</b> is confirmed. We'll email you when it ships.</p>
      <table width="100%" cellpadding="6">${rows}</table>
-     <p><b>Total: $${Number(order.total_cad).toFixed(2)} CAD</b></p>`,
+     <p><b>Total: ₹${Number(order.total_inr).toLocaleString("en-IN")}</b></p>`,
   );
   return { already: false, orderNumber: order.order_number };
 }

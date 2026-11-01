@@ -15,9 +15,9 @@ import { supabaseBrowser } from "@/lib/supabase/client";
 
 type Address = { id: string; first_name: string; last_name: string; line1: string; line2: string | null; city: string; province: string | null; postal_code: string; country: string; phone: string | null; is_default: boolean };
 type OrderRow = {
-  id: string; order_number: number; status: string; total_cad: number; subtotal_cad: number; tax_cad: number; shipping_cad: number; discount_cad: number;
+  id: string; order_number: number; status: string; total_inr: number; subtotal_inr: number; tax_inr: number; shipping_inr: number; discount_inr: number;
   created_at: string; tracking_number: string | null; tracking_url: string | null; shipping_address: Record<string, string>;
-  order_items: { product_name: string; variant_label: string | null; quantity: number; unit_price_cad: number }[];
+  order_items: { product_name: string; variant_label: string | null; quantity: number; unit_price_inr: number }[];
   order_status_events: { status: string; created_at: string }[];
 };
 
@@ -75,7 +75,7 @@ function Orders() {
   useEffect(() => {
     supabaseBrowser()
       .from("orders")
-      .select("id, order_number, status, total_cad, created_at, order_items ( quantity )")
+      .select("id, order_number, status, total_inr, created_at, order_items ( quantity )")
       .neq("status", "pending")
       .order("created_at", { ascending: false })
       .then(({ data }) => setOrders((data as unknown as OrderRow[]) ?? []));
@@ -97,7 +97,7 @@ function Orders() {
           <span className="text-sm text-muted">{new Date(o.created_at).toLocaleDateString("en-CA", { dateStyle: "medium" })}</span>
           <span><Badge tone={o.status === "delivered" ? "green" : o.status === "cancelled" ? "red" : "gold"}>{STATUS_LABEL[o.status]}</Badge></span>
           <span className="text-sm text-muted">{o.order_items.reduce((n, i) => n + i.quantity, 0)} item(s)</span>
-          <b className="md:text-right"><Price cad={Number(o.total_cad)} /></b>
+          <b className="md:text-right"><Price cad={Number(o.total_inr)} /></b>
         </Link>
       ))}
     </div>
@@ -162,14 +162,14 @@ function OrderDetail({ id }: { id: string }) {
                 <br />
                 <span className="text-muted">{it.variant_label} · ×{it.quantity}</span>
               </span>
-              <Price cad={Number(it.unit_price_cad) * it.quantity} />
+              <Price cad={Number(it.unit_price_inr) * it.quantity} />
             </div>
           ))}
           <dl className="mt-3 flex flex-col gap-1 text-sm">
-            {[["Subtotal", o.subtotal_cad], ["Discount", -o.discount_cad], ["Shipping", o.shipping_cad], ["Taxes", o.tax_cad]].map(([k, v]) => (
+            {[["Subtotal", o.subtotal_inr], ["Discount", -o.discount_inr], ["Shipping", o.shipping_inr], ["Taxes", o.tax_inr]].map(([k, v]) => (
               <div key={k as string} className="flex justify-between"><dt className="text-muted">{k}</dt><dd><Price cad={Number(v)} /></dd></div>
             ))}
-            <div className="flex justify-between border-t border-line pt-2 font-extrabold"><dt>Total</dt><dd><Price cad={Number(o.total_cad)} /></dd></div>
+            <div className="flex justify-between border-t border-line pt-2 font-extrabold"><dt>Total</dt><dd><Price cad={Number(o.total_inr)} /></dd></div>
           </dl>
         </Card>
         <Card>
@@ -224,7 +224,7 @@ function Profile() {
       <Card>
         <div id="addresses" className="flex scroll-mt-40 items-center justify-between">
           <H className="text-xl">Addresses</H>
-          <Btn kind="light" size="sm" iconL={Plus} onClick={() => setEditing({ country: "CA" })}>Add</Btn>
+          <Btn kind="light" size="sm" iconL={Plus} onClick={() => setEditing({ country: "IN" })}>Add</Btn>
         </div>
         {addr === null ? (
           <div className="az-skeleton mt-4 h-24 rounded-tile" />
@@ -334,8 +334,8 @@ function NameModal({ onClose }: { onClose: () => void }) {
   );
 }
 
-export const CA_POSTAL = /^[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d$/;
-export const PROVINCES = ["AB", "BC", "MB", "NB", "NL", "NS", "NT", "NU", "ON", "PE", "QC", "SK", "YT"];
+export const IN_PIN = /^[1-9]\d{5}$/;
+export const STATES = ["Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal", "Andaman and Nicobar Islands", "Chandigarh", "Dadra and Nagar Haveli and Daman and Diu", "Delhi", "Jammu and Kashmir", "Ladakh", "Lakshadweep", "Puducherry"];
 
 function AddressModal({ value, onClose, onSaved }: { value: Partial<Address>; onClose: () => void; onSaved: () => void }) {
   const { user } = useAuth();
@@ -345,10 +345,11 @@ function AddressModal({ value, onClose, onSaved }: { value: Partial<Address>; on
   const save = async () => {
     const e: Record<string, string> = {};
     for (const k of ["first_name", "last_name", "line1", "city", "postal_code"] as const) if (!String(a[k] ?? "").trim()) e[k] = "Required.";
-    if (a.country === "CA" && a.postal_code && !CA_POSTAL.test(a.postal_code)) e.postal_code = "Use the format A1A 1A1.";
+    if (a.postal_code && !IN_PIN.test(a.postal_code.trim())) e.postal_code = "Enter a 6-digit PIN code.";
+    if (!a.province) e.province = "Select a state.";
     setErrors(e);
     if (Object.keys(e).length) return;
-    const row = { first_name: a.first_name, last_name: a.last_name, line1: a.line1, line2: a.line2 || null, city: a.city, province: a.province || null, postal_code: a.postal_code!.toUpperCase(), country: a.country || "CA", phone: a.phone || null, user_id: user!.id };
+    const row = { first_name: a.first_name, last_name: a.last_name, line1: a.line1, line2: a.line2 || null, city: a.city, province: a.province || null, postal_code: a.postal_code!.trim(), country: "IN", phone: a.phone || null, user_id: user!.id };
     const sb = supabaseBrowser();
     if (a.id) await sb.from("addresses").update(row).eq("id", a.id);
     else {
@@ -370,17 +371,8 @@ function AddressModal({ value, onClose, onSaved }: { value: Partial<Address>; on
           <div className="sm:col-span-2"><Field label="Address" error={errors.line1}><input className="field" value={a.line1 ?? ""} onChange={set("line1")} autoComplete="address-line1" /></Field></div>
           <div className="sm:col-span-2"><Field label="Apartment, suite (optional)"><input className="field" value={a.line2 ?? ""} onChange={set("line2")} /></Field></div>
           <Field label="City" error={errors.city}><input className="field" value={a.city ?? ""} onChange={set("city")} /></Field>
-          <Field label="Country">
-            <select className="field" value={a.country ?? "CA"} onChange={set("country")}>
-              {[["CA", "Canada"], ["US", "United States"], ["GB", "United Kingdom"], ["FR", "France"], ["AU", "Australia"]].map(([c, n]) => <option key={c} value={c}>{n}</option>)}
-            </select>
-          </Field>
-          {a.country === "CA" ? (
-            <Field label="Province"><select className="field" value={a.province ?? ""} onChange={set("province")}><option value="">Select…</option>{PROVINCES.map((p) => <option key={p}>{p}</option>)}</select></Field>
-          ) : (
-            <Field label="State / region"><input className="field" value={a.province ?? ""} onChange={set("province")} /></Field>
-          )}
-          <Field label="Postal code" error={errors.postal_code}><input className="field" value={a.postal_code ?? ""} onChange={set("postal_code")} /></Field>
+          <Field label="State" error={errors.province}><select className="field" value={a.province ?? ""} onChange={set("province")}><option value="">Select…</option>{STATES.map((p) => <option key={p}>{p}</option>)}</select></Field>
+          <Field label="PIN code" error={errors.postal_code}><input className="field" value={a.postal_code ?? ""} onChange={set("postal_code")} /></Field>
           <div className="sm:col-span-2"><Field label="Phone (optional)"><input className="field" value={a.phone ?? ""} onChange={set("phone")} /></Field></div>
         </div>
         <Btn full size="lg" className="mt-5" onClick={save}>Save address</Btn>

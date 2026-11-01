@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useSyncExternalStore, type ReactNode } from "react";
 import { Missing } from "@/components/ui/primitives";
-import { usePrefs, type Currency, type Lang } from "@/lib/prefs";
+import { usePrefs, type Lang } from "@/lib/prefs";
 import type { I18nText, Rates, StoreSettings } from "@/lib/types";
 
 type ShopCtx = { rates: Rates; settings: StoreSettings };
@@ -27,43 +27,28 @@ export function useHydrated() {
   );
 }
 
-/** Language/currency after hydration (server render uses EN / CAD). */
-export function useLocale(): { lang: Lang; currency: Currency } {
+/** Language after hydration (server render uses EN). The store sells in INR only. */
+export function useLocale(): { lang: Lang; currency: "INR" } {
   const hydrated = useHydrated();
-  const { lang, currency } = usePrefs();
-  return hydrated ? { lang, currency } : { lang: "en", currency: "CAD" };
+  const lang = usePrefs((s) => s.lang);
+  return { lang: hydrated ? lang : "en", currency: "INR" };
 }
 
-const SYMBOL: Record<string, string> = { CAD: "$", USD: "$", AUD: "$", EUR: "€", GBP: "£" };
+const INR = new Intl.NumberFormat("en-IN", { maximumFractionDigits: 2, minimumFractionDigits: 0 });
 
-export function formatMoney(amountCad: number, currency: Currency, rate: number, lang: Lang, withCode = true) {
-  const value = amountCad * rate;
-  const locale = lang === "fr" ? "fr-CA" : "en-CA";
-  const num = new Intl.NumberFormat(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
-  const sym = SYMBOL[currency] ?? "";
-  const body = currency === "EUR" || lang === "fr" ? `${num} ${sym}` : `${sym}${num}`;
-  return withCode && currency !== "EUR" ? `${body} ${currency}` : body;
+/** ₹ with Indian digit grouping, e.g. ₹1,69,200. */
+export function formatMoney(amountInr: number) {
+  return `₹${INR.format(Math.round(amountInr * 100) / 100)}`;
 }
 
-/** Hook returning a formatter for CAD amounts in the selected currency (null if rate missing). */
 export function useMoney() {
-  const { rates } = useShopCtx();
-  const { lang, currency } = useLocale();
-  const rate = rates[currency];
-  return {
-    currency,
-    rateMissing: rate == null,
-    format: (cad: number, withCode = true) => (rate == null ? null : formatMoney(cad, currency, rate, lang, withCode)),
-  };
+  return { currency: "INR" as const, rateMissing: false, format: (inr: number) => formatMoney(inr) };
 }
 
-/** Price in the shopper's currency; shows MISSING when the price or the exchange rate is absent. */
-export function Price({ cad, withCode = true, className }: { cad: number | null | undefined; withCode?: boolean; className?: string }) {
-  const { format, currency } = useMoney();
+/** Price in INR; shows MISSING when the price is absent. */
+export function Price({ cad, className }: { cad: number | null | undefined; withCode?: boolean; className?: string }) {
   if (cad == null) return <Missing field="price" className={className} />;
-  const s = format(cad, withCode);
-  if (s == null) return <Missing field={`${currency} exchange rate`} className={className} />;
-  return <span className={className}>{s}</span>;
+  return <span className={className}>{formatMoney(cad)}</span>;
 }
 
 /** Picks the current-language text; shows MISSING when that translation is absent. */

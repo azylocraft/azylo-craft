@@ -54,7 +54,7 @@ export function ArticleView({ a }: { a: Article }) {
     return () => io.disconnect();
   }, [headings]);
 
-  const date = a.publishedAt ? new Date(a.publishedAt).toLocaleDateString(lang === "fr" ? "fr-CA" : "en-CA", { month: "long", day: "numeric", year: "numeric" }) : null;
+  const date = a.publishedAt ? new Date(a.publishedAt).toLocaleDateString(lang === "fr" ? "fr-FR" : "en-IN", { month: "long", day: "numeric", year: "numeric" }) : null;
   const hydrated = useHydrated();
   const url = hydrated ? location.href : "";
   const title = text(a.title, "article title");
@@ -138,7 +138,7 @@ export function ArticleView({ a }: { a: Article }) {
                     <Eyebrow>{t("journal.ctaEyebrow")}</Eyebrow>
                     <div className="text-xl font-extrabold">{t("journal.ctaFits")}</div>
                     <div className="text-sm text-muted">
-                      <T text={a.linkedProduct.name} field="product name" fallback /> · {t("card.from")} <Price cad={a.linkedProduct.fromPriceCad} />
+                      <T text={a.linkedProduct.name} field="product name" fallback /> · {t("card.from")} <Price cad={a.linkedProduct.fromPriceInr} />
                     </div>
                     <BtnLink href={`/products/${a.linkedProduct.slug}`} icon={ArrowRight} className="self-start">
                       {t("journal.viewProduct")}

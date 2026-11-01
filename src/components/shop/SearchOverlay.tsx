@@ -69,7 +69,7 @@ function SearchBody() {
       const like = `%${term.replace(/[%_,()]/g, " ")}%`;
       const { data, error } = await supabaseBrowser()
         .from("products")
-        .select("id, slug, name_en, name_fr, placeholder_tone, product_variants ( price_cad ), product_images ( storage_path, sort_order )")
+        .select("id, slug, name_en, name_fr, placeholder_tone, product_variants ( price_inr ), product_images ( storage_path, sort_order )")
         .or(`name_en.ilike.${like},name_fr.ilike.${like},eyebrow_en.ilike.${like}`)
         .order("sort_order")
         .limit(6);
@@ -79,7 +79,7 @@ function SearchBody() {
       setResults(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (data ?? []).map((r: any) => {
-          const prices = (r.product_variants ?? []).filter((v: { price_cad: number | null }) => v.price_cad != null).map((v: { price_cad: number }) => Number(v.price_cad));
+          const prices = (r.product_variants ?? []).filter((v: { price_inr: number | null }) => v.price_inr != null).map((v: { price_inr: number }) => Number(v.price_inr));
           const img = [...(r.product_images ?? [])].sort((a, b) => a.sort_order - b.sort_order)[0];
           return { id: r.id, slug: r.slug, name: tx(r.name_en, r.name_fr), price: prices.length ? Math.min(...prices) : null, image: mediaUrl(img?.storage_path), tone: r.placeholder_tone };
         }),

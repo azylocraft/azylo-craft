@@ -80,7 +80,7 @@ export function PCard({ p, imgH = 300 }: { p: ProductCardData; imgH?: number }) 
           <div>
             <div className="text-[10px] font-bold tracking-[.1em] text-muted">{t("card.from")}</div>
             <div className="text-[19px] font-extrabold">
-              <Price cad={p.fromPriceCad} withCode={false} />
+              <Price cad={p.fromPriceInr} withCode={false} />
             </div>
           </div>
           <span className="flex items-center gap-1.5 text-[11px] text-muted">
@@ -137,7 +137,7 @@ export function GCard({ p, imgH = 270 }: { p: ProductCardData; imgH?: number }) 
         <div className="mt-auto flex items-end justify-between gap-2 pt-1.5">
           <span className="text-[11px] font-extrabold tracking-[.04em] sm:text-xs">
             {lang === "fr" ? "À PARTIR DE " : "FROM "}
-            <Price cad={p.fromPriceCad} />
+            <Price cad={p.fromPriceInr} />
           </span>
           <span className="hidden size-[38px] flex-none items-center justify-center rounded-full bg-ink text-white sm:flex">
             <ArrowRight size={15} aria-hidden />

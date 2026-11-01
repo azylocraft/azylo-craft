@@ -320,7 +320,7 @@ export function ArticleCardView({ a, imgH = 260 }: { a: ArticleCard; imgH?: numb
   const text = useText();
   const { lang } = useLocale();
   const date = a.publishedAt
-    ? new Date(a.publishedAt).toLocaleDateString(lang === "fr" ? "fr-CA" : "en-CA", { month: "short", day: "numeric", year: "numeric" })
+    ? new Date(a.publishedAt).toLocaleDateString(lang === "fr" ? "fr-FR" : "en-IN", { month: "short", day: "numeric", year: "numeric" })
     : null;
   return (
     <Link href={`/blogs/${a.slug}`} className="flex h-full flex-col overflow-hidden rounded-card border border-line2 bg-white shadow-card hover:shadow-soft">

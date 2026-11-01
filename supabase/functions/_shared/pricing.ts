@@ -1,4 +1,4 @@
-// Server-side order pricing. Every amount is recomputed from the database in CAD;
+// Server-side order pricing. Every amount is recomputed from the database in INR;
 // nothing the browser sends about prices is trusted.
 import type { SupabaseClient } from "npm:@supabase/supabase-js@2";
 
@@ -9,17 +9,15 @@ export type Address = {
 };
 
 const round = (n: number) => Math.round(n * 100) / 100;
-export const CA_POSTAL = /^[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d$/;
+export const IN_PIN = /^[1-9]\d{5}$/;
 
 export function validateAddress(a: Partial<Address> | undefined): Record<string, string> {
   const e: Record<string, string> = {};
   if (!a) return { address: "required" };
   for (const k of ["first_name", "last_name", "line1", "city", "postal_code", "country"] as const)
     if (!String(a[k] ?? "").trim()) e[k] = "required";
-  if (a.country === "CA") {
-    if (a.postal_code && !CA_POSTAL.test(a.postal_code)) e.postal_code = "format";
-    if (!a.province) e.province = "required";
-  }
+  if (a.postal_code && !IN_PIN.test(String(a.postal_code).trim())) e.postal_code = "format";
+  if (!a.province) e.province = "required";
   return e;
 }
 
@@ -31,7 +29,7 @@ export async function priceCart(db: SupabaseClient, lines: LineInput[], opts: { 
 
   const { data: variants, error } = await db
     .from("product_variants")
-    .select("id, model_en, color_en, price_cad, stock, is_active, products ( id, name_en, slug, is_published, product_images ( storage_path, sort_order ) )")
+    .select("id, model_en, color_en, price_inr, stock, is_active, products ( id, name_en, slug, is_published, product_images ( storage_path, sort_order ) )")
     .in("id", clean.map((l) => l.variantId));
   if (error) return { error: error.message } as const;
 
@@ -40,16 +38,16 @@ export async function priceCart(db: SupabaseClient, lines: LineInput[], opts: { 
     // deno-lint-ignore no-explicit-any
     const v: any = variants?.find((x) => x.id === l.variantId);
     if (!v || !v.is_active || !v.products?.is_published) return { error: "An item in your cart is no longer available." } as const;
-    if (v.price_cad == null) return { error: `${v.products.name_en}: this option can't be ordered yet.` } as const;
+    if (v.price_inr == null) return { error: `${v.products.name_en}: this option can't be ordered yet.` } as const;
     if (v.stock != null && v.stock < l.quantity) return { error: `${v.products.name_en}: only ${v.stock} left in this option.` } as const;
     const img = [...(v.products.product_images ?? [])].sort((a: { sort_order: number }, b: { sort_order: number }) => a.sort_order - b.sort_order)[0];
     items.push({
       product_id: v.products.id, variant_id: v.id, product_name: v.products.name_en ?? v.products.slug,
       variant_label: [v.color_en, v.model_en].filter(Boolean).join(" / ") + (l.customColor ? " · Custom color" : ""),
-      image_path: img?.storage_path ?? null, unit_price_cad: Number(v.price_cad), quantity: l.quantity, custom_color: !!l.customColor,
+      image_path: img?.storage_path ?? null, unit_price_inr: Number(v.price_inr), quantity: l.quantity, custom_color: !!l.customColor,
     });
   }
-  const subtotal = round(items.reduce((s, i) => s + i.unit_price_cad * i.quantity, 0));
+  const subtotal = round(items.reduce((s, i) => s + i.unit_price_inr * i.quantity, 0));
 
   // Discount
   let discount = 0;
@@ -62,7 +60,7 @@ export async function priceCart(db: SupabaseClient, lines: LineInput[], opts: { 
     else if (d.starts_at && new Date(d.starts_at) > now) discountMessage = "This code isn't active yet.";
     else if (d.ends_at && new Date(d.ends_at) < now) discountMessage = "This code has expired.";
     else if (d.usage_limit != null && d.used_count >= d.usage_limit) discountMessage = "This code has reached its usage limit.";
-    else if (subtotal < Number(d.min_subtotal_cad)) discountMessage = `This code needs a subtotal of at least $${Number(d.min_subtotal_cad).toFixed(2)} CAD.`;
+    else if (subtotal < Number(d.min_subtotal_inr)) discountMessage = `This code needs a subtotal of at least ₹${Number(d.min_subtotal_inr).toLocaleString("en-IN")}.`;
     else {
       discount = round(Math.min(d.kind === "percent" ? (subtotal * Number(d.value)) / 100 : Number(d.value), subtotal));
       discountCode = d.code;
@@ -71,27 +69,18 @@ export async function priceCart(db: SupabaseClient, lines: LineInput[], opts: { 
 
   // Shipping (methods from store_settings; free standard delivery by default)
   const { data: settings } = await db.from("store_settings").select("shipping_methods").eq("id", 1).maybeSingle();
-  const methods: { code: string; label_en?: string; price_cad: number; days_min?: number; days_max?: number }[] =
-    settings?.shipping_methods?.length ? settings.shipping_methods : [{ code: "standard", label_en: "Free standard delivery", price_cad: 0 }];
+  const methods: { code: string; label_en?: string; price_inr: number; days_min?: number; days_max?: number }[] =
+    settings?.shipping_methods?.length ? settings.shipping_methods : [{ code: "standard", label_en: "Free standard delivery", price_inr: 0 }];
   const method = methods.find((m) => m.code === opts.shippingCode) ?? methods[0];
-  const shipping = round(Number(method.price_cad) || 0);
+  const shipping = round(Number(method.price_inr) || 0);
 
-  // Taxes: Canada by province from tax_rates; elsewhere included.
-  const taxable = Math.max(0, subtotal - discount + shipping);
+  // Prices are inclusive of GST, so no tax is added on top.
   const taxBreakdown: { label: string; rate: number; amount: number }[] = [];
-  if (opts.country === "CA" && opts.province) {
-    const { data: t } = await db.from("tax_rates").select("*").eq("province", opts.province).maybeSingle();
-    if (t) {
-      if (Number(t.hst)) taxBreakdown.push({ label: "HST", rate: Number(t.hst), amount: round((taxable * Number(t.hst)) / 100) });
-      if (Number(t.gst)) taxBreakdown.push({ label: "GST", rate: Number(t.gst), amount: round((taxable * Number(t.gst)) / 100) });
-      if (Number(t.pst)) taxBreakdown.push({ label: t.pst_label ?? "PST", rate: Number(t.pst), amount: round((taxable * Number(t.pst)) / 100) });
-    }
-  }
-  const tax = round(taxBreakdown.reduce((s, x) => s + x.amount, 0));
+  const tax = 0;
   const total = round(subtotal - discount + shipping + tax);
 
   return {
     items, subtotal, discount, discountCode, discountMessage, shipping, shippingMethod: method, methods,
-    tax, taxBreakdown, taxesIncluded: opts.country !== "CA", total, currency: "CAD" as const,
+    tax, taxBreakdown, taxesIncluded: true, total, currency: "INR" as const,
   };
 }

@@ -1,6 +1,7 @@
 import clsx from "clsx";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { Missing } from "@/components/ui/primitives";
 
 export const slugify = (s: string) =>
@@ -18,8 +19,10 @@ export function Markdown({ source, field, className }: { source: string | null |
   return (
     <div className={clsx("az-prose", className)}>
       <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
         components={{
           h2: ({ children }) => <h2 id={slugify(String(children))}>{children}</h2>,
+          img: ({ src, alt }) => <img src={typeof src === "string" ? src : undefined} alt={alt ?? ""} loading="lazy" />,
           a: ({ href = "", children }) =>
             href.startsWith("/") ? (
               <Link href={href}>{children}</Link>

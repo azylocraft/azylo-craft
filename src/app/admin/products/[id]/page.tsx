@@ -11,12 +11,12 @@ import { supabaseBrowser } from "@/lib/supabase/client";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-type Variant = { id?: string; model_en: string; color_en: string; color_hex: string; material: string; price_cad: string; stock: string; sku: string; is_active: boolean; _delete?: boolean };
+type Variant = { id?: string; model_en: string; color_en: string; color_hex: string; material: string; price_inr: string; stock: string; sku: string; is_active: boolean; _delete?: boolean };
 const FUNCTIONS = ["electric", "massage", "storage", "convertible", "modular"];
 
 const toV = (v: any): Variant => ({
   id: v.id, model_en: v.model_en ?? "", color_en: v.color_en ?? "", color_hex: v.color_hex ?? "", material: v.material ?? "",
-  price_cad: v.price_cad == null ? "" : String(v.price_cad), stock: v.stock == null ? "" : String(v.stock), sku: v.sku ?? "", is_active: v.is_active,
+  price_inr: v.price_inr == null ? "" : String(v.price_inr), stock: v.stock == null ? "" : String(v.stock), sku: v.sku ?? "", is_active: v.is_active,
 });
 
 /** Product editor (design screen 86). */
@@ -91,7 +91,7 @@ export default function ProductEditor() {
         }
         const r = {
           product_id: id, model_en: v.model_en || null, color_en: v.color_en || null, color_hex: /^#[0-9a-f]{6}$/i.test(v.color_hex) ? v.color_hex : null,
-          material: v.material || null, price_cad: v.price_cad === "" ? null : Number(v.price_cad), stock: v.stock === "" ? null : Math.max(0, Math.floor(Number(v.stock))),
+          material: v.material || null, price_inr: v.price_inr === "" ? null : Number(v.price_inr), stock: v.stock === "" ? null : Math.max(0, Math.floor(Number(v.stock))),
           sku: v.sku || null, is_active: v.is_active, sort_order: i,
         };
         const res = v.id ? await sb.from("product_variants").update(r).eq("id", v.id) : await sb.from("product_variants").insert(r);
@@ -190,12 +190,12 @@ export default function ProductEditor() {
         </div>
       </div>
 
-      <Panel title="Variants & inventory" className="mt-5" actions={<Btn size="sm" kind="light" iconL={Plus} onClick={() => setVariants([...variants, { model_en: "", color_en: "", color_hex: "#C9B48F", material: "fabric", price_cad: "", stock: "", sku: "", is_active: true }])}>Add variant</Btn>}>
-        <p className="mb-3 text-xs text-muted">Price in CAD (empty = MISSING: price, can&apos;t be bought). Stock empty = made to order; 0 = out of stock.</p>
+      <Panel title="Variants & inventory" className="mt-5" actions={<Btn size="sm" kind="light" iconL={Plus} onClick={() => setVariants([...variants, { model_en: "", color_en: "", color_hex: "#C9B48F", material: "fabric", price_inr: "", stock: "", sku: "", is_active: true }])}>Add variant</Btn>}>
+        <p className="mb-3 text-xs text-muted">Price in INR (empty = MISSING: price, can&apos;t be bought). Stock empty = made to order; 0 = out of stock.</p>
         <div className="overflow-x-auto">
           <table className="w-full min-w-[900px] text-sm">
             <thead className="text-left text-xs uppercase tracking-[.08em] text-muted">
-              <tr><th className="p-2">Model</th><th className="p-2">Colour</th><th className="p-2">Hex</th><th className="p-2">Material</th><th className="p-2">Price CAD</th><th className="p-2">Stock</th><th className="p-2">SKU</th><th className="p-2">Active</th><th /></tr>
+              <tr><th className="p-2">Model</th><th className="p-2">Colour</th><th className="p-2">Hex</th><th className="p-2">Material</th><th className="p-2">Price ₹</th><th className="p-2">Stock</th><th className="p-2">SKU</th><th className="p-2">Active</th><th /></tr>
             </thead>
             <tbody>
               {variants.map((v, i) =>
@@ -205,7 +205,7 @@ export default function ProductEditor() {
                     <td className="p-1.5"><input className="field !min-h-10" value={v.color_en} onChange={(e) => vset(i, "color_en", e.target.value)} aria-label="Colour" /></td>
                     <td className="p-1.5"><input type="color" value={/^#[0-9a-f]{6}$/i.test(v.color_hex) ? v.color_hex : "#cccccc"} onChange={(e) => vset(i, "color_hex", e.target.value)} className="h-10 w-12 rounded border border-line" aria-label="Colour swatch" /></td>
                     <td className="p-1.5"><input className="field !min-h-10 w-28" value={v.material} onChange={(e) => vset(i, "material", e.target.value)} aria-label="Material" /></td>
-                    <td className="p-1.5"><input className="field !min-h-10 w-28" inputMode="decimal" value={v.price_cad} onChange={(e) => vset(i, "price_cad", e.target.value.replace(/[^0-9.]/g, ""))} aria-label="Price" /></td>
+                    <td className="p-1.5"><input className="field !min-h-10 w-28" inputMode="decimal" value={v.price_inr} onChange={(e) => vset(i, "price_inr", e.target.value.replace(/[^0-9.]/g, ""))} aria-label="Price" /></td>
                     <td className="p-1.5"><input className="field !min-h-10 w-20" inputMode="numeric" value={v.stock} onChange={(e) => vset(i, "stock", e.target.value.replace(/\D/g, ""))} aria-label="Stock" /></td>
                     <td className="p-1.5"><input className="field !min-h-10 w-28" value={v.sku} onChange={(e) => vset(i, "sku", e.target.value)} aria-label="SKU" /></td>
                     <td className="p-1.5 text-center"><input type="checkbox" checked={v.is_active} onChange={(e) => vset(i, "is_active", e.target.checked)} className="size-4 accent-[var(--az-ink)]" aria-label="Active" /></td>

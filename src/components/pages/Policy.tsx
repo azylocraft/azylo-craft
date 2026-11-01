@@ -11,7 +11,7 @@ import type { I18nText } from "@/lib/types";
 export function PolicyView({ title, body, lastUpdated }: { title: I18nText; body: I18nText; lastUpdated: string }) {
   const t = useT();
   const { lang } = useLocale();
-  const date = new Date(lastUpdated).toLocaleDateString(lang === "fr" ? "fr-CA" : "en-CA", { year: "numeric", month: "long", day: "numeric" });
+  const date = new Date(lastUpdated).toLocaleDateString(lang === "fr" ? "fr-FR" : "en-IN", { year: "numeric", month: "long", day: "numeric" });
   return (
     <div className="px-4 pb-4 pt-6 md:px-12">
       <Crumb items={[{ label: "Home", href: "/" }, { label: <T text={title} field="page title" fallback /> }]} />

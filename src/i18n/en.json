@@ -12,7 +12,7 @@
     "closeMenu": "Close menu",
     "language": "Language",
     "currency": "Currency",
-    "rateNote": "Prices convert at today's rate. Orders are charged in CAD."
+    "rateNote": "All prices are in Indian rupees and include GST."
   },
   "nav": {
     "home": "Home",
@@ -40,11 +40,7 @@
     "app": "AZYLO for Android"
   },
   "currencyNames": {
-    "CAD": "Canadian dollar",
-    "USD": "US dollar",
-    "EUR": "Euro",
-    "GBP": "British pound",
-    "AUD": "Australian dollar"
+    "INR": "Indian rupee"
   },
   "langNames": {
     "en": "English",
@@ -54,11 +50,11 @@
     "heroEyebrow": "AZYLO · Made to adapt",
     "heroTitle": "More comfort.",
     "heroTitleAccent": "More possibility.",
-    "heroSub": "Made-to-order recliners, sofa beds and small-space sofas that fit how you actually live — delivered free, duties included.",
+    "heroSub": "Made-to-order recliners, sofa beds and small-space sofas that fit how you actually live — delivered free across India, GST included.",
     "exploreSofas": "Explore sofas",
     "exploreTables": "Explore smart tables",
     "trustFree": "Free delivery",
-    "trustDuties": "Duties included",
+    "trustDuties": "GST included",
     "trustSmall": "Sized for small spaces",
     "featured": "Featured",
     "new2026": "New for 2026",
@@ -68,12 +64,12 @@
     "howDelivery": "How delivery works",
     "strip": {
       "free": "Free delivery",
-      "duties": "Duties included",
+      "duties": "GST included",
       "payment": "Flexible payment",
       "samples": "Complimentary fabric samples",
       "custom": "1-to-1 customization",
       "freeDesc": "To your door, at no extra cost.",
-      "dutiesDesc": "No surprise fees at the door outside Canada.",
+      "dutiesDesc": "The price you see is the price you pay — no extra tax at checkout.",
       "paymentDesc": "Secure checkout with major cards and wallets.",
       "samplesDesc": "See and feel the fabric before you decide.",
       "customDesc": "Talk to a specialist about size, fabric and colour."
@@ -86,7 +82,7 @@
     "typesTitle": "Explore Sofas",
     "typesAccent": "by Type",
     "typesSub": "Switch categories and compare products, functions and prices on one page.",
-    "typesTrust": "Free delivery · Delivery and duties included · Taxes added in Canada, included elsewhere",
+    "typesTrust": "Free delivery across India · Prices include GST",
     "tabPower": "Power Reclining",
     "tabBeds": "Sofa Beds",
     "tabModular": "Modular",
@@ -142,7 +138,7 @@
     "emailPlaceholder": "Your email address",
     "subscribe": "Subscribe",
     "note": "Useful emails, never noise. Unsubscribe anytime.",
-    "brandBlurb": "Considered, space-conscious sofas made to order and delivered to your door, duties included.",
+    "brandBlurb": "Considered, space-conscious sofas made to order and delivered free to your door across India.",
     "shop": "Shop",
     "brand": "AZYLO",
     "support": "Support",
@@ -165,8 +161,8 @@
       "orderHelp": "Get order help",
       "cookies": "Cookie preferences"
     },
-    "trustDelivery": "Free delivery, duties included",
-    "trustTaxes": "Canadian sales taxes calculated at checkout",
+    "trustDelivery": "Free delivery across India",
+    "trustTaxes": "All prices include GST",
     "trustCare": "Customer care replies within 24–36 hours",
     "privacy": "Privacy",
     "terms": "Terms",
@@ -197,7 +193,7 @@
     "from": "FROM",
     "madeToOrder": "Made to order",
     "freeDelivery": "Free delivery",
-    "dutiesNote": "Delivery and duties included · Taxes added in Canada, included elsewhere",
+    "dutiesNote": "Free delivery across India · Price includes GST",
     "viewSofa": "View This Sofa",
     "new": "New",
     "experiences": "{n} customer experiences"
@@ -208,7 +204,7 @@
     "items": "{n} item(s)",
     "complimentary": "Complimentary delivery",
     "deliveryOnUs": "Delivery is on us.",
-    "deliveryTaxNote": "Duties included outside Canada.",
+    "deliveryTaxNote": "Free delivery across India.",
     "remove": "Remove",
     "removeTitle": "Remove this piece?",
     "removeBody": "It will be taken out of your cart. You can add it again anytime.",
@@ -224,7 +220,7 @@
     "discountInvalid": "This code isn't valid.",
     "discountUnavailable": "We couldn't check this code right now. Try again.",
     "estimatedTotal": "ESTIMATED TOTAL",
-    "taxNote": "Canada: sales taxes are calculated at checkout. Outside Canada: taxes and duties are included.",
+    "taxNote": "All prices are in INR and include GST.",
     "checkout": "Checkout",
     "viewCart": "View cart",
     "emptyTitle": "Your cart is empty",
@@ -244,10 +240,10 @@
   "filters": {
     "filter": "Filter",
     "title": "Filters",
-    "price": "Price range (CAD)",
+    "price": "Price range (₹)",
     "min": "Min",
     "max": "Max",
-    "cadNote": "Prices are filtered in CAD.",
+    "cadNote": "Prices in Indian rupees.",
     "material": "Material",
     "colour": "Colour",
     "function": "Function",

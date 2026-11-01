@@ -115,12 +115,12 @@ export function CartLines({ compact }: { compact?: boolean }) {
               )}
               {d && (
                 <span className="text-xs text-muted">
-                  <Price cad={d.priceCad} withCode={false} />
+                  <Price cad={d.priceInr} withCode={false} />
                 </span>
               )}
               <div className="mt-1 flex items-center justify-between">
                 <Stepper small value={l.quantity} onChange={(n) => setQuantity(l.variantId, n)} label={t("cart.quantity")} />
-                <b className="text-[13.5px]">{d ? <Price cad={d.priceCad == null ? null : d.priceCad * l.quantity} withCode={false} /> : null}</b>
+                <b className="text-[13.5px]">{d ? <Price cad={d.priceInr == null ? null : d.priceInr * l.quantity} withCode={false} /> : null}</b>
               </div>
             </div>
           </li>
@@ -157,7 +157,7 @@ export function NoteBox() {
   );
 }
 
-export type DiscountResult = { valid: boolean; code?: string; amountCad?: number; message?: string };
+export type DiscountResult = { valid: boolean; code?: string; amountInr?: number; message?: string };
 
 export function DiscountBox({ subtotal, onResult }: { subtotal: number; onResult?: (r: DiscountResult | null) => void }) {
   const t = useT();
@@ -170,7 +170,7 @@ export function DiscountBox({ subtotal, onResult }: { subtotal: number; onResult
     const code = value.trim();
     if (!code) return;
     setState({ kind: "busy" });
-    const { data, error } = await supabaseBrowser().functions.invoke<DiscountResult>("validate-discount", { body: { code, subtotalCad: subtotal } });
+    const { data, error } = await supabaseBrowser().functions.invoke<DiscountResult>("validate-discount", { body: { code, subtotalInr: subtotal } });
     if (error || !data) {
       setState({ kind: "err", msg: t("cart.discountUnavailable") });
       return;

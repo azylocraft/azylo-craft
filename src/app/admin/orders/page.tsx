@@ -44,10 +44,10 @@ export default function AdminOrders() {
               {orders?.map((o) => (
                 <tr key={o.id} onClick={() => setOpen(o)} className={clsx("cursor-pointer border-b border-line2 hover:bg-bg2", open?.id === o.id && "bg-gold-soft")}>
                   <td className="p-4 font-bold">#{o.order_number}</td>
-                  <td className="p-4">{new Date(o.created_at).toLocaleDateString("en-CA")}</td>
+                  <td className="p-4">{new Date(o.created_at).toLocaleDateString("en-IN")}</td>
                   <td className="p-4">{o.email}</td>
                   <td className="p-4"><Badge tone={o.status === "delivered" ? "green" : o.status === "cancelled" ? "red" : "gold"}>{STATUS_LABEL[o.status]}</Badge></td>
-                  <td className="p-4 text-right">${Number(o.total_cad).toFixed(2)}</td>
+                  <td className="p-4 text-right">₹{Number(o.total_inr).toLocaleString("en-IN")}</td>
                 </tr>
               ))}
             </tbody>
@@ -68,16 +68,16 @@ function OrderEditor({ order, onSaved }: { order: any; onSaved: () => void }) {
   const a = order.shipping_address ?? {};
   return (
     <Panel title={`Order #${order.order_number}`}>
-      <p className="text-sm text-muted">{order.email} · {new Date(order.created_at).toLocaleString("en-CA")}</p>
+      <p className="text-sm text-muted">{order.email} · {new Date(order.created_at).toLocaleString("en-IN")}</p>
       <ul className="mt-4 divide-y divide-line2 text-sm">
         {order.order_items.map((it: any) => (
           <li key={it.id} className="flex justify-between gap-3 py-2">
             <span><b>{it.product_name}</b><br /><span className="text-muted">{it.variant_label} × {it.quantity}{it.custom_color ? " · custom colour" : ""}</span></span>
-            <span>${(Number(it.unit_price_cad) * it.quantity).toFixed(2)}</span>
+            <span>₹{(Number(it.unit_price_inr) * it.quantity).toLocaleString("en-IN")}</span>
           </li>
         ))}
       </ul>
-      <p className="mt-3 text-right font-extrabold">Total ${Number(order.total_cad).toFixed(2)} CAD</p>
+      <p className="mt-3 text-right font-extrabold">Total ₹{Number(order.total_inr).toLocaleString("en-IN")}</p>
       <p className="mt-3 text-sm"><b>Ship to:</b> {a.first_name} {a.last_name}, {a.line1}, {a.city} {a.province} {a.postal_code}, {a.country}</p>
       {order.note && <p className="mt-2 text-sm"><b>Note:</b> {order.note}</p>}
       <div className="mt-5 grid gap-3">

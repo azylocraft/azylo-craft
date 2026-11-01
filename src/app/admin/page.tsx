@@ -11,7 +11,7 @@ import { supabaseBrowser } from "@/lib/supabase/client";
 
 type Row = {
   id: string; slug: string; name_en: string | null; is_published: boolean; is_best_seller: boolean; is_new: boolean; is_featured: boolean; is_demo: boolean;
-  product_variants: { price_cad: number | null; stock: number | null }[];
+  product_variants: { price_inr: number | null; stock: number | null }[];
   product_images: { storage_path: string; sort_order: number; image_type: string }[];
 };
 
@@ -24,7 +24,7 @@ export default function AdminProducts() {
   useEffect(() => {
     supabaseBrowser()
       .from("products")
-      .select("id, slug, name_en, is_published, is_best_seller, is_new, is_featured, is_demo, product_variants ( price_cad, stock ), product_images ( storage_path, sort_order, image_type )")
+      .select("id, slug, name_en, is_published, is_best_seller, is_new, is_featured, is_demo, product_variants ( price_inr, stock ), product_images ( storage_path, sort_order, image_type )")
       .order("sort_order")
       .then(({ data }) => setRows((data as Row[]) ?? []));
   }, []);
@@ -59,7 +59,7 @@ export default function AdminProducts() {
                 <tr key={i}><td colSpan={6} className="p-4"><div className="az-skeleton h-10 rounded-lg" /></td></tr>
               ))}
             {shown.map((r) => {
-              const prices = r.product_variants.filter((v) => v.price_cad != null).map((v) => Number(v.price_cad));
+              const prices = r.product_variants.filter((v) => v.price_inr != null).map((v) => Number(v.price_inr));
               const stock = r.product_variants.some((v) => v.stock == null) ? "Made to order" : String(r.product_variants.reduce((n, v) => n + (v.stock ?? 0), 0));
               const img = [...r.product_images].sort((a, b) => a.sort_order - b.sort_order)[0];
               return (
@@ -73,7 +73,7 @@ export default function AdminProducts() {
                       </span>
                     </Link>
                   </td>
-                  <td className="p-4">{prices.length ? `$${Math.min(...prices).toFixed(2)}` : <span className="text-red">MISSING</span>}</td>
+                  <td className="p-4">{prices.length ? `₹${Math.min(...prices).toLocaleString("en-IN")}` : <span className="text-red">MISSING</span>}</td>
                   <td className="p-4">{r.product_variants.length}</td>
                   <td className="p-4">{stock}</td>
                   <td className="p-4">{r.product_images.length}</td>

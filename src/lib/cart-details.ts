@@ -12,7 +12,7 @@ export type CartDetail = {
   name: I18nText;
   model: I18nText;
   color: I18nText;
-  priceCad: number | null;
+  priceInr: number | null;
   stock: number | null;
   image: string | null;
   tone: string | null;
@@ -37,7 +37,7 @@ export function useCartDetails() {
     supabaseBrowser()
       .from("product_variants")
       .select(
-        "id, model_en, model_fr, color_en, color_fr, price_cad, stock, products ( slug, name_en, name_fr, placeholder_tone, product_images ( storage_path, image_type, sort_order ) )",
+        "id, model_en, model_fr, color_en, color_fr, price_inr, stock, products ( slug, name_en, name_fr, placeholder_tone, product_images ( storage_path, image_type, sort_order ) )",
       )
       .in("id", ids.split(","))
       .then(({ data, error }) => {
@@ -52,7 +52,7 @@ export function useCartDetails() {
             name: tx(v.products?.name_en, v.products?.name_fr),
             model: tx(v.model_en, v.model_fr),
             color: tx(v.color_en, v.color_fr),
-            priceCad: v.price_cad == null ? null : Number(v.price_cad),
+            priceInr: v.price_inr == null ? null : Number(v.price_inr),
             stock: v.stock,
             image: mediaUrl(imgs[0]?.storage_path),
             tone: v.products?.placeholder_tone ?? null,
@@ -67,8 +67,8 @@ export function useCartDetails() {
   }, [ids, attempt]);
 
   const lines = cart.map((l) => ({ ...l, detail: details[l.variantId] as CartDetail | undefined }));
-  const subtotal = lines.reduce((s, l) => s + (l.detail?.priceCad ?? 0) * l.quantity, 0);
-  const missingPrice = lines.some((l) => l.detail && l.detail.priceCad == null);
+  const subtotal = lines.reduce((s, l) => s + (l.detail?.priceInr ?? 0) * l.quantity, 0);
+  const missingPrice = lines.some((l) => l.detail && l.detail.priceInr == null);
   return { lines, subtotal, missingPrice, status: ids ? status : "ready", retry: () => setAttempt((n) => n + 1) };
 }
 
@@ -88,21 +88,21 @@ export function useProductCards(idList: string[]) {
     queueMicrotask(() => !cancelled && setStatus("loading"));
     supabaseBrowser()
       .from("products")
-      .select("id, slug, name_en, name_fr, placeholder_tone, created_at, is_new, is_best_seller, chips, eyebrow_en, eyebrow_fr, product_variants ( price_cad, is_active ), product_images ( storage_path, image_type, sort_order )")
+      .select("id, slug, name_en, name_fr, placeholder_tone, created_at, is_new, is_best_seller, chips, eyebrow_en, eyebrow_fr, product_variants ( price_inr, is_active ), product_images ( storage_path, image_type, sort_order )")
       .in("id", ids.split(","))
       .then(({ data, error }) => {
         if (cancelled) return;
         if (error) return setStatus("error");
         setCards(
           ((data ?? []) as any[]).map((r) => {
-            const prices = (r.product_variants ?? []).filter((v: any) => v.price_cad != null).map((v: any) => Number(v.price_cad));
+            const prices = (r.product_variants ?? []).filter((v: any) => v.price_inr != null).map((v: any) => Number(v.price_inr));
             const imgs = [...(r.product_images ?? [])].sort((a: any, b: any) => a.sort_order - b.sort_order);
             return {
               id: r.id,
               slug: r.slug,
               name: tx(r.name_en, r.name_fr),
               eyebrow: tx(r.eyebrow_en, r.eyebrow_fr),
-              fromPriceCad: prices.length ? Math.min(...prices) : null,
+              fromPriceInr: prices.length ? Math.min(...prices) : null,
               isNew: r.is_new,
               isBestSeller: r.is_best_seller,
               reviewCount: 0,

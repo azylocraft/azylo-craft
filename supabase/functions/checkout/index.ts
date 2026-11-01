@@ -1,6 +1,6 @@
 // Checkout API. Actions:
 //   quote  — recompute totals for the summary panel (no side effects)
-//   create — create the pending order + a Razorpay order (amount computed here, in CAD)
+//   create — create the pending order + a Razorpay order (amount computed here, in INR)
 //   verify — check Razorpay's payment signature and mark the order paid
 //   status — confirmation page polling (needs order id + razorpay order id)
 import { admin, cors, isEmail, json, rateLimit, str, userId } from "../_shared/util.ts";
@@ -45,8 +45,8 @@ Deno.serve(async (req) => {
     const { data: order, error } = await db
       .from("orders")
       .insert({
-        user_id: await userId(req), email, status: "pending", currency: "CAD",
-        subtotal_cad: q.subtotal, discount_cad: q.discount, shipping_cad: q.shipping, tax_cad: q.tax, total_cad: q.total,
+        user_id: await userId(req), email, status: "pending", currency: "INR",
+        subtotal_inr: q.subtotal, discount_inr: q.discount, shipping_inr: q.shipping, tax_inr: q.tax, total_inr: q.total,
         tax_breakdown: q.taxBreakdown, discount_code: q.discountCode, shipping_method: q.shippingMethod.code,
         shipping_address: address, billing_address: body.billingAddress ?? null, note: str(body.note, 500) || null,
         marketing_opt_in: body.marketingOptIn === true,
@@ -59,7 +59,7 @@ Deno.serve(async (req) => {
     const rp = await fetch("https://api.razorpay.com/v1/orders", {
       method: "POST",
       headers: { Authorization: `Basic ${btoa(`${KEY_ID()}:${KEY_SECRET()}`)}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ amount: Math.round(q.total * 100), currency: "CAD", receipt: `azylo-${order.order_number}`, notes: { order_id: order.id } }),
+      body: JSON.stringify({ amount: Math.round(q.total * 100), currency: "INR", receipt: `azylo-${order.order_number}`, notes: { order_id: order.id } }),
     });
     const rj = await rp.json();
     if (!rp.ok) {
@@ -86,7 +86,7 @@ Deno.serve(async (req) => {
   if (action === "status") {
     const { data } = await db
       .from("orders")
-      .select("id, order_number, status, email, total_cad, subtotal_cad, discount_cad, shipping_cad, tax_cad, shipping_address, order_items ( product_name, variant_label, quantity, unit_price_cad, image_path )")
+      .select("id, order_number, status, email, total_inr, subtotal_inr, discount_inr, shipping_inr, tax_inr, shipping_address, order_items ( product_name, variant_label, quantity, unit_price_inr, image_path )")
       .eq("id", str(body.orderId, 64))
       .eq("razorpay_order_id", str(body.razorpayOrderId, 64))
       .maybeSingle();

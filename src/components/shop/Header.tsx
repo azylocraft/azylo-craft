@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import { Eyebrow, Logo, Round } from "@/components/ui/primitives";
 import { useT } from "@/lib/i18n";
-import { CURRENCIES, LANGS, usePrefs } from "@/lib/prefs";
+import { LANGS, usePrefs } from "@/lib/prefs";
 import { categoriesPanel, categoryPills, discoverMenu, routes } from "@/lib/routes";
 import { useCartCount, useWishCount } from "@/lib/shop-store";
 import { useDismiss } from "@/lib/use-dismiss";
@@ -121,7 +121,7 @@ export function Header() {
 
   const toggle = (m: Menu) => setMenu((cur) => (cur === m ? null : m));
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
-  const curLabel = currency === "EUR" ? "€ EUR" : currency === "GBP" ? "£ GBP" : `$${currency}`;
+  const curLabel = "₹ INR";
 
   const cartN = mounted ? cartCount : 0;
   const wishN = mounted ? wishCount : 0;
@@ -273,7 +273,7 @@ export function Header() {
             <Globe size={15} className="text-gold" aria-hidden />
             {mounted ? lang.toUpperCase() : "EN"}
             <span aria-hidden className="h-3.5 w-px bg-line" />
-            {mounted ? curLabel : "$CAD"}
+            {curLabel}
             <ChevronDown size={13} aria-hidden />
           </button>
           {menu === "lang" && (
@@ -327,15 +327,13 @@ function MobileAccount({ onClose }: { onClose: () => void }) {
 function LocaleControls({
   t,
   lang,
-  currency,
   onLang,
-  onCurrency,
 }: {
   t: ReturnType<typeof useT>;
   lang: (typeof LANGS)[number];
-  currency: (typeof CURRENCIES)[number];
+  currency?: string;
   onLang: (l: (typeof LANGS)[number]) => void;
-  onCurrency: (c: (typeof CURRENCIES)[number]) => void;
+  onCurrency?: unknown;
 }) {
   return (
     <>
@@ -358,30 +356,7 @@ function LocaleControls({
         ))}
       </div>
       <Eyebrow line={false}>{t("header.currency")}</Eyebrow>
-      <div role="radiogroup" aria-label={t("header.currency")} className="flex flex-col gap-2.5">
-        {CURRENCIES.map((c) => (
-          <button
-            key={c}
-            type="button"
-            role="radio"
-            aria-checked={currency === c}
-            onClick={() => onCurrency(c)}
-            className="flex items-center gap-3 text-left text-sm"
-          >
-            <span
-              aria-hidden
-              className={clsx(
-                "inline-flex size-[18px] flex-none items-center justify-center rounded-full border-[1.5px]",
-                currency === c ? "border-ink" : "border-[#CFC8BC]",
-              )}
-            >
-              {currency === c && <span className="size-[9px] rounded-full bg-ink" />}
-            </span>
-            <b className="w-10">{c}</b>
-            <span className="text-muted">{t(`currencyNames.${c}`)}</span>
-          </button>
-        ))}
-      </div>
+      <p className="text-sm"><b>₹ INR</b> <span className="text-muted">Indian rupee</span></p>
       <p className="text-[11.5px] leading-normal text-faint">{t("header.rateNote")}</p>
     </>
   );
@@ -449,7 +424,7 @@ function MobileDrawer({ onClose, wishCount, onWishlist }: { onClose: () => void;
           className="mt-4 flex items-center gap-2 text-[13px] text-muted"
         >
           <Globe size={15} className="text-gold" aria-hidden />
-          {t(`langNames.${lang}`)} · ${currency}
+          {t(`langNames.${lang}`)} · ₹ INR
           <ChevronDown size={13} aria-hidden className={clsx("transition-transform", localeOpen && "rotate-180")} />
         </button>
         {localeOpen && (

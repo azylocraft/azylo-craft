@@ -69,7 +69,7 @@ function WishBody({ onClose }: { onClose: () => void }) {
                       <T text={c.name} field="product name" fallback />
                     </b>
                     <span className="text-[13px] font-bold text-gold">
-                      {t("wish.from")} <Price cad={c.fromPriceCad} />
+                      {t("wish.from")} <Price cad={c.fromPriceInr} />
                     </span>
                     <Link href={`/products/${c.slug}`} onClick={onClose} className="mt-auto flex items-center gap-1.5 text-[13px] font-bold hover:text-gold">
                       {t("wish.view")}

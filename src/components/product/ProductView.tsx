@@ -72,7 +72,7 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
   const variant: Variant | undefined =
     product.variants.find((v) => keyOf(v.model) === model && (isCustom || keyOf(v.color) === color)) ??
     product.variants.find((v) => keyOf(v.model) === model);
-  const noPrice = !variant || variant.priceCad == null;
+  const noPrice = !variant || variant.priceInr == null;
   const outOfStock = variant?.stock === 0;
   const canBuy = !!variant && !noPrice && !outOfStock;
 
@@ -81,7 +81,7 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
   const livePhotos = product.images.filter((i) => i.type === "live");
   const galleryImages = product.images.filter((i) => i.type !== "real_space");
 
-  const fmtDate = (d: Date) => d.toLocaleDateString(lang === "fr" ? "fr-CA" : "en-CA", { month: "short", day: "numeric" });
+  const fmtDate = (d: Date) => d.toLocaleDateString(lang === "fr" ? "fr-FR" : "en-IN", { month: "short", day: "numeric" });
   const delivery =
     product.leadMin != null && product.leadMax != null
       ? (() => {
@@ -146,7 +146,7 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
               <span className="inline-flex h-7 self-start items-center gap-1.5 rounded-full bg-gold-soft px-3 text-xs font-bold text-gold">★ {t("card.experiences", { n: product.reviewCount })}</span>
             )}
             <div className="text-[28px] font-extrabold" aria-live="polite">
-              {variant ? <Price cad={variant.priceCad} /> : <Missing field="variants" />}
+              {variant ? <Price cad={variant.priceInr} /> : <Missing field="variants" />}
             </div>
 
             <div className="rounded-tile border border-line bg-white">
@@ -199,7 +199,7 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
                         )}
                       >
                         <T text={label} field="model" fallback />
-                        <span className="flex-none text-xs text-muted">{v?.priceCad != null ? <Price cad={v.priceCad} withCode={false} /> : <Missing field="price" />}</span>
+                        <span className="flex-none text-xs text-muted">{v?.priceInr != null ? <Price cad={v.priceInr} withCode={false} /> : <Missing field="price" />}</span>
                       </button>
                     );
                   })}
@@ -384,7 +384,7 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
           <Btn size="lg" disabled={!canBuy} onClick={add} tabIndex={showMini ? 0 : -1} className="flex-1 sm:flex-none">
             {canBuy ? (
               <>
-                {t("product.addToCart")} · <Price cad={(variant?.priceCad ?? 0) * qty} withCode={false} />
+                {t("product.addToCart")} · <Price cad={(variant?.priceInr ?? 0) * qty} withCode={false} />
               </>
             ) : outOfStock ? (
               t("product.outOfStock")

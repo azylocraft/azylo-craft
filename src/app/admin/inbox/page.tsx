@@ -50,7 +50,7 @@ export default function AdminInbox() {
             <thead className="border-b border-line text-left text-xs uppercase tracking-[.1em] text-muted"><tr><th className="p-4">Email</th><th className="p-4">Source</th><th className="p-4">Status</th><th className="p-4">Since</th></tr></thead>
             <tbody>
               {rows.map((r) => (
-                <tr key={r.id} className="border-b border-line2"><td className="p-4">{r.email}</td><td className="p-4">{r.source}</td><td className="p-4">{r.subscribed ? <Badge tone="green">Subscribed</Badge> : <Badge tone="grey">Unsubscribed</Badge>}</td><td className="p-4">{new Date(r.created_at).toLocaleDateString("en-CA")}</td></tr>
+                <tr key={r.id} className="border-b border-line2"><td className="p-4">{r.email}</td><td className="p-4">{r.source}</td><td className="p-4">{r.subscribed ? <Badge tone="green">Subscribed</Badge> : <Badge tone="grey">Unsubscribed</Badge>}</td><td className="p-4">{new Date(r.created_at).toLocaleDateString("en-IN")}</td></tr>
               ))}
             </tbody>
           </table>
@@ -67,7 +67,7 @@ export default function AdminInbox() {
                 <div className="flex items-center gap-2">
                   {r.status === "new" && <Badge>New</Badge>}
                   {r.source === "chat" && <Badge tone="grey">Chat</Badge>}
-                  <span className="text-xs text-muted">{new Date(r.created_at).toLocaleString("en-CA")}</span>
+                  <span className="text-xs text-muted">{new Date(r.created_at).toLocaleString("en-IN")}</span>
                 </div>
               </div>
               {tab === "questions" && r.products && <p className="mt-1 text-xs text-muted">About: {r.products.name_en}</p>}

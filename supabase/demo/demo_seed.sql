@@ -51,26 +51,26 @@ begin
     returning id into pid;
 
     delete from public.product_variants where product_id = pid;
-    base := (p->>'price')::numeric;
+    base := round((p->>'price')::numeric * 60 / 100) * 100;  -- demo prices in INR
     if p->>'slug' = 'electric-recliner-sofa-bed' then
       -- Matches PROJECT_SPEC §8, including the two variants with no price.
       for c in 0..2 loop
-        insert into public.product_variants (product_id, model_en, color_en, color_fr, color_hex, material, price_cad, sort_order) values
-          (pid, 'Cat-claw fabric · Chaise lounge / Electric', colors->c->>0, colors->c->>1, colors->c->>2, 'fabric', 2820, c),
+        insert into public.product_variants (product_id, model_en, color_en, color_fr, color_hex, material, price_inr, sort_order) values
+          (pid, 'Cat-claw fabric · Chaise lounge / Electric', colors->c->>0, colors->c->>1, colors->c->>2, 'fabric', 169200, c),
           (pid, 'Cat-claw fabric · Chaise lounge / Electric / Massage', colors->c->>0, colors->c->>1, colors->c->>2, 'fabric', null, 10 + c),
           (pid, 'Imported leather · Chaise lounge / Electric', colors->c->>0, colors->c->>1, colors->c->>2, 'leather', null, 20 + c),
-          (pid, 'Imported leather · Chaise lounge / Electric / Massage', colors->c->>0, colors->c->>1, colors->c->>2, 'leather', 3510, 30 + c);
+          (pid, 'Imported leather · Chaise lounge / Electric / Massage', colors->c->>0, colors->c->>1, colors->c->>2, 'leather', 210600, 30 + c);
       end loop;
     else
       for m in 0..1 loop
         for c in 0..2 loop
-          insert into public.product_variants (product_id, model_en, color_en, color_fr, color_hex, material, price_cad, stock, sort_order)
+          insert into public.product_variants (product_id, model_en, color_en, color_fr, color_hex, material, price_inr, stock, sort_order)
           values (
             pid,
             case m when 0 then 'Standard fabric' else 'Performance fabric' end,
             colors->c->>0, colors->c->>1, colors->c->>2,
             'fabric',
-            round(base * (1 + m * 0.15), 2),
+            round(base * (1 + m * 0.15) / 100) * 100,
             case when i = 15 and c = 2 then 0 else null end,   -- one out-of-stock demo variant
             m * 10 + c
           );
@@ -102,7 +102,7 @@ update public.store_settings set
   phone = '+1 514 555-0182',
   address = '4200 Rue Saint-Denis, Montréal, QC H2J 2K8',
   opening_hours_en = 'Mon–Fri 9:00–18:00 · Sat 10:00–16:00',
-  shipping_methods = '[{"code":"standard","label_en":"Free standard delivery","label_fr":"Livraison standard gratuite","price_cad":0,"days_min":45,"days_max":55}]',
+  shipping_methods = '[{"code":"standard","label_en":"Free standard delivery","label_fr":"Livraison standard gratuite","price_inr":0,"days_min":45,"days_max":55}]',
   is_demo = true
 where id = 1;
 
@@ -142,7 +142,7 @@ insert into public.faqs (slug, faq_group, question_en, answer_en, sort_order, is
 
 -- Discount code for testing
 delete from public.discounts where is_demo;
-insert into public.discounts (code, kind, value, min_subtotal_cad, is_demo) values ('WELCOME10', 'percent', 10, 500, true);
+insert into public.discounts (code, kind, value, min_subtotal_inr, is_demo) values ('WELCOME10', 'percent', 10, 30000, true);
 
 -- Demo policy bodies (replace with your own text in Admin → Pages)
 update public.pages set body_en = E'**Demo policy text — replace this in Admin → Pages before launch.**\n\n## Overview\nThis placeholder shows how a policy page is laid out: a lead sentence, then sections separated by dividers.\n\n## Section one\nDemo paragraph. Contact us at [the contact page](/pages/contact) with any question.\n\n## Section two\n- Demo point one\n- Demo point two\n- Demo point three'

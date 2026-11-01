@@ -16,7 +16,7 @@ import {
 const CARD_SELECT = `
   id, slug, name_en, name_fr, eyebrow_en, eyebrow_fr, chips, functions, is_new, is_best_seller, is_featured,
   placeholder_tone, sort_order, created_at,
-  product_variants ( price_cad, stock, material, color_en, is_active ),
+  product_variants ( price_inr, stock, material, color_en, is_active ),
   product_images ( storage_path, image_type, sort_order ),
   reviews ( count )
 `;
@@ -30,15 +30,15 @@ const studioImages = (row: Row) =>
 
 export function toCard(row: Row): ProductCardData {
   const prices = (row.product_variants ?? [])
-    .filter((v: Row) => v.is_active !== false && v.price_cad != null)
-    .map((v: Row) => Number(v.price_cad));
+    .filter((v: Row) => v.is_active !== false && v.price_inr != null)
+    .map((v: Row) => Number(v.price_inr));
   const imgs = studioImages(row);
   return {
     id: row.id,
     slug: row.slug,
     name: tx(row.name_en, row.name_fr),
     eyebrow: tx(row.eyebrow_en, row.eyebrow_fr),
-    fromPriceCad: prices.length ? Math.min(...prices) : null,
+    fromPriceInr: prices.length ? Math.min(...prices) : null,
     isNew: !!row.is_new,
     isBestSeller: !!row.is_best_seller,
     reviewCount: row.reviews?.[0]?.count ?? 0,
@@ -144,7 +144,7 @@ export async function getProduct(slug: string): Promise<ProductDetail | null> {
       color: tx(v.color_en, v.color_fr),
       colorHex: v.color_hex,
       material: v.material,
-      priceCad: v.price_cad == null ? null : Number(v.price_cad),
+      priceInr: v.price_inr == null ? null : Number(v.price_inr),
       stock: v.stock,
     }));
   const images = [...(row.product_images ?? [])]

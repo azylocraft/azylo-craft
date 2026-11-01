@@ -40,7 +40,7 @@ export function parseListing(sp: SP): ListingParams {
 
 export function applyListing(rows: { card: ProductCardData; extras: CardRowExtras }[], p: ListingParams) {
   const filtered = rows.filter(({ card, extras }) => {
-    const price = card.fromPriceCad;
+    const price = card.fromPriceInr;
     if (p.min != null && (price == null || price < p.min)) return false;
     if (p.max != null && (price == null || price > p.max)) return false;
     if (p.material.length && !p.material.some((m) => extras.materials.includes(m))) return false;
@@ -53,7 +53,7 @@ export function applyListing(rows: { card: ProductCardData; extras: CardRowExtra
     const x = f(a), y = f(b);
     return x < y ? -1 : x > y ? 1 : 0;
   };
-  const priceOr = (r: (typeof rows)[number], dflt: number) => r.card.fromPriceCad ?? dflt;
+  const priceOr = (r: (typeof rows)[number], dflt: number) => r.card.fromPriceInr ?? dflt;
   const sorted = [...filtered].sort(
     {
       featured: by((r) => r.extras.featuredOrder),
