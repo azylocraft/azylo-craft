@@ -47,10 +47,28 @@ export const str = (v: unknown, max: number) => (typeof v === "string" ? v.trim(
 
 /** Sends through Resend when RESEND_API_KEY is set; otherwise logs and skips (never fails the caller). */
 export async function sendEmail(to: string, subject: string, html: string, replyTo?: string) {
+  if (!to) {
+    console.log(`email skipped (no recipient): ${subject}`);
+    return { sent: false };
+  }
+  // Gmail SMTP (port 465 — Supabase blocks 25/587) until a verified domain is set up in Resend.
+  const gmailUser = Deno.env.get("GMAIL_USER");
+  const gmailPass = Deno.env.get("GMAIL_APP_PASSWORD");
+  if (gmailUser && gmailPass) {
+    try {
+      const nodemailer = (await import("npm:nodemailer@6.9.16")).default;
+      const transport = nodemailer.createTransport({ host: "smtp.gmail.com", port: 465, secure: true, auth: { user: gmailUser, pass: gmailPass } });
+      await transport.sendMail({ from: `AZYLO <${gmailUser}>`, to, subject, html, replyTo });
+      return { sent: true };
+    } catch (e) {
+      console.error("gmail send failed", e);
+      return { sent: false };
+    }
+  }
   const key = Deno.env.get("RESEND_API_KEY");
   const from = Deno.env.get("EMAIL_FROM") ?? "AZYLO <onboarding@resend.dev>";
-  if (!key || !to) {
-    console.log(`email skipped (no key or recipient): ${subject}`);
+  if (!key) {
+    console.log(`email skipped (no email provider configured): ${subject}`);
     return { sent: false };
   }
   try {
