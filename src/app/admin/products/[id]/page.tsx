@@ -8,6 +8,7 @@ import { AdminTitle, Panel } from "@/components/admin/AdminShell";
 import { MediaManager, type Img, type Vid } from "@/components/admin/MediaManager";
 import { ComparisonEditor } from "@/components/admin/ComparisonEditor";
 import { MarkdownField } from "@/components/admin/MarkdownField";
+import { ProductReviews } from "@/components/admin/ProductReviews";
 import { OfferEditor } from "@/components/admin/OfferEditor";
 import { Btn, BtnLink } from "@/components/ui/primitives";
 import { supabaseBrowser } from "@/lib/supabase/client";
@@ -198,6 +199,7 @@ export default function ProductEditor() {
 
       <OfferEditor productId={id} />
       <ComparisonEditor productId={id} />
+      <ProductReviews productId={id} productName={p.name_en ?? "This product"} />
 
       <Panel title="Variants & inventory" className="mt-5" actions={<Btn size="sm" kind="light" iconL={Plus} onClick={() => setVariants([...variants, { model_en: "", color_en: "", color_hex: "#C9B48F", material: "fabric", price_inr: "", compare_at_inr: "", stock: "", sku: "", is_active: true }])}>Add variant</Btn>}>
         <p className="mb-3 text-xs text-muted">Price in INR (empty = MISSING: price, can&apos;t be bought). MRP / was price is optional and shown struck through — it must be a genuine earlier or regular price. Stock empty = made to order; 0 = out of stock.</p>
