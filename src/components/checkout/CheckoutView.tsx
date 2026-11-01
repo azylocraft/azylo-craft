@@ -155,7 +155,8 @@ export function CheckoutView() {
       setState("paying");
       const paid = await payWithRazorpay({
         keyId: data.keyId, razorpayOrderId: data.razorpayOrderId, amount: data.amount, currency: data.currency, orderNumber: data.orderNumber,
-        prefill: { name: `${ship.first_name} ${ship.last_name}`, email, contact: ship.phone },
+        // Razorpay expects the mobile number with the country code (+91…).
+        prefill: { name: `${ship.first_name} ${ship.last_name}`, email, contact: ship.phone ? `+91${ship.phone.replace(/\D/g, "").slice(-10)}` : undefined },
       });
       setState("verifying");
       const v = await sb.functions.invoke("checkout", { body: { action: "verify", ...paid } });
