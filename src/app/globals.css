@@ -1,0 +1,111 @@
+@import "tailwindcss";
+
+/* Values come from src/theme/tokens.ts (injected as --az-* in layout.tsx). */
+@theme inline {
+  --color-bg: var(--az-bg);
+  --color-bg2: var(--az-bg2);
+  --color-card: var(--az-card);
+  --color-ink: var(--az-ink);
+  --color-ink2: var(--az-ink2);
+  --color-muted: var(--az-muted);
+  --color-faint: var(--az-faint);
+  --color-line: var(--az-line);
+  --color-line2: var(--az-line2);
+  --color-gold: var(--az-gold);
+  --color-gold-soft: var(--az-gold-soft);
+  --color-gold-line: var(--az-gold-line);
+  --color-gold-bright: var(--az-gold-bright);
+  --color-cream: var(--az-cream);
+  --color-dark: var(--az-dark);
+  --color-dark2: var(--az-dark2);
+  --color-dark-line: var(--az-dark-line);
+  --color-dark-field: var(--az-dark-field);
+  --color-on-dark: var(--az-on-dark);
+  --color-on-dark-muted: var(--az-on-dark-muted);
+  --color-on-dark-faint: var(--az-on-dark-faint);
+  --color-green: var(--az-green);
+  --color-green-soft: var(--az-green-soft);
+  --color-blue: var(--az-blue);
+  --color-red: var(--az-red);
+  --color-red-soft: var(--az-red-soft);
+  --color-skeleton: var(--az-skeleton);
+  --color-skeleton-hi: var(--az-skeleton-hi);
+
+  --font-sans: var(--font-manrope), system-ui, sans-serif;
+  --font-serif: var(--font-instrument-serif), Georgia, serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+
+  --shadow-card: var(--az-shadow-card);
+  --shadow-float: var(--az-shadow-float);
+  --shadow-soft: var(--az-shadow-soft);
+  --shadow-bar: var(--az-shadow-bar);
+
+  --radius-field: var(--az-radius-field);
+  --radius-tile: var(--az-radius-tile);
+  --radius-card: var(--az-radius-card);
+  --radius-panel: var(--az-radius-panel);
+  --radius-block: var(--az-radius-block);
+  --radius-section: var(--az-radius-section);
+  --radius-modal: var(--az-radius-modal);
+  --radius-hero: var(--az-radius-hero);
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--az-bg);
+  color: var(--az-ink);
+  font-family: var(--font-manrope), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--az-gold);
+  outline-offset: 2px;
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+.text-pretty {
+  text-wrap: pretty;
+}
+
+@keyframes az-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.az-skeleton {
+  background: linear-gradient(90deg, var(--az-skeleton), var(--az-skeleton-hi), var(--az-skeleton));
+  background-size: 200% 100%;
+  animation: az-shimmer 1.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Admin-authored markdown (articles, policies, accordions) */
+.az-prose { color: var(--az-ink2); font-size: 15px; line-height: 1.7; }
+.az-prose > * + * { margin-top: 0.9em; }
+.az-prose h2 { color: var(--az-ink); font-size: 26px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; margin-top: 1.8em; scroll-margin-top: 160px; }
+.az-prose h3 { color: var(--az-ink); font-size: 17px; font-weight: 800; margin-top: 1.4em; }
+.az-prose ul { list-style: disc; padding-left: 1.3em; }
+.az-prose ol { list-style: decimal; padding-left: 1.3em; }
+.az-prose li + li { margin-top: 0.35em; }
+.az-prose a { color: var(--az-gold); text-decoration: underline; text-underline-offset: 3px; }
+.az-prose strong { color: var(--az-ink); }
+.az-prose blockquote { border-left: 3px solid var(--az-gold); background: var(--az-gold-soft); padding: 14px 18px; border-radius: 0 14px 14px 0; }
+.az-prose img { border-radius: 18px; width: 100%; }
+.az-prose hr { border: 0; border-top: 1px solid var(--az-line); }
+
+/* Form field base (design Field: 52px, radius 14, line border) */
+.field { width: 100%; min-height: 52px; border-radius: var(--az-radius-field); border: 1px solid var(--az-line); background: #fff; padding: 0 16px; font-size: 14px; color: var(--az-ink); outline: none; }
+.field:focus { border-color: var(--az-ink); }
+textarea.field { padding-top: 14px; padding-bottom: 14px; }
+select.field { appearance: none; background-image: linear-gradient(45deg, transparent 50%, var(--az-muted) 50%), linear-gradient(135deg, var(--az-muted) 50%, transparent 50%); background-position: calc(100% - 20px) 50%, calc(100% - 15px) 50%; background-size: 5px 5px; background-repeat: no-repeat; padding-right: 40px; }

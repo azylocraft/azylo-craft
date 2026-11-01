@@ -1,0 +1,228 @@
+import clsx from "clsx";
+import Link from "next/link";
+import type { LucideIcon } from "lucide-react";
+import type { ComponentProps, ReactNode } from "react";
+
+/* Typography ------------------------------------------------------------ */
+
+export function Serif({ children, gold, className }: { children: ReactNode; gold?: boolean; className?: string }) {
+  return (
+    <span className={clsx("font-serif font-normal italic tracking-normal", gold && "text-gold", className)}>
+      {children}
+    </span>
+  );
+}
+
+export function Eyebrow({
+  children,
+  line = true,
+  center,
+  className,
+}: {
+  children: ReactNode;
+  line?: boolean;
+  center?: boolean;
+  className?: string;
+}) {
+  return (
+    <div
+      className={clsx(
+        "flex items-center gap-3 text-[11px] font-bold uppercase tracking-[.18em] text-gold",
+        center && "justify-center",
+        className,
+      )}
+    >
+      {line && <span aria-hidden className="h-px w-7 bg-current" />}
+      {children}
+      {line && center && <span aria-hidden className="h-px w-7 bg-current" />}
+    </div>
+  );
+}
+
+type HeadingTag = "h1" | "h2" | "h3" | "div";
+export function H({ as: Tag = "h2", children, className }: { as?: HeadingTag; children: ReactNode; className?: string }) {
+  return (
+    <Tag className={clsx("text-balance font-extrabold leading-[1.04] tracking-[-0.035em]", className)}>{children}</Tag>
+  );
+}
+
+export function P({ children, className }: { children: ReactNode; className?: string }) {
+  return <p className={clsx("m-0 text-pretty text-[15px] leading-[1.65] text-muted", className)}>{children}</p>;
+}
+
+/* Buttons --------------------------------------------------------------- */
+
+export type BtnKind = "dark" | "outline" | "light" | "gold" | "ghostW" | "white";
+export type BtnSize = "sm" | "md" | "lg";
+
+const btnKinds: Record<BtnKind, string> = {
+  dark: "bg-ink text-white border-ink hover:bg-ink2",
+  outline: "bg-transparent text-ink border-ink hover:bg-ink hover:text-white",
+  light: "bg-white text-ink border-line hover:border-ink",
+  gold: "bg-gold text-white border-gold hover:brightness-110",
+  ghostW: "bg-transparent text-white border-white/50 hover:border-white hover:bg-white/10",
+  white: "bg-white text-ink border-white hover:bg-bg2",
+};
+const btnSizes: Record<BtnSize, string> = {
+  sm: "h-9 px-4 text-[13px]",
+  md: "h-[46px] px-[26px] text-sm",
+  lg: "h-[54px] px-[26px] text-sm",
+};
+
+export function btnClass(kind: BtnKind = "dark", size: BtnSize = "md", full?: boolean) {
+  return clsx(
+    "inline-flex items-center justify-center gap-2.5 whitespace-nowrap rounded-full border font-bold transition-colors",
+    "disabled:cursor-not-allowed disabled:border-line disabled:bg-line2 disabled:text-faint",
+    btnKinds[kind],
+    btnSizes[size],
+    full && "w-full",
+  );
+}
+
+type BtnOwn = { kind?: BtnKind; size?: BtnSize; full?: boolean; icon?: LucideIcon; iconL?: LucideIcon };
+
+export function Btn({ kind, size, full, icon: Icon, iconL: IconL, className, children, ...rest }: BtnOwn & ComponentProps<"button">) {
+  return (
+    <button type="button" className={clsx(btnClass(kind, size, full), className)} {...rest}>
+      {IconL && <IconL size={16} aria-hidden />}
+      {children}
+      {Icon && <Icon size={16} aria-hidden />}
+    </button>
+  );
+}
+
+export function BtnLink({ kind, size, full, icon: Icon, iconL: IconL, className, children, ...rest }: BtnOwn & ComponentProps<typeof Link>) {
+  return (
+    <Link className={clsx(btnClass(kind, size, full), className)} {...rest}>
+      {IconL && <IconL size={16} aria-hidden />}
+      {children}
+      {Icon && <Icon size={16} aria-hidden />}
+    </Link>
+  );
+}
+
+/* Small pieces ---------------------------------------------------------- */
+
+export function Chip({ children, active, dot, className }: { children: ReactNode; active?: boolean; dot?: boolean; className?: string }) {
+  return (
+    <span
+      className={clsx(
+        "inline-flex h-9 items-center gap-2 whitespace-nowrap rounded-full border px-4 text-[13px] font-semibold",
+        active ? "border-ink bg-ink text-white" : "border-line bg-white text-ink2",
+        className,
+      )}
+    >
+      {dot && <span aria-hidden className="size-[5px] rounded-full bg-gold" />}
+      {children}
+    </span>
+  );
+}
+
+export type RoundKind = "outline" | "dark" | "ghost";
+const roundKinds: Record<RoundKind, string> = {
+  outline: "bg-white text-ink border-line",
+  dark: "bg-ink text-white border-ink",
+  ghost: "bg-transparent text-faint border-line",
+};
+
+export function Round({
+  icon: Icon,
+  size = 44,
+  kind = "outline",
+  className,
+}: {
+  icon: LucideIcon;
+  size?: number;
+  kind?: RoundKind;
+  className?: string;
+}) {
+  return (
+    <span
+      aria-hidden
+      style={{ width: size, height: size }}
+      className={clsx("inline-flex flex-none items-center justify-center rounded-full border", roundKinds[kind], className)}
+    >
+      <Icon size={Math.round(size * 0.4)} />
+    </span>
+  );
+}
+
+export type BadgeTone = "gold" | "dark" | "blue" | "green" | "red" | "grey";
+const badgeTones: Record<BadgeTone, string> = {
+  gold: "bg-gold-soft text-gold",
+  dark: "bg-ink text-white",
+  blue: "bg-blue text-white",
+  green: "bg-green-soft text-green",
+  red: "bg-red-soft text-red",
+  grey: "bg-line2 text-muted",
+};
+
+export function Badge({ children, tone = "gold", className }: { children: ReactNode; tone?: BadgeTone; className?: string }) {
+  return (
+    <span
+      className={clsx(
+        "inline-flex h-[22px] items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 text-[10.5px] font-bold uppercase tracking-[.06em]",
+        badgeTones[tone],
+        className,
+      )}
+    >
+      {children}
+    </span>
+  );
+}
+
+export function Card({ children, className }: { children: ReactNode; className?: string }) {
+  return <div className={clsx("rounded-block border border-line2 bg-white p-7 shadow-card", className)}>{children}</div>;
+}
+
+export function Skel({ className }: { className?: string }) {
+  return <div aria-hidden className={clsx("az-skeleton h-3.5 rounded-lg", className)} />;
+}
+
+export function Divider({ className }: { className?: string }) {
+  return <div aria-hidden className={clsx("h-px bg-line", className)} />;
+}
+
+export function Logo({ className, light, size = 20 }: { className?: string; light?: boolean; size?: number }) {
+  return (
+    <span
+      className={clsx("inline-flex items-center gap-2 font-extrabold tracking-[.34em]", light ? "text-white" : "text-ink", className)}
+      style={{ fontSize: size }}
+    >
+      AZYLO
+      <span aria-hidden className="h-0.5 w-3.5 bg-gold" style={{ marginTop: size * 0.45 }} />
+    </span>
+  );
+}
+
+/** Visible placeholder for any missing data, text or image (global content rule). */
+export function Missing({ field, className, block }: { field: string; className?: string; block?: boolean }) {
+  return (
+    <span
+      className={clsx(
+        "inline-flex items-center rounded-md border border-dashed border-red bg-red-soft px-2 py-0.5 font-mono text-[11px] font-medium uppercase tracking-[.04em] text-red",
+        block && "flex w-full justify-center",
+        className,
+      )}
+    >
+      MISSING: {field}
+    </span>
+  );
+}
+
+/** Image slot that shows a MISSING placeholder until a real image URL exists. */
+export function MissingImage({ field, className, dark }: { field: string; className?: string; dark?: boolean }) {
+  return (
+    <div
+      role="img"
+      aria-label={`MISSING: ${field}`}
+      className={clsx(
+        "relative flex items-center justify-center overflow-hidden",
+        dark ? "bg-dark2" : "bg-cream",
+        className,
+      )}
+    >
+      <Missing field={field} />
+    </div>
+  );
+}
