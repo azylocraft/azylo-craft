@@ -42,7 +42,7 @@ function SecHead({ eb, title, sub, right }: { eb?: string; title: React.ReactNod
         <H className="text-[30px] md:text-[40px]">{title}</H>
       </div>
       <div className="flex flex-col items-start gap-5 md:pt-6">
-        {sub && <P className="max-w-[420px] lowercase text-ink2">{sub}</P>}
+        {sub && <P className="max-w-[420px] text-ink2">{sub}</P>}
         {right && <div className="flex flex-wrap items-center gap-2.5">{right}</div>}
       </div>
     </div>

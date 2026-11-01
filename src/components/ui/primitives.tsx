@@ -37,7 +37,7 @@ export function Eyebrow({
 type HeadingTag = "h1" | "h2" | "h3" | "div";
 export function H({ as: Tag = "h2", children, className }: { as?: HeadingTag; children: ReactNode; className?: string }) {
   return (
-    <Tag className={clsx("az-h text-balance font-medium leading-[1.04] tracking-[-0.04em]", className)}>{children}</Tag>
+    <Tag className={clsx("az-h text-balance font-[800] leading-[1.04] tracking-[-0.04em]", className)}>{children}</Tag>
   );
 }
 

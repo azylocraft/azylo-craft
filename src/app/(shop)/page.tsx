@@ -1,5 +1,6 @@
-import { Hero, TrustStrip } from "@/components/home/Hero";
-import { AppPromo, BestSellers, ExploreTypes, FitLife, ImageSearch, JournalRow, MaterialsTeaser, NewArrivals, type TypeTab } from "@/components/home/HomeSections";
+import { Hero } from "@/components/home/Hero";
+import { HowItWorks, Obstacles, Outcomes, WhyItMatters } from "@/components/home/Story";
+import { BestSellers, ExploreTypes, JournalRow, MaterialsTeaser, NewArrivals, type TypeTab } from "@/components/home/HomeSections";
 import { collectionCounts, listArticles, listCards, listMaterials } from "@/lib/catalog";
 
 export const revalidate = 60;
@@ -27,13 +28,13 @@ export default async function HomePage() {
   return (
     <>
       <Hero featured={f ? { name: f.name.en ?? "", slug: f.slug, imageUrl: f.image ?? undefined, tone: f.tone } : null} />
-      <TrustStrip />
+      <Outcomes />
       <BestSellers products={best} />
+      <Obstacles />
+      <HowItWorks />
       <ExploreTypes tabs={tabs} />
       <NewArrivals products={fresh} />
-      <AppPromo photo={best[2]?.image ?? f?.image} />
-      <ImageSearch photo={best[1]?.image ?? f?.image} />
-      <FitLife photo={best[0]?.image ?? f?.image} />
+      <WhyItMatters />
       <MaterialsTeaser materials={materials.filter((m) => m.category === "upholstery").map((m) => ({ slug: m.slug, name: m.name, image: m.sofaImage }))} />
       <JournalRow articles={journal.articles} />
     </>

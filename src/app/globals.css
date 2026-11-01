@@ -139,8 +139,7 @@ select.field { appearance: none; background-image: linear-gradient(45deg, transp
    Bau theme: lowercase display type, olive accents, motion
    --------------------------------------------------------------------- */
 
-/* Headings and buttons are lowercase, like the wordmark. */
-.az-h,
+/* Buttons are lowercase, like the wordmark; headings stay in bold sentence case. */
 .az-btn {
   text-transform: lowercase;
 }
@@ -181,11 +180,11 @@ a:hover .az-logo-dot { animation: az-dot-hop .6s cubic-bezier(.3, 1.6, .5, 1); }
 
 /* Cards: slow image zoom + lift. */
 .az-card { transition: transform .5s cubic-bezier(.2, .7, .2, 1), box-shadow .5s; }
-.az-card img { transition: transform .9s cubic-bezier(.2, .7, .2, 1), opacity .3s; }
+.az-card img, .az-zoom img { transition: transform .9s cubic-bezier(.2, .7, .2, 1), opacity .3s; }
 .az-card:hover { transform: translateY(-4px); }
-.az-card:hover img { transform: scale(1.05); }
-.az-card .az-card-go { transition: transform .4s cubic-bezier(.2, .7, .2, 1); }
-.az-card:hover .az-card-go { transform: rotate(45deg); }
+.az-card:hover img, .az-zoom:hover img { transform: scale(1.05); }
+.az-card .az-card-go, .az-zoom .az-card-go { transition: transform .4s cubic-bezier(.2, .7, .2, 1); }
+.az-card:hover .az-card-go, .az-zoom:hover .az-card-go { transform: rotate(45deg); }
 
 /* Hero: words rise out of a mask, the photo settles in. */
 .az-mask { display: inline-block; overflow: hidden; vertical-align: bottom; padding-bottom: .06em; }
