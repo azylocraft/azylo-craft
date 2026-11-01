@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, ExternalLink, Minus, TrendingDown } from "lucide-react";
+import { Check, ExternalLink, Minus, Sparkles, TrendingDown } from "lucide-react";
 import { Price, useLocale } from "@/components/shop/ShopContext";
 import { Eyebrow, H, P, Serif } from "@/components/ui/primitives";
 import type { Comparison } from "@/lib/types";
@@ -10,25 +10,36 @@ export function PriceCompareHint({ price, comparisons }: { price: number | null;
   if (price == null || comparisons.length === 0) return null;
   const cheapest = comparisons.reduce((a, c) => (c.priceInr < a.priceInr ? c : a), comparisons[0]);
   const diff = cheapest.priceInr - price;
+
+  if (diff <= 0)
+    return (
+      <a href="#compare" className="-mt-2 flex items-center gap-2 self-start text-[13px] text-muted underline hover:text-ink">
+        Compared with {comparisons.length} other seller{comparisons.length > 1 ? "s" : ""} · See comparison ↓
+      </a>
+    );
+
+  const pct = Math.round((diff / cheapest.priceInr) * 100);
   return (
     <a
       href="#compare"
-      className="-mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 self-start rounded-field border border-green/30 bg-green-soft px-3.5 py-2 text-[13px] text-ink hover:border-green"
+      className="az-deal group relative -mt-1 flex w-full items-center gap-4 overflow-hidden rounded-tile border border-green/40 bg-[linear-gradient(120deg,var(--az-green-soft),#F3FAF5_55%,var(--az-gold-soft))] p-4 text-ink shadow-soft transition-transform hover:-translate-y-0.5 md:p-5"
     >
-      <TrendingDown size={16} className="flex-none text-green" aria-hidden />
-      {diff > 0 ? (
-        <span>
-          <b className="text-green">
-            <Price cad={diff} /> less
-          </b>{" "}
-          than {cheapest.seller} (<Price cad={cheapest.priceInr} />)
+      <span className="flex size-12 flex-none items-center justify-center rounded-full bg-green text-white shadow-soft md:size-14">
+        <Sparkles size={24} aria-hidden />
+      </span>
+      <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+        <span className="text-[11px] font-extrabold uppercase tracking-[.16em] text-green">Surprise · you save</span>
+        <span className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
+          <span className="text-[26px] font-extrabold leading-none tracking-[-0.02em] text-green md:text-[30px]">
+            <Price cad={diff} />
+          </span>
+          <span className="rounded-full bg-green px-2.5 py-1 text-xs font-extrabold text-white">{pct}% less</span>
         </span>
-      ) : (
-        <span>
-          Compared with {comparisons.length} other seller{comparisons.length > 1 ? "s" : ""}
+        <span className="text-[13px] text-muted">
+          than {cheapest.seller} at <s className="decoration-red/70">{<Price cad={cheapest.priceInr} />}</s>
+          <span className="ml-2 font-bold text-ink underline underline-offset-2 group-hover:text-green">See comparison ↓</span>
         </span>
-      )}
-      <span className="font-bold underline">See comparison ↓</span>
+      </span>
     </a>
   );
 }
