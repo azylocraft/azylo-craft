@@ -4,6 +4,8 @@ import clsx from "clsx";
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight, Info } from "lucide-react";
 import { Media } from "@/components/shop/Media";
+import { StudioHero } from "@/components/shop/StudioHero";
+import { mediaUrl } from "@/lib/media";
 import { T, useLocale, useText } from "@/components/shop/ShopContext";
 import { BtnLink, Eyebrow, H, Missing, P, Serif } from "@/components/ui/primitives";
 import { useT } from "@/lib/i18n";
@@ -33,6 +35,9 @@ const NAV = [
   ["layers", "materials.nav.layers"],
   ["checklist", "materials.nav.checklist"],
 ] as const;
+
+/** Studio cut-out used behind the Materials Guide title (uploaded to product-media/studio/). */
+const MATERIALS_HERO_CUTOUT = "studio/p006-cut.webp";
 
 const TONES = ["#E8E1D3", "#C9B48F", "#6B4F3A", "#B7A58E", "#D3C2AB", "#3B3630"];
 
@@ -112,7 +117,6 @@ export function MaterialsView({ materials }: { materials: Material[] }) {
     history.replaceState(null, "", `#${uph[i].slug}`);
   };
   const m = uph[tab];
-  const heroImage = uph.find((x) => x.slug === "boucle")?.sofaImage ?? uph.find((x) => x.sofaImage)?.sofaImage ?? null;
   const spec = (k: string) => {
     const s = m?.specs?.[k];
     return (lang === "fr" ? s?.fr : s?.en) ?? s?.en ?? null;
@@ -120,36 +124,30 @@ export function MaterialsView({ materials }: { materials: Material[] }) {
 
   return (
     <>
-      <section className="px-4 pt-6 md:px-12">
-        {/* Full-bleed photo hero; the image is the first upholstery material's sofa photo (editable in Admin → Materials). */}
-        <div className="relative isolate flex min-h-[560px] items-center overflow-hidden rounded-block bg-dark text-white md:rounded-hero lg:min-h-[660px]">
-          {heroImage && <img src={heroImage} alt="" className="az-settle absolute inset-0 -z-20 size-full object-cover" />}
-          <div aria-hidden className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(18,17,15,.55)_0%,rgba(18,17,15,.85)_100%)] md:bg-[linear-gradient(90deg,rgba(18,17,15,.9)_0%,rgba(18,17,15,.7)_42%,rgba(18,17,15,.15)_100%)]" />
-          <div className="flex max-w-[680px] flex-col gap-5 p-7 md:p-16 lg:pl-[7%]">
-            <div className="az-fade-up">
-              <Eyebrow>{t("materials.eyebrow")}</Eyebrow>
-            </div>
-            <H as="h1" className="az-fade-up text-[40px] text-white md:text-[64px] xl:text-[76px]">
-              {t("materials.heroTitle")} <Serif gold>{t("materials.heroAccent")}</Serif>
-            </H>
-            <div className="az-fade-up flex flex-col gap-5" style={{ ["--d" as string]: "250ms" }}>
-              <P className="max-w-[520px] text-[16px] text-on-dark">{t("materials.heroSub")}</P>
-              <div className="flex flex-wrap gap-3">
-                <BtnLink href="#upholstery" kind="white" icon={ArrowRight}>
-                  {t("materials.start")}
-                </BtnLink>
-                <BtnLink href={collectionHref("all")} kind="ghostW">
-                  {t("materials.shop")}
-                </BtnLink>
-              </div>
-              <p className="flex items-start gap-2 text-xs text-on-dark-muted">
-                <Info size={14} className="mt-px flex-none" aria-hidden />
-                {t("materials.disclaimer")}
-              </p>
-            </div>
-          </div>
+      <StudioHero
+        eyebrow={<Eyebrow>{t("materials.eyebrow")}</Eyebrow>}
+        title={
+          <>
+            {t("materials.heroTitle")} <span className="text-gold">{t("materials.heroAccent")}</span>
+          </>
+        }
+        cutout={mediaUrl(MATERIALS_HERO_CUTOUT)}
+        alt="Green upholstered sofa on a white background"
+      >
+        <P className="text-[16px]">{t("materials.heroSub")}</P>
+        <div className="flex flex-wrap justify-center gap-3">
+          <BtnLink href="#upholstery" icon={ArrowRight}>
+            {t("materials.start")}
+          </BtnLink>
+          <BtnLink href={collectionHref("all")} kind="outline">
+            {t("materials.shop")}
+          </BtnLink>
         </div>
-      </section>
+        <p className="flex items-start gap-2 text-xs text-muted">
+          <Info size={14} className="mt-px flex-none" aria-hidden />
+          {t("materials.disclaimer")}
+        </p>
+      </StudioHero>
 
       <nav aria-label={t("materials.navLabel")} className="sticky top-[60px] z-20 mt-6 overflow-x-auto px-4 md:top-[136px] md:px-12 [scrollbar-width:none]">
         <div className="flex w-max gap-1.5 rounded-full border border-line bg-white p-1.5 shadow-soft">
