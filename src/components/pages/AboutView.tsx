@@ -38,7 +38,7 @@ export function AboutView({ blocks }: { blocks: Blocks }) {
             </div>
           </div>
           <div className="flex flex-col justify-end gap-4 border-t border-dark-line pt-6 lg:border-l lg:border-t-0 lg:pl-10 lg:pt-0">
-            <p className="font-serif text-2xl italic text-gold-bright">{copy("statement")}</p>
+            <p className="text-2xl font-semibold tracking-[-0.03em] text-gold-bright">{copy("statement")}</p>
             <div className="flex flex-wrap gap-2">
               {["Purpose", "Proportion", "Durability"].map((c) => (
                 <span key={c} className="rounded-full border border-white/20 px-3 py-1.5 text-xs">
@@ -156,7 +156,7 @@ export function AboutView({ blocks }: { blocks: Blocks }) {
           <span aria-hidden className="pointer-events-none absolute inset-0 flex items-center justify-center text-[100px] font-extrabold tracking-[.3em] text-white/[.04] md:text-[220px]">
             AZYLO
           </span>
-          <p className="relative mx-auto max-w-[760px] font-serif text-[26px] italic leading-snug text-gold-bright md:text-[40px]">{copy("quote")}</p>
+          <p className="relative mx-auto max-w-[760px] text-[26px] font-semibold leading-snug tracking-[-0.03em] text-gold-bright md:text-[40px]">{copy("quote")}</p>
         </div>
       </section>
 

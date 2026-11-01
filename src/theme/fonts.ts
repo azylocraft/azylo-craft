@@ -1,17 +1,10 @@
-import { Instrument_Serif, JetBrains_Mono, Manrope } from "next/font/google";
+import { Inter_Tight, JetBrains_Mono } from "next/font/google";
 
-export const manrope = Manrope({
+/** Tight neo-grotesk used for everything: UI, headings and the "azylo." wordmark. */
+export const interTight = Inter_Tight({
   subsets: ["latin", "latin-ext"],
-  weight: ["400", "500", "600", "700", "800"],
-  variable: "--font-manrope",
-  display: "swap",
-});
-
-export const instrumentSerif = Instrument_Serif({
-  subsets: ["latin", "latin-ext"],
-  weight: "400",
-  style: ["normal", "italic"],
-  variable: "--font-instrument-serif",
+  weight: ["400", "500", "600", "700", "800", "900"],
+  variable: "--font-inter-tight",
   display: "swap",
 });
 
@@ -22,4 +15,4 @@ export const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
-export const fontVariables = `${manrope.variable} ${instrumentSerif.variable} ${jetbrainsMono.variable}`;
+export const fontVariables = `${interTight.variable} ${jetbrainsMono.variable}`;

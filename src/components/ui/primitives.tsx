@@ -7,7 +7,7 @@ import type { ComponentProps, ReactNode } from "react";
 
 export function Serif({ children, gold, className }: { children: ReactNode; gold?: boolean; className?: string }) {
   return (
-    <span className={clsx("font-serif font-normal italic tracking-normal", gold && "text-gold", className)}>
+    <span className={clsx("az-accent", gold && "text-gold", className)}>
       {children}
     </span>
   );
@@ -26,15 +26,10 @@ export function Eyebrow({
 }) {
   return (
     <div
-      className={clsx(
-        "flex items-center gap-3 text-[11px] font-bold uppercase tracking-[.18em] text-gold",
-        center && "justify-center",
-        className,
-      )}
+      data-line={line ? "" : undefined}
+      className={clsx("az-eb flex items-center gap-1 text-[12px] font-medium lowercase tracking-normal opacity-60", center && "justify-center", className)}
     >
-      {line && <span aria-hidden className="h-px w-7 bg-current" />}
       {children}
-      {line && center && <span aria-hidden className="h-px w-7 bg-current" />}
     </div>
   );
 }
@@ -42,7 +37,7 @@ export function Eyebrow({
 type HeadingTag = "h1" | "h2" | "h3" | "div";
 export function H({ as: Tag = "h2", children, className }: { as?: HeadingTag; children: ReactNode; className?: string }) {
   return (
-    <Tag className={clsx("text-balance font-extrabold leading-[1.04] tracking-[-0.035em]", className)}>{children}</Tag>
+    <Tag className={clsx("az-h text-balance font-bold leading-[1.02] tracking-[-0.045em]", className)}>{children}</Tag>
   );
 }
 
@@ -71,7 +66,7 @@ const btnSizes: Record<BtnSize, string> = {
 
 export function btnClass(kind: BtnKind = "dark", size: BtnSize = "md", full?: boolean) {
   return clsx(
-    "inline-flex items-center justify-center gap-2.5 whitespace-nowrap rounded-full border font-bold transition-colors",
+    "az-btn inline-flex items-center justify-center gap-2.5 whitespace-nowrap rounded-full border font-semibold transition-[background-color,color,border-color,transform] duration-300 active:scale-[.98]",
     "disabled:cursor-not-allowed disabled:border-line disabled:bg-line2 disabled:text-faint",
     btnKinds[kind],
     btnSizes[size],
@@ -81,22 +76,40 @@ export function btnClass(kind: BtnKind = "dark", size: BtnSize = "md", full?: bo
 
 type BtnOwn = { kind?: BtnKind; size?: BtnSize; full?: boolean; icon?: LucideIcon; iconL?: LucideIcon };
 
+/** Inverted circle that carries the trailing arrow (the "to gallery ↗" pill). */
+const arrowCircle: Record<BtnKind, string> = {
+  dark: "bg-white text-ink",
+  outline: "bg-ink text-white",
+  light: "bg-ink text-white",
+  gold: "bg-white text-gold",
+  ghostW: "bg-white text-ink",
+  white: "bg-ink text-white",
+};
+
+function BtnArrow({ Icon, kind = "dark" }: { Icon: LucideIcon; kind?: BtnKind }) {
+  return (
+    <span aria-hidden className={clsx("az-btn-ic ml-1 flex aspect-square h-[calc(100%-8px)] flex-none items-center justify-center rounded-full", arrowCircle[kind])}>
+      <Icon size={15} />
+    </span>
+  );
+}
+
 export function Btn({ kind, size, full, icon: Icon, iconL: IconL, className, children, ...rest }: BtnOwn & ComponentProps<"button">) {
   return (
-    <button type="button" className={clsx(btnClass(kind, size, full), className)} {...rest}>
+    <button type="button" className={clsx(btnClass(kind, size, full), Icon && "pr-1", className)} {...rest}>
       {IconL && <IconL size={16} aria-hidden />}
       {children}
-      {Icon && <Icon size={16} aria-hidden />}
+      {Icon && <BtnArrow Icon={Icon} kind={kind} />}
     </button>
   );
 }
 
 export function BtnLink({ kind, size, full, icon: Icon, iconL: IconL, className, children, ...rest }: BtnOwn & ComponentProps<typeof Link>) {
   return (
-    <Link className={clsx(btnClass(kind, size, full), className)} {...rest}>
+    <Link className={clsx(btnClass(kind, size, full), Icon && "pr-1", className)} {...rest}>
       {IconL && <IconL size={16} aria-hidden />}
       {children}
-      {Icon && <Icon size={16} aria-hidden />}
+      {Icon && <BtnArrow Icon={Icon} kind={kind} />}
     </Link>
   );
 }
@@ -183,14 +196,16 @@ export function Divider({ className }: { className?: string }) {
   return <div aria-hidden className={clsx("h-px bg-line", className)} />;
 }
 
+/** Wordmark: lowercase "azylo" in heavy Inter Tight with the round olive dot. */
 export function Logo({ className, light, size = 20 }: { className?: string; light?: boolean; size?: number }) {
+  const fs = Math.round(size * 1.45);
   return (
     <span
-      className={clsx("inline-flex items-center gap-2 font-extrabold tracking-[.34em]", light ? "text-white" : "text-ink", className)}
-      style={{ fontSize: size }}
+      className={clsx("az-logo inline-flex items-baseline font-black lowercase leading-none tracking-[-0.06em]", light ? "text-white" : "text-ink", className)}
+      style={{ fontSize: fs }}
     >
-      AZYLO
-      <span aria-hidden className="h-0.5 w-3.5 bg-gold" style={{ marginTop: size * 0.45 }} />
+      azylo
+      <span aria-hidden className="az-logo-dot ml-[0.04em] inline-block rounded-full bg-gold" style={{ width: fs * 0.27, height: fs * 0.27 }} />
     </span>
   );
 }

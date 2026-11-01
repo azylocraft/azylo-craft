@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Camera, Check, PenLine, Star, X } from "lucide-react";
 import { Field } from "@/components/product/ProductView";
@@ -13,6 +14,7 @@ const MAX_PHOTOS = 4;
 
 /** "Write a review" for customers who bought this product. Reviews are moderated before they appear. */
 export function WriteReview({ productId, productName }: { productId: string; productName: string }) {
+  const pathname = usePathname();
   const { user, profile } = useAuth();
   const [canReview, setCanReview] = useState<boolean | null>(null);
   const [open, setOpen] = useState(false);
@@ -26,7 +28,7 @@ export function WriteReview({ productId, productName }: { productId: string; pro
 
   if (!user)
     return (
-      <Link href={`/auth/login?next=${encodeURIComponent(typeof window !== "undefined" ? location.pathname : "/")}`} className="self-start text-sm font-bold underline">
+      <Link href={`/auth/login?next=${encodeURIComponent(pathname)}`} className="self-start text-sm font-bold underline">
         Bought this? Log in to write a review
       </Link>
     );
