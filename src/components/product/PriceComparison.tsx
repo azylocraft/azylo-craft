@@ -5,6 +5,34 @@ import { Price, useLocale } from "@/components/shop/ShopContext";
 import { Eyebrow, H, P, Serif } from "@/components/ui/primitives";
 import type { Comparison } from "@/lib/types";
 
+/** Compact line under the product price: savings vs the cheapest seller + link to the full table. */
+export function PriceCompareHint({ price, comparisons }: { price: number | null; comparisons: Comparison[] }) {
+  if (price == null || comparisons.length === 0) return null;
+  const cheapest = comparisons.reduce((a, c) => (c.priceInr < a.priceInr ? c : a), comparisons[0]);
+  const diff = cheapest.priceInr - price;
+  return (
+    <a
+      href="#compare"
+      className="-mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 self-start rounded-field border border-green/30 bg-green-soft px-3.5 py-2 text-[13px] text-ink hover:border-green"
+    >
+      <TrendingDown size={16} className="flex-none text-green" aria-hidden />
+      {diff > 0 ? (
+        <span>
+          <b className="text-green">
+            <Price cad={diff} /> less
+          </b>{" "}
+          than {cheapest.seller} (<Price cad={cheapest.priceInr} />)
+        </span>
+      ) : (
+        <span>
+          Compared with {comparisons.length} other seller{comparisons.length > 1 ? "s" : ""}
+        </span>
+      )}
+      <span className="font-bold underline">See comparison ↓</span>
+    </a>
+  );
+}
+
 function Yes({ on }: { on: boolean }) {
   return on ? <Check size={16} className="text-green" aria-label="Included" /> : <Minus size={16} className="text-faint" aria-label="Not included" />;
 }

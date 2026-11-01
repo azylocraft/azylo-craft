@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import { Gallery, Lightbox } from "@/components/product/Gallery";
 import { VideoModal } from "@/components/product/VideoModal";
-import { PriceComparison } from "@/components/product/PriceComparison";
+import { PriceCompareHint, PriceComparison } from "@/components/product/PriceComparison";
 import { RelatedCarousel } from "@/components/product/Related";
 import { Stepper } from "@/components/shop/CartParts";
 import { Crumb, RecentlyViewed } from "@/components/shop/Listing";
@@ -149,6 +149,7 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
             <div className="text-[28px] font-extrabold" aria-live="polite">
               {variant ? <Price cad={variant.priceInr} /> : <Missing field="variants" />}
             </div>
+            <PriceCompareHint price={variant?.priceInr ?? null} comparisons={product.comparisons} />
 
             <div className="rounded-tile border border-line bg-white">
               <div className="grid grid-cols-2 divide-x divide-line border-b border-line text-[13px] font-bold">
