@@ -13,11 +13,31 @@ import { useT } from "@/lib/i18n";
 import { useShop } from "@/lib/shop-store";
 import { supabaseBrowser } from "@/lib/supabase/client";
 
-export function Stepper({ value, onChange, small, label }: { value: number; onChange: (n: number) => void; small?: boolean; label: string }) {
+export function Stepper({
+  value,
+  onChange,
+  onRemove,
+  small,
+  label,
+}: {
+  value: number;
+  onChange: (n: number) => void;
+  /** When set, "−" at quantity 1 removes the line instead of being disabled. */
+  onRemove?: () => void;
+  small?: boolean;
+  label: string;
+}) {
   const h = small ? "h-9" : "h-12";
+  const removes = value <= 1 && !!onRemove;
   return (
     <span className={clsx("inline-flex items-center gap-1 rounded-full border border-line bg-white px-1.5", h)} role="group" aria-label={label}>
-      <button type="button" aria-label="Decrease quantity" disabled={value <= 1} onClick={() => onChange(value - 1)} className="flex size-7 items-center justify-center rounded-full text-muted hover:text-ink disabled:opacity-40">
+      <button
+        type="button"
+        aria-label={removes ? "Remove item" : "Decrease quantity"}
+        disabled={value <= 1 && !onRemove}
+        onClick={() => (removes ? onRemove!() : onChange(value - 1))}
+        className="flex size-7 items-center justify-center rounded-full text-muted hover:text-ink disabled:opacity-40"
+      >
         <Minus size={14} aria-hidden />
       </button>
       <span aria-live="polite" className="min-w-[18px] text-center text-sm font-bold">
@@ -119,7 +139,7 @@ export function CartLines({ compact }: { compact?: boolean }) {
                 </span>
               )}
               <div className="mt-1 flex items-center justify-between">
-                <Stepper small value={l.quantity} onChange={(n) => setQuantity(l.variantId, n)} label={t("cart.quantity")} />
+                <Stepper small value={l.quantity} onChange={(n) => setQuantity(l.variantId, n)} onRemove={() => setConfirm(l.variantId)} label={t("cart.quantity")} />
                 <b className="text-[13.5px]">{d ? <Price cad={d.priceInr == null ? null : d.priceInr * l.quantity} withCode={false} /> : null}</b>
               </div>
             </div>
