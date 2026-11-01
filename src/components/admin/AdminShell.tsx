@@ -3,7 +3,7 @@
 import clsx from "clsx";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ExternalLink, Inbox, LayoutGrid, Package, Settings, ShoppingBag, Star } from "lucide-react";
+import { ExternalLink, FileText, HelpCircle, Inbox, LayoutGrid, Package, Settings, ShoppingBag, Star } from "lucide-react";
 import { Logo } from "@/components/ui/primitives";
 
 const NAV = [
@@ -11,6 +11,8 @@ const NAV = [
   ["/admin/collections", "Collections", LayoutGrid],
   ["/admin/orders", "Orders", ShoppingBag],
   ["/admin/reviews", "Reviews", Star],
+  ["/admin/faqs", "FAQs", HelpCircle],
+  ["/admin/pages", "Pages", FileText],
   ["/admin/inbox", "Inbox", Inbox],
   ["/admin/settings", "Settings", Settings],
 ] as const;

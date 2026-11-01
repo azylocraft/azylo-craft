@@ -329,7 +329,8 @@
     "acc1": "Product overview",
     "acc2": "Delivery & access",
     "acc3": "Shipping, payment & returns",
-    "alsoLike": "You may also like"
+    "alsoLike": "You may also like",
+    "acc3Intro": "Find answers about delivery timelines, order changes, tracking, returns, and other important order information."
   },
   "faq": {
     "eyebrow": "AZYLO · Help center",
@@ -346,9 +347,9 @@
       "products": "Products"
     },
     "group": {
-      "shipping": "Shipping and payment",
-      "orders": "Orders and changes",
-      "returns": "Returns and refunds",
+      "shipping": "Shipping & payment",
+      "orders": "Order information & concerns",
+      "returns": "Returns & refunds",
       "products": "Products and customization"
     },
     "stillTitle": "Still need help?",

@@ -7,6 +7,7 @@ import { ArrowLeft, ExternalLink, Plus, Save, Trash2 } from "lucide-react";
 import { AdminTitle, Panel } from "@/components/admin/AdminShell";
 import { MediaManager, type Img, type Vid } from "@/components/admin/MediaManager";
 import { ComparisonEditor } from "@/components/admin/ComparisonEditor";
+import { MarkdownField } from "@/components/admin/MarkdownField";
 import { OfferEditor } from "@/components/admin/OfferEditor";
 import { Btn, BtnLink } from "@/components/ui/primitives";
 import { supabaseBrowser } from "@/lib/supabase/client";
@@ -147,8 +148,11 @@ export default function ProductEditor() {
             </div>
             <div className="mt-4 flex flex-col gap-4">
               {text("short_description_en", "Short description")}
-              {text("overview_en", "01 Product overview (markdown)", true, "Use ### for headings and - for bullet points.")}
-              {text("delivery_access_en", "02 Delivery & access (markdown)", true)}
+              <MarkdownField label="01 Product overview" value={p.overview_en ?? ""} onChange={(v) => set("overview_en", v)} dropTitle="Product overview" rows={16} />
+              <MarkdownField label="02 Delivery & access" value={p.delivery_access_en ?? ""} onChange={(v) => set("delivery_access_en", v)} dropTitle="Delivery & access" />
+              <p className="text-[11px] text-faint">
+                03 Shipping, payment &amp; returns is shared by all products — edit it in <Link href="/admin/faqs" className="font-bold underline">Admin → FAQs</Link>.
+              </p>
             </div>
           </Panel>
           <MediaManager productId={id} slug={p.slug} images={images} videos={videos} onChange={loadMedia} />

@@ -119,7 +119,17 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
 
   const [ask, setAsk] = useState(false);
   const [speak, setSpeak] = useState(false);
-  const [openAcc, setOpenAcc] = useState<string | null>("overview");
+  const [openAcc, setOpenAcc] = useState<Set<string>>(() => new Set(["overview", "delivery", "shipping"]));
+  const accProps = (key: string) => ({
+    open: openAcc.has(key),
+    onToggle: (o: boolean) =>
+      setOpenAcc((prev) => {
+        const next = new Set(prev);
+        if (o) next.add(key);
+        else next.delete(key);
+        return next;
+      }),
+  });
 
   return (
     <>
@@ -135,10 +145,12 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
                   {t("product.video")} <span className="hidden font-medium text-on-dark-muted sm:inline">– {t("product.videoSub")}</span>
                 </button>
               )}
-              <a href="#real-spaces" className="inline-flex h-11 items-center gap-2.5 rounded-full bg-dark px-5 text-[13px] font-bold text-white">
-                <Images size={15} aria-hidden />
-                {t("product.realSpaces")} <span className="font-medium text-on-dark-muted">– {t("product.photos", { n: realSpaces.length })}</span>
-              </a>
+              {realSpaces.length > 0 && (
+                <a href="#real-spaces" className="inline-flex h-11 items-center gap-2.5 rounded-full bg-dark px-5 text-[13px] font-bold text-white">
+                  <Images size={15} aria-hidden />
+                  {t("product.realSpaces")} <span className="font-medium text-on-dark-muted">– {t("product.photos", { n: realSpaces.length })}</span>
+                </a>
+              )}
             </div>
             <Gallery images={galleryImages} tone={product.tone} name={name} />
           </div>
@@ -289,7 +301,7 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
               <div>
                 <b>{t("product.standardDelivery")}</b>
                 <p className="text-muted">{t("product.standardDeliveryBody")}</p>
-                <button type="button" onClick={() => { setOpenAcc("delivery"); document.getElementById("acc-delivery")?.scrollIntoView({ behavior: "smooth" }); }} className="mt-1 font-bold underline">
+                <button type="button" onClick={() => { setOpenAcc((prev) => new Set(prev).add("delivery")); document.getElementById("acc-delivery")?.scrollIntoView({ behavior: "smooth" }); }} className="mt-1 font-bold underline">
                   {t("product.checkAccess")}
                 </button>
               </div>
@@ -334,8 +346,8 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
 
       {/* Accordions */}
       <section className="px-4 pt-16 md:px-12">
-        <div className="mx-auto max-w-[980px] border-t border-line">
-          <AccordionRow number="01" title={t("product.acc1")} open={openAcc === "overview"} onToggle={(o) => setOpenAcc(o ? "overview" : null)}>
+        <div className="mx-auto max-w-[980px] rounded-card border border-line2 bg-white px-5 shadow-soft md:px-10">
+          <AccordionRow number="01" title={t("product.acc1")} {...accProps("overview")}>
             <Markdown source={product.overview[lang] ?? product.overview.en} field="product overview" />
             {product.specs.length > 0 && (
               <dl className="mt-6 grid gap-x-8 gap-y-2 rounded-tile border border-line2 bg-white p-5 sm:grid-cols-2">
@@ -348,20 +360,24 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
               </dl>
             )}
           </AccordionRow>
-          <AccordionRow id="acc-delivery" number="02" title={t("product.acc2")} open={openAcc === "delivery"} onToggle={(o) => setOpenAcc(o ? "delivery" : null)}>
+          <AccordionRow id="acc-delivery" number="02" title={t("product.acc2")} {...accProps("delivery")}>
             <Markdown source={product.deliveryAccess[lang] ?? product.deliveryAccess.en} field="delivery & access" />
           </AccordionRow>
-          <AccordionRow number="03" title={t("product.acc3")} open={openAcc === "shipping"} onToggle={(o) => setOpenAcc(o ? "shipping" : null)}>
+          <AccordionRow number="03" title={t("product.acc3")} last {...accProps("shipping")}>
+            <P className="mb-2 max-w-[640px]">{t("product.acc3Intro")}</P>
             {(["shipping", "orders", "returns"] as const).map((g) => {
               const rows = faqs.filter((f) => f.group === g && f.showOnProduct);
               return (
-                <div key={g} className="mb-5">
-                  <div className="mb-1 text-[11px] font-extrabold uppercase tracking-[.14em] text-gold">{t(`faq.group.${g}`)}</div>
+                <div key={g} className="mt-8">
+                  <div className="mb-2 flex items-center gap-3 border-b border-line pb-3 text-[20px] font-[800] tracking-[-0.01em] md:text-[24px]">
+                    <span aria-hidden className="h-0.5 w-5 bg-gold" />
+                    {t(`faq.group.${g}`).toLocaleUpperCase("en")}
+                  </div>
                   {rows.length === 0 ? (
                     <Missing field={`${g} FAQs`} />
                   ) : (
                     rows.map((f) => (
-                      <AccordionRow key={f.id} size="sm" title={<T text={f.question} field="question" fallback />}>
+                      <AccordionRow key={f.id} size="sm" defaultOpen title={<T text={f.question} field="question" fallback />}>
                         <Markdown source={f.answer[lang] ?? f.answer.en} field="answer" />
                       </AccordionRow>
                     ))
