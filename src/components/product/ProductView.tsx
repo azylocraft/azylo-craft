@@ -5,14 +5,11 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   CalendarDays,
-  Check,
   ChevronDown,
   CircleAlert,
   Images,
   Link2,
   Mail,
-  MessageCircle,
-  Phone,
   Play,
   Search,
   Share2,
@@ -20,7 +17,6 @@ import {
   Sofa,
   Sparkles,
   Truck,
-  X,
 } from "lucide-react";
 import { Gallery, Lightbox } from "@/components/product/Gallery";
 import { VideoModal } from "@/components/product/VideoModal";
@@ -32,7 +28,6 @@ import { RelatedCarousel } from "@/components/product/Related";
 import { Stepper } from "@/components/shop/CartParts";
 import { Crumb, RecentlyViewed } from "@/components/shop/Listing";
 import { Media } from "@/components/shop/Media";
-import { Modal, Overlay } from "@/components/shop/Overlay";
 import { WishHeart } from "@/components/shop/ProductCards";
 import { Price, T, useLocale, useShopCtx, useText } from "@/components/shop/ShopContext";
 import { AccordionRow } from "@/components/ui/Accordion";
@@ -41,7 +36,6 @@ import { Badge, Btn, Eyebrow, H, Missing, P, Serif } from "@/components/ui/primi
 import { useT } from "@/lib/i18n";
 import { routes } from "@/lib/routes";
 import { useShop } from "@/lib/shop-store";
-import { supabaseBrowser } from "@/lib/supabase/client";
 import type { I18nText, ProductCardData, ProductDetail, Variant } from "@/lib/types";
 import { useUi } from "@/lib/ui-store";
 
@@ -116,8 +110,6 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
     return () => io.disconnect();
   }, []);
 
-  const [ask, setAsk] = useState(false);
-  const [speak, setSpeak] = useState(false);
   const [openAcc, setOpenAcc] = useState<Set<string>>(() => new Set(["overview", "delivery", "shipping"]));
   const accProps = (key: string) => ({
     open: openAcc.has(key),
@@ -283,18 +275,6 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
               </p>
             )}
 
-            <div className="rounded-tile border border-line2 bg-white p-5">
-              <div className="flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-[.14em] text-gold">{t("product.concierge")}</div>
-              <div className="mt-1.5 text-base font-extrabold">{t("product.conciergeTitle")}</div>
-              <div className="mt-3.5 grid grid-cols-2 gap-2">
-                <Btn kind="outline" size="sm" iconL={MessageCircle} onClick={() => setAsk(true)}>
-                  {t("product.ask")}
-                </Btn>
-                <Btn kind="light" size="sm" iconL={Phone} onClick={() => setSpeak(true)}>
-                  {t("product.speak")}
-                </Btn>
-              </div>
-            </div>
             <div className="flex items-start gap-3 rounded-tile bg-cream/60 p-4 text-[13px]">
               <Truck size={18} className="mt-0.5 flex-none text-gold" aria-hidden />
               <div>
@@ -415,8 +395,6 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
       </div>
 
       {video && product.videos.length > 0 && <VideoModal videos={product.videos} onClose={() => setVideo(false)} />}
-      {ask && <AskQuestion productId={product.id} productName={name} onClose={() => setAsk(false)} />}
-      {speak && <SpeakModal onClose={() => setSpeak(false)} />}
     </>
   );
 }
@@ -530,72 +508,6 @@ function ShareMenu({ name, onCopied }: { name: string; onCopied: () => void }) {
   );
 }
 
-function AskQuestion({ productId, productName, onClose }: { productId: string; productName: string; onClose: () => void }) {
-  const t = useT();
-  const [form, setForm] = useState({ name: "", email: "", question: "", website: "" });
-  const [state, setState] = useState<"idle" | "busy" | "sent" | "error">("idle");
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const errs: Record<string, string> = {};
-    if (!form.name.trim()) errs.name = t("form.required");
-    if (!/^\S+@\S+\.\S+$/.test(form.email)) errs.email = t("form.email");
-    if (form.question.trim().length < 5) errs.question = t("form.required");
-    setErrors(errs);
-    if (Object.keys(errs).length) return;
-    setState("busy");
-    const { error } = await supabaseBrowser().functions.invoke("product-question", { body: { ...form, productId } });
-    setState(error ? "error" : "sent");
-  };
-  return (
-    <Overlay onClose={onClose} label={t("product.ask")}>
-      <Modal>
-        <div className="mb-5 flex items-start justify-between gap-4">
-          <div>
-            <Eyebrow>{t("product.concierge")}</Eyebrow>
-            <H className="mt-2 text-[26px]">{state === "sent" ? t("product.askSentTitle") : t("product.ask")}</H>
-            <p className="mt-1 text-[13px] text-muted">{productName}</p>
-          </div>
-          <button type="button" aria-label={t("common.close")} onClick={onClose} className="flex size-10 flex-none items-center justify-center rounded-full border border-line">
-            <X size={16} aria-hidden />
-          </button>
-        </div>
-        {state === "sent" ? (
-          <div className="flex flex-col items-start gap-4">
-            <span className="flex size-[52px] items-center justify-center rounded-full bg-green-soft text-green">
-              <Check size={22} aria-hidden />
-            </span>
-            <P>{t("product.askSentBody")}</P>
-            <Btn onClick={onClose}>{t("common.close")}</Btn>
-          </div>
-        ) : (
-          <form onSubmit={submit} noValidate className="flex flex-col gap-3.5">
-            <Field label={t("form.name")} error={errors.name}>
-              <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="field" autoComplete="name" />
-            </Field>
-            <Field label={t("form.emailLabel")} error={errors.email}>
-              <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="field" autoComplete="email" />
-            </Field>
-            <Field label={t("product.yourQuestion")} error={errors.question}>
-              <textarea value={form.question} onChange={(e) => setForm({ ...form, question: e.target.value })} className="field h-32 resize-none py-3" maxLength={2000} />
-            </Field>
-            <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden className="hidden" value={form.website} onChange={(e) => setForm({ ...form, website: e.target.value })} />
-            {state === "error" && (
-              <p role="alert" className="flex items-center gap-2 text-sm text-red">
-                <CircleAlert size={15} aria-hidden />
-                {t("form.sendError")}
-              </p>
-            )}
-            <Btn type="submit" full size="lg" disabled={state === "busy"}>
-              {state === "busy" ? t("form.sending") : state === "error" ? t("common.retry") : t("form.send")}
-            </Btn>
-          </form>
-        )}
-      </Modal>
-    </Overlay>
-  );
-}
-
 export function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
   return (
     <label className={clsx("flex flex-col gap-1.5", error && "[&_.field]:border-red [&_.field]:bg-[#FFFBFA]")}>
@@ -611,41 +523,3 @@ export function Field({ label, error, children }: { label: string; error?: strin
   );
 }
 
-function SpeakModal({ onClose }: { onClose: () => void }) {
-  const t = useT();
-  const { settings } = useShopCtx();
-  return (
-    <Overlay onClose={onClose} label={t("product.speak")}>
-      <Modal className="max-w-[460px]">
-        <div className="mb-5 flex items-start justify-between">
-          <H className="text-[26px]">{t("product.speakTitle")}</H>
-          <button type="button" aria-label={t("common.close")} onClick={onClose} className="flex size-10 items-center justify-center rounded-full border border-line">
-            <X size={16} aria-hidden />
-          </button>
-        </div>
-        <div className="flex flex-col gap-2.5">
-          {settings.phone ? (
-            <a href={`tel:${settings.phone}`} className="flex items-center gap-3 rounded-field border border-line p-4 font-bold hover:border-ink">
-              <Phone size={18} className="text-gold" aria-hidden />
-              {settings.phone}
-            </a>
-          ) : (
-            null
-          )}
-          {settings.email ? (
-            <a href={`mailto:${settings.email}`} className="flex items-center gap-3 rounded-field border border-line p-4 font-bold hover:border-ink">
-              <Mail size={18} className="text-gold" aria-hidden />
-              {settings.email}
-            </a>
-          ) : (
-            null
-          )}
-          <Link href={routes.contact} onClick={onClose} className="flex items-center gap-3 rounded-field border border-line p-4 font-bold hover:border-ink">
-            <MessageCircle size={18} className="text-gold" aria-hidden />
-            {t("product.contactForm")}
-          </Link>
-        </div>
-      </Modal>
-    </Overlay>
-  );
-}
