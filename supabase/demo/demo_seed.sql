@@ -51,15 +51,15 @@ begin
     returning id into pid;
 
     delete from public.product_variants where product_id = pid;
-    base := round((p->>'price')::numeric * 18 / 100) * 100;  -- demo prices in INR (all under ₹1,00,000)
+    base := round((p->>'price')::numeric * 2.7 / 100) * 100;  -- demo prices in INR (all under ₹15,000)
     if p->>'slug' = 'electric-recliner-sofa-bed' then
       -- Matches PROJECT_SPEC §8, including the two variants with no price.
       for c in 0..2 loop
         insert into public.product_variants (product_id, model_en, color_en, color_fr, color_hex, material, price_inr, sort_order) values
-          (pid, 'Cat-claw fabric · Chaise lounge / Electric', colors->c->>0, colors->c->>1, colors->c->>2, 'fabric', 50800, c),
+          (pid, 'Cat-claw fabric · Chaise lounge / Electric', colors->c->>0, colors->c->>1, colors->c->>2, 'fabric', 7600, c),
           (pid, 'Cat-claw fabric · Chaise lounge / Electric / Massage', colors->c->>0, colors->c->>1, colors->c->>2, 'fabric', null, 10 + c),
           (pid, 'Imported leather · Chaise lounge / Electric', colors->c->>0, colors->c->>1, colors->c->>2, 'leather', null, 20 + c),
-          (pid, 'Imported leather · Chaise lounge / Electric / Massage', colors->c->>0, colors->c->>1, colors->c->>2, 'leather', 63200, 30 + c);
+          (pid, 'Imported leather · Chaise lounge / Electric / Massage', colors->c->>0, colors->c->>1, colors->c->>2, 'leather', 9500, 30 + c);
       end loop;
     else
       for m in 0..1 loop
@@ -142,7 +142,7 @@ insert into public.faqs (slug, faq_group, question_en, answer_en, sort_order, is
 
 -- Discount code for testing
 delete from public.discounts where is_demo;
-insert into public.discounts (code, kind, value, min_subtotal_inr, is_demo) values ('WELCOME10', 'percent', 10, 10000, true);
+insert into public.discounts (code, kind, value, min_subtotal_inr, is_demo) values ('WELCOME10', 'percent', 10, 1500, true);
 
 -- Demo policy bodies (replace with your own text in Admin → Pages)
 update public.pages set body_en = E'**Demo policy text — replace this in Admin → Pages before launch.**\n\n## Overview\nThis placeholder shows how a policy page is laid out: a lead sentence, then sections separated by dividers.\n\n## Section one\nDemo paragraph. Contact us at [the contact page](/pages/contact) with any question.\n\n## Section two\n- Demo point one\n- Demo point two\n- Demo point three'
