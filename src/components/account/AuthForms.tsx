@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CircleAlert, Eye, EyeOff, MailCheck } from "lucide-react";
 import { Field } from "@/components/product/ProductView";
 import { Btn, Eyebrow, H, Logo, P } from "@/components/ui/primitives";
@@ -89,7 +89,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
         const { data, error } = await sb.auth.signUp({
           email: f.email,
           password: f.password,
-          options: { data: { first_name: f.first.trim(), last_name: f.last.trim() }, emailRedirectTo: `${origin()}/auth/callback?next=/account` },
+          options: { data: { first_name: f.first.trim(), last_name: f.last.trim() }, emailRedirectTo: `${origin()}/auth/confirm?next=/account` },
         });
         if (error) return setMsg(error.message);
         if (data.session) {
@@ -97,7 +97,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
           router.refresh();
         } else setDone(true);
       } else if (mode === "forgot-password") {
-        const { error } = await sb.auth.resetPasswordForEmail(f.email, { redirectTo: `${origin()}/auth/callback?next=/auth/reset-password` });
+        const { error } = await sb.auth.resetPasswordForEmail(f.email, { redirectTo: `${origin()}/auth/confirm?next=/auth/reset-password` });
         if (error) return setMsg(error.message);
         setDone(true);
       } else {
@@ -113,22 +113,9 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
   if (done)
     return (
       <Shell>
-        <div className="flex flex-col items-start gap-4">
-          <span className="flex size-[52px] items-center justify-center rounded-full bg-gold-soft text-gold">
-            <MailCheck size={22} aria-hidden />
-          </span>
-          <H as="h1" className="text-[30px]">Check your inbox</H>
-          <P>
-            {mode === "sign-up" ? "We sent a confirmation link to " : "We sent a password reset link to "}
-            <b className="text-ink">{f.email}</b>. The link opens this site and signs you in.
-          </P>
-          <Link href="/auth/login" className="font-bold underline">
-            Back to log in
-          </Link>
-        </div>
+        <SentNotice mode={mode} email={f.email} />
       </Shell>
     );
-
   const titles: Record<AuthMode, [string, string]> = {
     login: ["Welcome back", "Log in"],
     "sign-up": ["Create your account", "Sign up"],
@@ -190,5 +177,49 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
         )}
       </div>
     </Shell>
+  );
+}
+
+/** "Check your inbox" with a spam-folder tip and a rate-limited Resend button. */
+function SentNotice({ mode, email }: { mode: AuthMode; email: string }) {
+  const [wait, setWait] = useState(60);
+  const [msg, setMsg] = useState<string | null>(null);
+  useEffect(() => {
+    if (wait <= 0) return;
+    const id = setTimeout(() => setWait((w) => w - 1), 1000);
+    return () => clearTimeout(id);
+  }, [wait]);
+  const resend = async () => {
+    setMsg(null);
+    const sb = supabaseBrowser();
+    const { error } =
+      mode === "sign-up"
+        ? await sb.auth.resend({ type: "signup", email, options: { emailRedirectTo: `${origin()}/auth/confirm?next=/account` } })
+        : await sb.auth.resetPasswordForEmail(email, { redirectTo: `${origin()}/auth/confirm?next=/auth/reset-password` });
+    setMsg(error ? error.message : "Sent again — check your inbox and Spam folder.");
+    setWait(60);
+  };
+  return (
+    <div className="flex flex-col items-start gap-4">
+      <span className="flex size-[52px] items-center justify-center rounded-full bg-gold-soft text-gold">
+        <MailCheck size={22} aria-hidden />
+      </span>
+      <H as="h1" className="text-[30px]">Check your inbox</H>
+      <P>
+        {mode === "sign-up" ? "We sent a confirmation link to " : "We sent a password reset link to "}
+        <b className="text-ink">{email}</b>. Open it on any device — it signs you in and brings you back here.
+      </P>
+      <div className="w-full rounded-field border border-gold-line bg-gold-soft p-4 text-sm text-ink2">
+        <b>Can&apos;t find it?</b> Check your <b>Spam</b> or <b>Promotions</b> folder for an email from <b>AZYLO</b>. If it&apos;s in Spam, mark it
+        &quot;Not spam&quot; so future order emails reach your inbox.
+      </div>
+      <Btn kind="outline" size="sm" onClick={resend} disabled={wait > 0}>
+        {wait > 0 ? `Resend email in ${wait}s` : "Resend email"}
+      </Btn>
+      {msg && <p role="status" className="text-sm text-muted">{msg}</p>}
+      <Link href="/auth/login" className="font-bold underline">
+        Back to log in
+      </Link>
+    </div>
   );
 }
