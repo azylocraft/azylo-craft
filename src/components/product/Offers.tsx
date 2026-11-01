@@ -274,6 +274,25 @@ export function ReviewsSection({ reviews, writeButton }: { reviews: Review[]; wr
   const [shown, setShown] = useState(6);
   const [photo, setPhoto] = useState<string | null>(null);
   if (reviews.length === 0 && !writeButton) return null;
+  // No reviews yet: a compact invitation instead of an empty section.
+  if (reviews.length === 0)
+    return (
+      <section id="reviews" className="scroll-mt-40 px-4 pt-12 md:px-12 md:pt-16">
+        <div className="flex flex-col items-start justify-between gap-3 rounded-card border border-line2 bg-white p-5 sm:flex-row sm:items-center md:px-7">
+          <span className="flex items-center gap-3 text-sm">
+            <Stars value={0} />
+            <span>
+              <b>No reviews yet.</b> <span className="text-muted">Bought this piece? Be the first to share your experience.</span>
+            </span>
+          </span>
+          {writeButton}
+        </div>
+      </section>
+    );
+  // Top 5 for the scrolling strip: best rated, with photos first, newest first.
+  const top = [...reviews]
+    .sort((a, b) => b.rating - a.rating || Number(b.photos.length > 0) - Number(a.photos.length > 0) || b.createdAt.localeCompare(a.createdAt))
+    .slice(0, 5);
   const avg = reviews.length ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length : 0;
   const dist = [5, 4, 3, 2, 1].map((n) => ({ n, c: reviews.filter((r) => r.rating === n).length }));
   const gallery = reviews.flatMap((r) => r.photos).slice(0, 12);
@@ -288,6 +307,40 @@ export function ReviewsSection({ reviews, writeButton }: { reviews: Review[]; wr
         </div>
         {writeButton}
       </div>
+
+      {top.length >= 3 && (
+        <div className="relative mt-8 overflow-hidden [mask-image:linear-gradient(90deg,transparent,#000_6%,#000_94%,transparent)]" aria-label="Top reviews">
+          <div className="az-marquee gap-4 pr-4" style={{ animationDuration: `${top.length * 9}s` }}>
+            {[0, 1].map((copy) =>
+              top.map((r) => (
+                <article key={copy + r.id} aria-hidden={copy === 1} className="flex w-[300px] flex-none flex-col overflow-hidden rounded-card border border-line2 bg-white md:w-[340px]">
+                  {r.photos[0] && (
+                    <button type="button" tabIndex={copy === 1 ? -1 : 0} onClick={() => setPhoto(r.photos[0])} className="block aspect-[4/3] w-full overflow-hidden bg-bg2">
+                      <img src={r.photos[0]} alt="Customer photo" loading="lazy" className="size-full object-cover" />
+                    </button>
+                  )}
+                  <div className="flex flex-1 flex-col gap-2 p-5">
+                    <div className="flex items-center justify-between gap-2">
+                      <Stars value={r.rating} />
+                      {r.verified && (
+                        <span className="flex items-center gap-1 text-[11px] font-bold text-green">
+                          <BadgeCheck size={13} aria-hidden /> Verified
+                        </span>
+                      )}
+                    </div>
+                    {r.title && <b className="text-[15px]">{r.title}</b>}
+                    {r.body && <p className="line-clamp-4 text-sm leading-relaxed text-muted">{r.body}</p>}
+                    <span className="mt-auto pt-1 text-xs text-faint">
+                      {r.author ?? "Customer"}
+                      {r.location ? ` · ${r.location}` : ""}
+                    </span>
+                  </div>
+                </article>
+              )),
+            )}
+          </div>
+        </div>
+      )}
 
       {reviews.length > 0 && (
         <div className="mt-8 grid gap-6 lg:grid-cols-[280px_1fr]">

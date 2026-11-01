@@ -456,8 +456,11 @@ function RealSpaces({ images, name }: { images: string[]; name: string }) {
         </div>
       ) : (
         <>
-          {/* Photos keep their own shape (e.g. 4:5) — nothing is cropped. */}
-          <div className="mt-8 grid grid-cols-2 items-start gap-3 md:grid-cols-4">
+          {/* Photos share the row equally (up to 4 per row) and keep their own shape — nothing is cropped. */}
+          <div
+            className={clsx("mt-8 grid items-start gap-3 md:[grid-template-columns:repeat(var(--cols),minmax(0,1fr))]", shown.length === 1 ? "max-w-[560px] grid-cols-1" : "grid-cols-2")}
+            style={{ ["--cols" as string]: Math.min(shown.length, 4) }}
+          >
             {shown.map((src, i) => (
               <button key={i} type="button" onClick={() => setOpen(i)} className="group relative overflow-hidden rounded-tile bg-bg2">
                 <img src={src} alt={`${name} — live photo ${i + 1}`} loading="lazy" className="block h-auto w-full transition-transform duration-500 group-hover:scale-[1.03]" />
