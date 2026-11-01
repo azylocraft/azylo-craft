@@ -49,6 +49,19 @@ export async function payWithRazorpay(opts: {
       description: `Order #${opts.orderNumber}`,
       prefill: opts.prefill,
       theme: { color: "#151412" },
+      // Show UPI, then credit and debit cards as separate options, then the rest.
+      config: {
+        display: {
+          blocks: {
+            upi: { name: "Pay using UPI", instruments: [{ method: "upi" }] },
+            credit: { name: "Credit card", instruments: [{ method: "card", types: ["credit"] }] },
+            debit: { name: "Debit card", instruments: [{ method: "card", types: ["debit"] }] },
+          },
+          sequence: ["block.upi", "block.credit", "block.debit"],
+          hide: [{ method: "card" }],
+          preferences: { show_default_blocks: true },
+        },
+      },
       handler: (r: Success) => resolve(r),
       modal: { ondismiss: () => reject(new Error("dismissed")) },
     });
