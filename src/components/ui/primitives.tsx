@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import Link from "next/link";
-import type { LucideIcon } from "lucide-react";
+import { ArrowRight, ArrowUpRight, type LucideIcon } from "lucide-react";
 import type { ComponentProps, ReactNode } from "react";
 
 /* Typography ------------------------------------------------------------ */
@@ -26,9 +26,9 @@ export function Eyebrow({
 }) {
   return (
     <div
-      data-line={line ? "" : undefined}
-      className={clsx("az-eb flex items-center gap-1 text-[12px] font-medium lowercase tracking-normal opacity-60", center && "justify-center", className)}
+      className={clsx("az-eb flex items-center gap-3 text-[12.5px] font-medium lowercase tracking-normal text-muted", center && "justify-center", className)}
     >
+      {line && <span aria-hidden className="size-1.5 flex-none rounded-full bg-gold" />}
       {children}
     </div>
   );
@@ -37,7 +37,7 @@ export function Eyebrow({
 type HeadingTag = "h1" | "h2" | "h3" | "div";
 export function H({ as: Tag = "h2", children, className }: { as?: HeadingTag; children: ReactNode; className?: string }) {
   return (
-    <Tag className={clsx("az-h text-balance font-bold leading-[1.02] tracking-[-0.045em]", className)}>{children}</Tag>
+    <Tag className={clsx("az-h text-balance font-bold leading-[1.02] tracking-[-0.05em]", className)}>{children}</Tag>
   );
 }
 
@@ -59,14 +59,14 @@ const btnKinds: Record<BtnKind, string> = {
   white: "bg-white text-ink border-white hover:bg-bg2",
 };
 const btnSizes: Record<BtnSize, string> = {
-  sm: "h-9 px-4 text-[13px]",
-  md: "h-[46px] px-[26px] text-sm",
-  lg: "h-[54px] px-[26px] text-sm",
+  sm: "h-9 px-4 text-[12.5px]",
+  md: "h-[46px] px-[26px] text-[13.5px]",
+  lg: "h-[54px] px-[26px] text-[13.5px]",
 };
 
 export function btnClass(kind: BtnKind = "dark", size: BtnSize = "md", full?: boolean) {
   return clsx(
-    "az-btn inline-flex items-center justify-center gap-2.5 whitespace-nowrap rounded-full border font-semibold transition-[background-color,color,border-color,transform] duration-300 active:scale-[.98]",
+    "az-btn inline-flex items-center justify-center gap-2.5 whitespace-nowrap rounded-full border font-medium transition-[background-color,color,border-color,transform] duration-300 active:scale-[.98]",
     "disabled:cursor-not-allowed disabled:border-line disabled:bg-line2 disabled:text-faint",
     btnKinds[kind],
     btnSizes[size],
@@ -76,40 +76,36 @@ export function btnClass(kind: BtnKind = "dark", size: BtnSize = "md", full?: bo
 
 type BtnOwn = { kind?: BtnKind; size?: BtnSize; full?: boolean; icon?: LucideIcon; iconL?: LucideIcon };
 
-/** Inverted circle that carries the trailing arrow (the "to gallery ↗" pill). */
-const arrowCircle: Record<BtnKind, string> = {
-  dark: "bg-white text-ink",
-  outline: "bg-ink text-white",
-  light: "bg-ink text-white",
-  gold: "bg-white text-gold",
-  ghostW: "bg-white text-ink",
-  white: "bg-ink text-white",
-};
+/** Trailing arrow in a ringed circle at the pill's right edge (the "to gallery ↗" button). */
+const arrowEdge: Record<BtnSize, string> = { sm: "-mr-[13px]", md: "-mr-[23px]", lg: "-mr-[23px]" };
 
-function BtnArrow({ Icon, kind = "dark" }: { Icon: LucideIcon; kind?: BtnKind }) {
+export function BtnArrow({ Icon, size = "md" }: { Icon: LucideIcon; size?: BtnSize }) {
   return (
-    <span aria-hidden className={clsx("az-btn-ic ml-1 flex aspect-square h-[calc(100%-8px)] flex-none items-center justify-center rounded-full", arrowCircle[kind])}>
+    <span aria-hidden className={clsx("az-btn-ic flex aspect-square h-[calc(100%-6px)] flex-none items-center justify-center rounded-full border-[1.5px] border-current", arrowEdge[size])}>
       <Icon size={15} />
     </span>
   );
 }
 
+/** The kit draws "arrow-right" button icons as ↗. */
+const arrowIcon = (Icon: LucideIcon) => (Icon === ArrowRight ? ArrowUpRight : Icon);
+
 export function Btn({ kind, size, full, icon: Icon, iconL: IconL, className, children, ...rest }: BtnOwn & ComponentProps<"button">) {
   return (
-    <button type="button" className={clsx(btnClass(kind, size, full), Icon && "pr-1", className)} {...rest}>
+    <button type="button" className={clsx(btnClass(kind, size, full), className)} {...rest}>
       {IconL && <IconL size={16} aria-hidden />}
       {children}
-      {Icon && <BtnArrow Icon={Icon} kind={kind} />}
+      {Icon && <BtnArrow Icon={arrowIcon(Icon)} size={size} />}
     </button>
   );
 }
 
 export function BtnLink({ kind, size, full, icon: Icon, iconL: IconL, className, children, ...rest }: BtnOwn & ComponentProps<typeof Link>) {
   return (
-    <Link className={clsx(btnClass(kind, size, full), Icon && "pr-1", className)} {...rest}>
+    <Link className={clsx(btnClass(kind, size, full), className)} {...rest}>
       {IconL && <IconL size={16} aria-hidden />}
       {children}
-      {Icon && <BtnArrow Icon={Icon} kind={kind} />}
+      {Icon && <BtnArrow Icon={arrowIcon(Icon)} size={size} />}
     </Link>
   );
 }
@@ -120,8 +116,8 @@ export function Chip({ children, active, dot, className }: { children: ReactNode
   return (
     <span
       className={clsx(
-        "inline-flex h-9 items-center gap-2 whitespace-nowrap rounded-full border px-4 text-[13px] font-semibold",
-        active ? "border-ink bg-ink text-white" : "border-line bg-white text-ink2",
+        "inline-flex h-9 items-center gap-2 whitespace-nowrap rounded-full border-[1.5px] border-ink px-4 text-[12.5px] font-medium lowercase",
+        active ? "bg-ink text-white" : "bg-white text-ink",
         className,
       )}
     >
@@ -196,16 +192,16 @@ export function Divider({ className }: { className?: string }) {
   return <div aria-hidden className={clsx("h-px bg-line", className)} />;
 }
 
-/** Wordmark: lowercase "azylo" in heavy Inter Tight with the round olive dot. */
+/** Wordmark: lowercase "azylo" in Hanken Grotesk 800 with the round olive dot. */
 export function Logo({ className, light, size = 20 }: { className?: string; light?: boolean; size?: number }) {
-  const fs = Math.round(size * 1.45);
+  const fs = Math.round(size * 1.25);
   return (
     <span
-      className={clsx("az-logo inline-flex items-baseline font-black lowercase leading-none tracking-[-0.06em]", light ? "text-white" : "text-ink", className)}
+      className={clsx("az-logo inline-flex items-baseline gap-[2px] font-extrabold lowercase leading-none tracking-[-0.055em]", light ? "text-white" : "text-ink", className)}
       style={{ fontSize: fs }}
     >
       azylo
-      <span aria-hidden className="az-logo-dot ml-[0.04em] inline-block rounded-full bg-gold" style={{ width: fs * 0.27, height: fs * 0.27 }} />
+      <span aria-hidden className="az-logo-dot inline-block flex-none rounded-full bg-gold" style={{ width: size * 0.32, height: size * 0.32 }} />
     </span>
   );
 }

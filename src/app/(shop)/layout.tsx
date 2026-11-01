@@ -18,28 +18,26 @@ export default async function ShopLayout({ children }: LayoutProps<"/">) {
   const [rates, settings] = await Promise.all([getRates(), getStoreSettings()]);
   return (
     <ShopProvider rates={rates} settings={settings}>
-      <div className="az-shop contents">
-        <CampaignBar />
-        <Header />
-        <main className="flex-1">{children}</main>
-        <AppStrip />
-        <Footer
-          year={new Date().getFullYear()}
-          contact={{
-            email: settings.email ?? undefined,
-            phone: settings.phone ?? undefined,
-            address: settings.address ?? undefined,
-          }}
-        />
-        <ChatPill />
-        <CartDrawer />
-        <Toast />
-        <SearchOverlay />
-        <WishDrawer />
-        <AccountDrawer />
-        <EmailPopup />
-        <Reveal />
-      </div>
+      <CampaignBar />
+      <Header />
+      <main className="flex-1">{children}</main>
+      <AppStrip />
+      <Footer
+        year={new Date().getFullYear()}
+        contact={{
+          email: settings.email ?? undefined,
+          phone: settings.phone ?? undefined,
+          address: settings.address ?? undefined,
+        }}
+      />
+      <ChatPill />
+      <CartDrawer />
+      <Toast />
+      <SearchOverlay />
+      <WishDrawer />
+      <AccountDrawer />
+      <EmailPopup />
+      <Reveal />
     </ShopProvider>
   );
 }

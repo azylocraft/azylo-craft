@@ -2,10 +2,10 @@
 
 import clsx from "clsx";
 import Link from "next/link";
-import { ArrowUpRight, Heart, ShieldCheck, Truck } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Heart, ShieldCheck, Truck } from "lucide-react";
 import { Media } from "@/components/shop/Media";
 import { Price, T, useHydrated, useLocale, useText } from "@/components/shop/ShopContext";
-import { Badge, Divider } from "@/components/ui/primitives";
+import { Badge, BtnArrow, btnClass, Divider } from "@/components/ui/primitives";
 import { useT } from "@/lib/i18n";
 import { useShop } from "@/lib/shop-store";
 import type { ProductCardData } from "@/lib/types";
@@ -44,9 +44,9 @@ export function PCard({ p, imgH = 300 }: { p: ProductCardData; imgH?: number }) 
   return (
     <Link
       href={`/products/${p.slug}`}
-      className="az-card group flex h-full flex-col overflow-hidden rounded-card bg-bg2 p-2"
+      className="az-card group flex h-full flex-col overflow-hidden rounded-card border border-line2 bg-white shadow-card hover:shadow-soft"
     >
-      <Media src={p.image} alt={text(p.name, "product name")} tone={p.tone} label={p.image ? undefined : t("card.photoLabel")} className="flex-none rounded-[22px]" >
+      <Media src={p.image} alt={text(p.name, "product name")} tone={p.tone} label={p.image ? undefined : t("card.photoLabel")} className="flex-none" >
         <div style={{ height: imgH }} />
         {p.image2 && (
           <img
@@ -65,7 +65,7 @@ export function PCard({ p, imgH = 300 }: { p: ProductCardData; imgH?: number }) 
         <span className="text-[10.5px] font-extrabold uppercase tracking-[.14em] text-gold">
           <T text={p.eyebrow} field="category tag" fallback />
         </span>
-        <div className="line-clamp-2 min-h-[42px] text-[17px] font-bold lowercase leading-[1.25] tracking-[-0.03em]">
+        <div className="line-clamp-2 min-h-[42px] text-base font-extrabold leading-[1.3] tracking-[-0.01em]">
           <T text={p.name} field="product name" fallback />
         </div>
         <span className="flex flex-wrap gap-1.5">
@@ -102,11 +102,9 @@ export function PCard({ p, imgH = 300 }: { p: ProductCardData; imgH?: number }) 
           <ShieldCheck size={15} className="flex-none text-gold" aria-hidden />
           {t("card.dutiesNote")}
         </span>
-        <span className="mt-auto flex items-center justify-between pt-1 text-[13px] font-semibold lowercase">
+        <span className={clsx(btnClass("dark", "md", true), "mt-auto")}>
           {t("card.viewSofa")}
-          <span className="az-card-go flex size-10 items-center justify-center rounded-full bg-ink text-white">
-            <ArrowUpRight size={17} aria-hidden />
-          </span>
+          <BtnArrow Icon={ArrowUpRight} />
         </span>
       </div>
     </Link>
@@ -121,9 +119,9 @@ export function GCard({ p, imgH = 270 }: { p: ProductCardData; imgH?: number }) 
   return (
     <Link
       href={`/products/${p.slug}`}
-      className="az-card group flex h-full flex-col overflow-hidden rounded-card bg-bg2 p-2"
+      className="az-card group flex h-full flex-col overflow-hidden rounded-card border border-line2 bg-white shadow-card hover:shadow-soft"
     >
-      <Media src={p.image} alt={text(p.name, "product name")} tone={p.tone} label={p.image ? undefined : t("card.photoLabel")} className="rounded-[18px] sm:rounded-[22px]">
+      <Media src={p.image} alt={text(p.name, "product name")} tone={p.tone} label={p.image ? undefined : t("card.photoLabel")}>
         <div className="h-[150px] sm:h-[210px] lg:h-[var(--img-h)]" style={{ ["--img-h" as string]: `${imgH}px` }} />
         {p.isNew && (
           <Badge tone="blue" className="absolute left-3 top-3 normal-case tracking-normal">
@@ -133,7 +131,7 @@ export function GCard({ p, imgH = 270 }: { p: ProductCardData; imgH?: number }) 
         <WishHeart productId={p.id} className="absolute right-2 top-2 sm:right-3 sm:top-3" />
       </Media>
       <div className="flex flex-1 flex-col gap-2 p-3 sm:px-[18px] sm:pb-[18px] sm:pt-4">
-        <span className="text-[11px] font-black lowercase tracking-[-0.03em] text-ink">azylo<span className="text-gold">.</span></span>
+        <span className="text-[9.5px] font-extrabold tracking-[.16em] text-gold sm:text-[10.5px]">AZYLO</span>
         <div className="line-clamp-2 min-h-[32px] text-[12.5px] font-bold leading-[1.35] sm:min-h-[39px] sm:text-[14.5px]">
           <T text={p.name} field="product name" fallback />
         </div>
@@ -154,7 +152,7 @@ export function GCard({ p, imgH = 270 }: { p: ProductCardData; imgH?: number }) 
               ) : null}
           </span>
           <span className="az-card-go hidden size-[38px] flex-none items-center justify-center rounded-full bg-ink text-white sm:flex">
-            <ArrowUpRight size={15} aria-hidden />
+            <ArrowRight size={15} aria-hidden />
           </span>
         </div>
       </div>
@@ -164,7 +162,7 @@ export function GCard({ p, imgH = 270 }: { p: ProductCardData; imgH?: number }) 
 
 export function GCardSkeleton() {
   return (
-    <div className="overflow-hidden rounded-card bg-bg2 p-2">
+    <div className="overflow-hidden rounded-card border border-line2 bg-white">
       <div className="az-skeleton h-[150px] sm:h-[270px]" />
       <div className="flex flex-col gap-2.5 p-4">
         <div className="az-skeleton h-2.5 w-12 rounded" />

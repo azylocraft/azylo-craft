@@ -1,10 +1,10 @@
-import { Inter_Tight, JetBrains_Mono } from "next/font/google";
+import { Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
 
-/** Tight neo-grotesk used for everything: UI, headings and the "azylo." wordmark. */
-export const interTight = Inter_Tight({
+/** Hanken Grotesk is used for everything: UI, headings and the "azylo." wordmark. */
+export const hanken = Hanken_Grotesk({
   subsets: ["latin", "latin-ext"],
-  weight: ["400", "500", "600", "700", "800", "900"],
-  variable: "--font-inter-tight",
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-hanken",
   display: "swap",
 });
 
@@ -15,4 +15,4 @@ export const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
-export const fontVariables = `${interTight.variable} ${jetbrainsMono.variable}`;
+export const fontVariables = `${hanken.variable} ${jetbrainsMono.variable}`;

@@ -31,8 +31,8 @@
   --color-skeleton: var(--az-skeleton);
   --color-skeleton-hi: var(--az-skeleton-hi);
 
-  --font-sans: var(--font-inter-tight), system-ui, sans-serif;
-  --font-serif: var(--font-inter-tight), system-ui, sans-serif;
+  --font-sans: var(--font-hanken), system-ui, sans-serif;
+  --font-serif: var(--font-hanken), system-ui, sans-serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
 
   --shadow-card: var(--az-shadow-card);
@@ -57,7 +57,7 @@ html {
 body {
   background: var(--az-bg);
   color: var(--az-ink);
-  font-family: var(--font-inter-tight), system-ui, sans-serif;
+  font-family: var(--font-hanken), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -131,19 +131,17 @@ select.field { appearance: none; background-image: linear-gradient(45deg, transp
 }
 
 /* ---------------------------------------------------------------------
-   Minimal theme: lowercase display type, numbered labels, motion
+   Bau theme: lowercase display type, olive accents, motion
    --------------------------------------------------------------------- */
 
-/* Storefront headings and buttons are lowercase, like the wordmark (admin keeps normal case). */
-.az-shop .az-h,
-.az-shop .az-btn {
+/* Headings and buttons are lowercase, like the wordmark. */
+.az-h,
+.az-btn {
   text-transform: lowercase;
 }
 
-/* Section labels read "01/ who we are" — numbered per page. */
-main { counter-reset: az-sec; }
-main .az-eb[data-line] { counter-increment: az-sec; }
-main .az-eb[data-line]::before { content: counter(az-sec, decimal-leading-zero) "/"; }
+/* Muted labels stay readable on dark surfaces. */
+.bg-dark .az-eb, .bg-dark2 .az-eb, .bg-ink .az-eb { color: var(--az-on-dark-muted); }
 
 /* Olive accent text gets the lighter olive on dark surfaces so it stays readable. */
 .bg-dark .text-gold, .bg-dark2 .text-gold, .bg-ink .text-gold,
@@ -169,7 +167,7 @@ a:hover .az-logo-dot { animation: az-dot-hop .6s cubic-bezier(.3, 1.6, .5, 1); }
 .az-card:hover { transform: translateY(-4px); }
 .az-card:hover img { transform: scale(1.05); }
 .az-card .az-card-go { transition: transform .4s cubic-bezier(.2, .7, .2, 1); }
-.az-card:hover .az-card-go { transform: rotate(45deg); }
+.az-card:hover .az-card-go { transform: rotate(-45deg); }
 
 /* Hero: words rise out of a mask, the photo settles in. */
 .az-mask { display: inline-block; overflow: hidden; vertical-align: bottom; padding-bottom: .06em; }
