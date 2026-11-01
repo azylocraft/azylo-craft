@@ -96,13 +96,22 @@ function colourCards(row: Row, card: ProductCardData): ProductCardData[] {
   const variants = (row.product_variants ?? []).filter(
     (v: Row) => v.is_active !== false,
   );
+  // Card order follows the photo order (the order colours were uploaded / arranged in Admin).
+  const offered = new Set<string>(
+    variants.map((v: Row) => v.color_en).filter(Boolean),
+  );
   const colours = [
-    ...new Set<string>(variants.map((v: Row) => v.color_en).filter(Boolean)),
+    ...new Set<string>(
+      photos
+        .map((i: Row) => [...offered].find((c) => c.toLowerCase() === i.color_en.toLowerCase()))
+        .filter((c): c is string => !!c),
+    ),
   ];
   const cards = colours.flatMap((c) => {
-    const photo = photos.find(
+    const ofPhotos = photos.filter(
       (i: Row) => i.color_en.toLowerCase() === c.toLowerCase(),
     );
+    const photo = ofPhotos[0];
     if (!photo) return [];
     const ofColour = variants.filter((v: Row) => v.color_en === c);
     const prices = ofColour
@@ -115,7 +124,7 @@ function colourCards(row: Row, card: ProductCardData): ProductCardData[] {
         colorHex: ofColour[0]?.color_hex ?? null,
         href: `/products/${row.slug}?colour=${colourSlug(c)}`,
         image: mediaUrl(photo.storage_path),
-        image2: card.image,
+        image2: mediaUrl(ofPhotos[1]?.storage_path) ?? card.image,
         fromPriceInr: prices.length ? Math.min(...prices) : null,
         compareAtInr: null,
       },

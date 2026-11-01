@@ -100,9 +100,10 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
 
   const name = text(product.name, "product name");
   const realSpaces = product.images.filter((i) => i.type === "real_space");
-  // The chosen colour's photo leads the gallery (and becomes the main image).
-  const colourPhoto = isCustom ? undefined : product.images.find((i) => i.color && i.color.toLowerCase() === color.toLowerCase());
-  const galleryImages = colourPhoto ? [colourPhoto, ...product.images.filter((i) => i !== colourPhoto)] : product.images;
+  // Photos tagged with a colour belong to that colour: the gallery shows the chosen colour's set
+  // (plus untagged photos). Without colour-tagged photos for the choice, every photo is shown.
+  const colourSet = isCustom ? [] : product.images.filter((i) => !i.color || i.color.toLowerCase() === color.toLowerCase());
+  const galleryImages = colourSet.some((i) => i.color) ? colourSet : product.images;
 
   const fmtDate = (d: Date) => d.toLocaleDateString(lang === "fr" ? "fr-FR" : "en-IN", { month: "short", day: "numeric" });
   const delivery =
@@ -167,7 +168,8 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
                 </a>
               )}
             </div>
-            <Gallery images={galleryImages} ratioFrom={product.images[0]?.url} tone={product.tone} name={name} />
+            {/* Re-mounted per colour, so each colour opens on "All" at its first photo. */}
+            <Gallery key={color} images={galleryImages} ratioFrom={product.images[0]?.url} tone={product.tone} name={name} />
           </div>
 
           {/* Buy box */}

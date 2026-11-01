@@ -27,7 +27,9 @@ export function Gallery({ images, tone, name, ratioFrom }: { images: ProductImag
   const text = useText();
   const [category, setCategory] = useState<string>("all");
   const tabs = CATEGORIES.map(([key, label]) => ({ key, label, n: images.filter((i) => i.type === key).length })).filter((c) => c.n > 0);
-  const visible = category === "all" ? images : images.filter((i) => i.type === category);
+  // A tab the current photos don't have (e.g. after switching colour) falls back to All.
+  const active = category === "all" || tabs.some((c) => c.key === category) ? category : "all";
+  const visible = active === "all" ? images : images.filter((i) => i.type === active);
   const slides = visible.length ? visible : null;
   const count = slides?.length ?? 5;
   const [ref, api] = useEmblaCarousel({ loop: false });
@@ -74,20 +76,20 @@ export function Gallery({ images, tone, name, ratioFrom }: { images: ProductImag
               key={c.key}
               type="button"
               role="tab"
-              aria-selected={category === c.key}
+              aria-selected={active === c.key}
               onClick={() => pick(c.key)}
               className={clsx(
                 "inline-flex h-9 flex-none items-center gap-1.5 rounded-full border px-4 text-[13px] transition-colors",
-                category === c.key ? "border-ink bg-ink text-white" : "border-line bg-white text-ink2 hover:border-ink",
+                active === c.key ? "border-ink bg-ink text-white" : "border-line bg-white text-ink2 hover:border-ink",
               )}
             >
-              {c.label} <span className={category === c.key ? "text-white/60" : "text-faint"}>· {c.n}</span>
+              {c.label} <span className={active === c.key ? "text-white/60" : "text-faint"}>· {c.n}</span>
             </button>
           ))}
         </div>
       )}
       <div className="relative overflow-hidden rounded-block bg-white">
-        <div key={category} ref={ref} className="overflow-hidden">
+        <div key={active} ref={ref} className="overflow-hidden">
           <div className="flex touch-pan-y">
             {Array.from({ length: count }, (_, i) => (
               <button key={i} type="button" onClick={() => setZoom(i)} className="relative min-w-0 flex-[0_0_100%] cursor-zoom-in" aria-label={`Zoom image ${i + 1}`}>
