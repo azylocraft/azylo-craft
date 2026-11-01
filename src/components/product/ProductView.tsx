@@ -426,7 +426,7 @@ function RealSpaces({ images, name }: { images: string[]; name: string }) {
   const [open, setOpen] = useState<number | null>(null);
   const tones = ["#D8C9B1", "#CBBBA3", "#E2D7C4", "#C9BEA9", "#DCD0BE"];
   const count = images.length;
-  const shown = count ? images.slice(0, 5) : [];
+  const shown = count ? images.slice(0, 8) : [];
   return (
     <section id="real-spaces" className="scroll-mt-40 px-4 pt-16 md:px-12 md:pt-24">
       <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
@@ -456,19 +456,22 @@ function RealSpaces({ images, name }: { images: string[]; name: string }) {
         </div>
       ) : (
         <>
-          <div className="mt-8 grid grid-cols-2 gap-3 md:grid-cols-6">
+          {/* Photos keep their own shape (e.g. 4:5) — nothing is cropped. */}
+          <div className="mt-8 grid grid-cols-2 items-start gap-3 md:grid-cols-4">
             {shown.map((src, i) => (
-              <button key={i} type="button" onClick={() => setOpen(i)} className={clsx("group relative overflow-hidden rounded-tile", i < 2 ? "md:col-span-3" : "md:col-span-2", i === 4 && "col-span-2 md:col-span-2")}>
-                <img src={src} alt={`${name} — live photo ${i + 1}`} loading="lazy" className="h-[160px] w-full object-cover transition-transform duration-500 group-hover:scale-105 md:h-[280px]" />
+              <button key={i} type="button" onClick={() => setOpen(i)} className="group relative overflow-hidden rounded-tile bg-bg2">
+                <img src={src} alt={`${name} — live photo ${i + 1}`} loading="lazy" className="block h-auto w-full transition-transform duration-500 group-hover:scale-[1.03]" />
                 <span className="absolute right-3 top-3 flex size-9 items-center justify-center rounded-full bg-white/90 opacity-0 transition-opacity group-hover:opacity-100">
                   <Search size={15} aria-hidden />
                 </span>
               </button>
             ))}
           </div>
-          <Btn kind="outline" className="mt-6" onClick={() => setOpen(0)}>
-            {t("product.viewAllPhotos", { n: count })}
-          </Btn>
+          {count > shown.length && (
+            <Btn kind="outline" className="mt-6" onClick={() => setOpen(0)}>
+              {t("product.viewAllPhotos", { n: count })}
+            </Btn>
+          )}
         </>
       )}
       {open != null && <Lightbox urls={images} start={open} onClose={() => setOpen(null)} label={name} />}

@@ -192,17 +192,32 @@ export function Divider({ className }: { className?: string }) {
   return <div aria-hidden className={clsx("h-px bg-line", className)} />;
 }
 
-/** Wordmark: lowercase "azylo" in Hanken Grotesk 800 with the round olive dot. */
+/**
+ * Wordmark "ΛZYLO": thin geometric capitals drawn as strokes (the A has no crossbar),
+ * matching the logo on the product photography. `size` sets the cap height scale.
+ */
 export function Logo({ className, light, size = 20 }: { className?: string; light?: boolean; size?: number }) {
-  const fs = Math.round(size * 1.25);
+  const h = Math.round(size * 1.05);
   return (
-    <span
-      className={clsx("az-logo inline-flex items-baseline gap-[2px] lowercase leading-none tracking-[-0.055em]", light ? "text-white" : "text-ink", className)}
-      style={{ fontSize: fs, fontWeight: 800 }}
+    <svg
+      role="img"
+      aria-label="AZYLO"
+      viewBox="0 0 344 64"
+      height={h}
+      width={Math.round((h * 344) / 64)}
+      className={clsx("az-logo inline-block flex-none", light ? "text-white" : "text-ink", className)}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={7}
+      strokeLinejoin="miter"
+      strokeMiterlimit={10}
     >
-      azylo
-      <span aria-hidden className="az-logo-dot inline-block flex-none rounded-full bg-gold" style={{ width: size * 0.32, height: size * 0.32 }} />
-    </span>
+      <path pathLength={1} d="M2 62 L30 2 L58 62" />
+      <path pathLength={1} d="M80 5 H128 L80 59 H130" />
+      <path pathLength={1} d="M150 2 L176 33 L202 2 M176 33 V62" />
+      <path pathLength={1} d="M227 2 V59 H262" />
+      <circle pathLength={1} cx={312} cy={32} r={27} />
+    </svg>
   );
 }
 
