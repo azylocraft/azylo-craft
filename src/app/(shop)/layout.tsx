@@ -7,6 +7,7 @@ import { WishDrawer } from "@/components/shop/WishDrawer";
 import { Toast } from "@/components/shop/Toast";
 import { SearchOverlay } from "@/components/shop/SearchOverlay";
 import { AccountDrawer } from "@/components/account/AccountDrawer";
+import { CampaignBar, EmailPopup } from "@/components/shop/Campaign";
 import { getRates, getStoreSettings } from "@/lib/catalog";
 
 export const revalidate = 60;
@@ -16,6 +17,7 @@ export default async function ShopLayout({ children }: LayoutProps<"/">) {
   const [rates, settings] = await Promise.all([getRates(), getStoreSettings()]);
   return (
     <ShopProvider rates={rates} settings={settings}>
+      <CampaignBar />
       <Header />
       <main className="flex-1">{children}</main>
       <AppStrip />
@@ -26,6 +28,7 @@ export default async function ShopLayout({ children }: LayoutProps<"/">) {
       <SearchOverlay />
       <WishDrawer />
       <AccountDrawer />
+      <EmailPopup />
     </ShopProvider>
   );
 }

@@ -173,6 +173,11 @@ export async function getProduct(slug: string): Promise<ProductDetail | null> {
         id: c.id, seller: c.seller_name, url: c.url, priceInr: Number(c.price_inr), includesDelivery: !!c.includes_delivery,
         includesGst: !!c.includes_gst, notes: c.notes, checkedOn: c.checked_on,
       })),
+    bonuses: Array.isArray(row.bonuses) ? row.bonuses : [],
+    guaranteeDays: row.guarantee_days ?? null,
+    guaranteeText: row.guarantee_text ?? null,
+    reviews: [],
+    recentOrders: 0,
     comparisonPoints: String(row.comparison_points_en ?? "")
       .split(String.fromCharCode(10))
       .map((l: string) => l.trim().replace(/^[-*•]/, "").trim())
@@ -295,6 +300,16 @@ export async function getStoreSettings(): Promise<StoreSettings> {
     openingHours: tx(data?.opening_hours_en, data?.opening_hours_fr),
     playStoreUrl: data?.play_store_url ?? null,
     shippingMethods: data?.shipping_methods ?? [],
+    campaign:
+      data?.campaign_title && data?.campaign_code && data?.campaign_ends_at && new Date(data.campaign_ends_at) > new Date()
+        ? { title: data.campaign_title, code: String(data.campaign_code), endsAt: data.campaign_ends_at }
+        : null,
+    bonusesDefault: Array.isArray(data?.bonuses_default) ? data.bonuses_default : [],
+    bundleMinItems: data?.bundle_min_items ?? 2,
+    bundlePercent: Number(data?.bundle_percent ?? 0),
+    lowStockThreshold: data?.low_stock_threshold ?? 5,
+    emiMonths: data?.emi_months ?? 12,
+    emailPopup: { enabled: data?.email_popup_enabled ?? false, code: data?.email_popup_code ? String(data.email_popup_code) : null },
   };
 }
 
@@ -303,4 +318,17 @@ export async function getRates(): Promise<Rates> {
   const out: Rates = { CAD: 1 };
   for (const r of data ?? []) out[r.currency] = r.rate_from_cad == null ? null : Number(r.rate_from_cad);
   return out;
+}
+
+/** Published reviews + real recent-order count for the product page. */
+export async function productSocialProof(productId: string) {
+  const db = supabasePublic();
+  const [{ data: reviews }, { data: recent }] = await Promise.all([
+    db.from("reviews").select("id, rating, title, body, author_name, created_at").eq("product_id", productId).eq("is_published", true).order("created_at", { ascending: false }).limit(20),
+    db.rpc("product_recent_orders", { p_product: productId, p_days: 30 }),
+  ]);
+  return {
+    reviews: (reviews ?? []).map((r: Row) => ({ id: r.id, rating: r.rating, title: r.title, body: r.body, author: r.author_name, createdAt: r.created_at })),
+    recentOrders: typeof recent === "number" ? recent : 0,
+  };
 }

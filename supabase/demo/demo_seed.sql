@@ -171,3 +171,10 @@ where slug = 'about-us' and (blocks = '{}'::jsonb or blocks ? 'demo');
 -- Demo article bodies with H2 sections (so the Contents box has entries)
 update public.articles set body_en = E'**Demo article — replace this text in Admin → Articles.**\n\n## Measure before you shop\nDemo paragraph about measuring the room, doors and hallways.\n\n- Width of every door on the way in\n- Turning space in hallways and stairwells\n- Elevator depth and height\n\n## Check the access route\nDemo paragraph about stairs, elevators and parking.\n\n### What to do instead\nDemo tip text.\n\n## Protect the piece on delivery day\nDemo paragraph about covers and floor protection.\n\n## Final thoughts\nDemo closing paragraph.'
 where is_demo_copy or body_en = 'MISSING: article content';
+
+-- Demo offers (edit in Admin → Settings → Offers & conversion)
+update public.store_settings set
+  campaign_title = 'Launch offer: 10% off your first order', campaign_code = 'WELCOME10', campaign_ends_at = now() + interval '14 days',
+  bundle_percent = 5, bundle_min_items = 2, email_popup_enabled = true, email_popup_code = 'WELCOME10',
+  bonuses_default = '[{"title":"Free delivery to your door","value_inr":null},{"title":"Free fabric samples before you decide","value_inr":null},{"title":"1-to-1 help choosing size and fabric","value_inr":null}]'::jsonb
+where id = 1;

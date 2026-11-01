@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { AdminTitle, Panel } from "@/components/admin/AdminShell";
 import { Btn } from "@/components/ui/primitives";
+import { GrowthSettings } from "@/components/admin/OfferEditor";
 import { supabaseBrowser } from "@/lib/supabase/client";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -45,6 +46,7 @@ export default function AdminSettings() {
       <AdminTitle title="Settings" actions={<Btn onClick={save}>Save all</Btn>} />
       {msg && <p role="status" className="mb-4 text-sm font-bold text-green">{msg}</p>}
       <div className="grid gap-5 xl:grid-cols-2">
+        <GrowthSettings />
         <Panel title="Store details">
           <div className="grid gap-3">
             {field("store_email", "Store email")}

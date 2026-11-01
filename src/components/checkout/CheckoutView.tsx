@@ -18,7 +18,7 @@ import { supabaseBrowser } from "@/lib/supabase/client";
 
 type Addr = { first_name: string; last_name: string; line1: string; line2: string; city: string; province: string; postal_code: string; country: string; phone: string };
 type Quote = {
-  subtotal: number; discount: number; discountCode: string | null; discountMessage: string | null; shipping: number;
+  subtotal: number; discount: number; bundleDiscount?: number; bundlePercent?: number; discountCode: string | null; discountMessage: string | null; shipping: number;
   shippingMethod: { code: string; label_en?: string; days_min?: number; days_max?: number }; methods: Quote["shippingMethod"][];
   tax: number; taxBreakdown: { label: string; rate: number; amount: number }[]; taxesIncluded: boolean; total: number; error?: string;
 };
@@ -242,7 +242,8 @@ export function CheckoutView() {
       ) : (
         <dl className={clsx("flex flex-col gap-2 text-sm", quoting && "opacity-60")}>
           <div className="flex justify-between"><dt className="text-muted">Subtotal</dt><dd><Price cad={quote.subtotal} /></dd></div>
-          {quote.discount > 0 && <div className="flex justify-between text-green"><dt>Discount ({quote.discountCode})</dt><dd>−<Price cad={quote.discount} /></dd></div>}
+          {quote.discount - (quote.bundleDiscount ?? 0) > 0 && <div className="flex justify-between text-green"><dt>Discount ({quote.discountCode})</dt><dd>−<Price cad={quote.discount - (quote.bundleDiscount ?? 0)} /></dd></div>}
+          {(quote.bundleDiscount ?? 0) > 0 && <div className="flex justify-between text-green"><dt>Bundle offer ({quote.bundlePercent}% off)</dt><dd>−<Price cad={quote.bundleDiscount!} /></dd></div>}
           <div className="flex justify-between"><dt className="text-muted">Shipping</dt><dd>{addressValid ? (quote.shipping === 0 ? "Free" : <Price cad={quote.shipping} />) : <span className="text-muted">Enter address</span>}</dd></div>
           {quote.taxesIncluded ? (
             <div className="flex justify-between"><dt className="text-muted">GST</dt><dd className="text-muted">Included</dd></div>

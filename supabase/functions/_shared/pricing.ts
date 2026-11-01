@@ -68,7 +68,7 @@ export async function priceCart(db: SupabaseClient, lines: LineInput[], opts: { 
   }
 
   // Shipping (methods from store_settings; free standard delivery by default)
-  const { data: settings } = await db.from("store_settings").select("shipping_methods").eq("id", 1).maybeSingle();
+  const { data: settings } = await db.from("store_settings").select("shipping_methods, bundle_min_items, bundle_percent").eq("id", 1).maybeSingle();
   const methods: { code: string; label_en?: string; price_inr: number; days_min?: number; days_max?: number }[] =
     settings?.shipping_methods?.length ? settings.shipping_methods : [{ code: "standard", label_en: "Free standard delivery", price_inr: 0 }];
   const method = methods.find((m) => m.code === opts.shippingCode) ?? methods[0];
@@ -77,10 +77,16 @@ export async function priceCart(db: SupabaseClient, lines: LineInput[], opts: { 
   // Prices are inclusive of GST, so no tax is added on top.
   const taxBreakdown: { label: string; rate: number; amount: number }[] = [];
   const tax = 0;
+  // Bundle offer: buy N or more pieces, get X% off the subtotal (on top of a discount code, capped at the subtotal).
+  const pieces = items.reduce((n, i) => n + i.quantity, 0);
+  const bundlePct = Number(settings?.bundle_percent ?? 0);
+  const bundleMin = Number(settings?.bundle_min_items ?? 2);
+  const bundleDiscount = bundlePct > 0 && pieces >= bundleMin ? round(Math.min((subtotal * bundlePct) / 100, subtotal - discount)) : 0;
+  discount = round(discount + bundleDiscount);
   const total = round(subtotal - discount + shipping + tax);
 
   return {
-    items, subtotal, discount, discountCode, discountMessage, shipping, shippingMethod: method, methods,
+    items, subtotal, discount, bundleDiscount, bundlePercent: bundleDiscount > 0 ? bundlePct : 0, discountCode, discountMessage, shipping, shippingMethod: method, methods,
     tax, taxBreakdown, taxesIncluded: true, total, currency: "INR" as const,
   };
 }

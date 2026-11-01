@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ProductView } from "@/components/product/ProductView";
-import { getProduct, listFaqs, relatedProducts } from "@/lib/catalog";
+import { getProduct, listFaqs, productSocialProof, relatedProducts } from "@/lib/catalog";
 
 export const revalidate = 60;
 
@@ -21,6 +21,7 @@ export default async function ProductPage({ params }: PageProps<"/products/[slug
   const { slug } = await params;
   const product = await getProduct(slug);
   if (!product) notFound();
-  const [related, faqs] = await Promise.all([relatedProducts(product), listFaqs()]);
+  const [related, faqs, proof] = await Promise.all([relatedProducts(product), listFaqs(), productSocialProof(product.id)]);
+  Object.assign(product, proof);
   return <ProductView product={product} related={related} faqs={faqs} />;
 }

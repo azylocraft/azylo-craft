@@ -25,6 +25,7 @@ import {
 import { Gallery, Lightbox } from "@/components/product/Gallery";
 import { VideoModal } from "@/components/product/VideoModal";
 import { PriceCompareHint, PriceComparison } from "@/components/product/PriceComparison";
+import { BundleHint, EmiLine, LowStock, OfferStack, RecentBuyers, ReviewsSection, TrustBadges } from "@/components/product/Offers";
 import { RelatedCarousel } from "@/components/product/Related";
 import { Stepper } from "@/components/shop/CartParts";
 import { Crumb, RecentlyViewed } from "@/components/shop/Listing";
@@ -51,6 +52,7 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
   const t = useT();
   const text = useText();
   const { lang } = useLocale();
+  const { settings } = useShopCtx();
   const addRecentlyViewed = useShop((s) => s.addRecentlyViewed);
   const addToCart = useShop((s) => s.addToCart);
   const openDrawer = useUi((s) => s.open);
@@ -150,6 +152,8 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
               {variant ? <Price cad={variant.priceInr} /> : <Missing field="variants" />}
             </div>
             <PriceCompareHint price={variant?.priceInr ?? null} comparisons={product.comparisons} />
+            <EmiLine price={variant?.priceInr ?? null} />
+            <RecentBuyers count={product.recentOrders} />
 
             <div className="rounded-tile border border-line bg-white">
               <div className="grid grid-cols-2 divide-x divide-line border-b border-line text-[13px] font-bold">
@@ -247,6 +251,9 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
               </fieldset>
             )}
 
+            <OfferStack price={variant?.priceInr ?? null} bonuses={[...product.bonuses, ...settings.bonusesDefault]} guaranteeDays={product.guaranteeDays} guaranteeText={product.guaranteeText} />
+            <LowStock stock={variant?.stock ?? null} />
+
             <div className="flex items-center gap-3">
               <Stepper value={qty} onChange={setQty} label={t("cart.quantity")} />
               <Btn full size="lg" disabled={!canBuy} onClick={add} className="flex-1">
@@ -255,6 +262,8 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
               <WishHeart productId={product.id} size={54} className="flex-none border border-line" />
               <ShareMenu name={name} onCopied={() => showToast(t("product.linkCopied"))} />
             </div>
+            <BundleHint />
+            <TrustBadges />
             {noPrice && variant && (
               <p className="text-xs text-red">
                 <Missing field="price" /> — {t("product.noPriceNote")}
@@ -367,6 +376,7 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
         </div>
       </section>
 
+      <ReviewsSection reviews={product.reviews} />
       <RecentlyViewed excludeId={product.id} />
       {related.length > 0 && <RelatedCarousel title={t("product.alsoLike")} products={related} />}
 

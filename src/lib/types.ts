@@ -51,6 +51,11 @@ export type ProductDetail = ProductCardData & {
   collectionSlugs: string[];
   comparisons: Comparison[];
   comparisonPoints: string[];
+  bonuses: Bonus[];
+  guaranteeDays: number | null;
+  guaranteeText: string | null;
+  reviews: Review[];
+  recentOrders: number;
 };
 
 export type Collection = {
@@ -81,8 +86,18 @@ export type StoreSettings = {
   openingHours: I18nText;
   playStoreUrl: string | null;
   shippingMethods: { code: string; label_en?: string; label_fr?: string; price_inr: number; days_min?: number; days_max?: number }[];
+  campaign: { title: string; code: string; endsAt: string } | null;
+  bonusesDefault: Bonus[];
+  bundleMinItems: number;
+  bundlePercent: number;
+  lowStockThreshold: number;
+  emiMonths: number;
+  emailPopup: { enabled: boolean; code: string | null };
 };
 
 export type Rates = Record<string, number | null>;
 
 export type Comparison = { id: string; seller: string; url: string | null; priceInr: number; includesDelivery: boolean; includesGst: boolean; notes: string | null; checkedOn: string };
+
+export type Bonus = { title: string; value_inr?: number | null };
+export type Review = { id: string; rating: number; title: string | null; body: string | null; author: string | null; createdAt: string };

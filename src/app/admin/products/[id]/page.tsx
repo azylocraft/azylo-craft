@@ -7,6 +7,7 @@ import { ArrowLeft, ExternalLink, Plus, Save, Trash2 } from "lucide-react";
 import { AdminTitle, Panel } from "@/components/admin/AdminShell";
 import { MediaManager, type Img, type Vid } from "@/components/admin/MediaManager";
 import { ComparisonEditor } from "@/components/admin/ComparisonEditor";
+import { OfferEditor } from "@/components/admin/OfferEditor";
 import { Btn, BtnLink } from "@/components/ui/primitives";
 import { supabaseBrowser } from "@/lib/supabase/client";
 
@@ -191,6 +192,7 @@ export default function ProductEditor() {
         </div>
       </div>
 
+      <OfferEditor productId={id} />
       <ComparisonEditor productId={id} />
 
       <Panel title="Variants & inventory" className="mt-5" actions={<Btn size="sm" kind="light" iconL={Plus} onClick={() => setVariants([...variants, { model_en: "", color_en: "", color_hex: "#C9B48F", material: "fabric", price_inr: "", stock: "", sku: "", is_active: true }])}>Add variant</Btn>}>
