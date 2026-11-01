@@ -65,3 +65,6 @@ assets/products/**/*.webm
 
 # design export (reference only)
 /AZYLO website design/
+
+# Source photos for manual uploads (they live in Supabase Storage)
+/azylo-product-images/

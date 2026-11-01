@@ -10,6 +10,9 @@ import { useText } from "@/components/shop/ShopContext";
 import type { ProductImage } from "@/lib/types";
 
 const TONES = ["#E7DFD1", "#DCD0BE", "#CDBEA6", "#E2D7C4", "#D3C2AB"];
+/** Frame shape used until the first photo has loaded (and when there are no photos). */
+const DEFAULT_RATIO = 4 / 3.4;
+const clampRatio = (r: number) => Math.min(1.6, Math.max(0.7, r));
 
 /** Main image + thumbnails, arrows, swipe, click-to-zoom lightbox. */
 export function Gallery({ images, tone, name }: { images: ProductImage[]; tone: string | null; name: string }) {
@@ -19,6 +22,16 @@ export function Gallery({ images, tone, name }: { images: ProductImage[]; tone: 
   const [ref, api] = useEmblaCarousel({ loop: false });
   const [index, setIndex] = useState(0);
   const [zoom, setZoom] = useState<number | null>(null);
+  // The frame takes the shape of the first photo (e.g. 4:5 portrait); other photos are shown whole inside it.
+  const [ratio, setRatio] = useState<number | null>(null);
+  const firstUrl = slides?.[0]?.url;
+  useEffect(() => {
+    if (!firstUrl) return;
+    const img = new Image();
+    img.onload = () => img.naturalWidth && setRatio(clampRatio(img.naturalWidth / img.naturalHeight));
+    img.src = firstUrl;
+  }, [firstUrl]);
+  const frame = ratio ?? DEFAULT_RATIO;
 
   useEffect(() => {
     if (!api) return;
@@ -38,14 +51,17 @@ export function Gallery({ images, tone, name }: { images: ProductImage[]; tone: 
           <div className="flex touch-pan-y">
             {Array.from({ length: count }, (_, i) => (
               <button key={i} type="button" onClick={() => setZoom(i)} className="relative min-w-0 flex-[0_0_100%] cursor-zoom-in" aria-label={`Zoom image ${i + 1}`}>
-                <Media
-                  src={slides?.[i]?.url}
-                  alt={slides ? text(slides[i].alt, "image alt") : `${name} — photo ${i + 1}`}
-                  tone={slides ? undefined : i === 0 ? tone : TONES[i % TONES.length]}
-                  label={slides ? undefined : `product photo ${i + 1} / ${count}`}
-                  eager={i === 0}
-                  className="aspect-[4/3.4] w-full"
-                />
+                <div className="max-h-[82vh] w-full" style={{ aspectRatio: frame }}>
+                  <Media
+                    src={slides?.[i]?.url}
+                    alt={slides ? text(slides[i].alt, "image alt") : `${name} — photo ${i + 1}`}
+                    tone={slides ? undefined : i === 0 ? tone : TONES[i % TONES.length]}
+                    label={slides ? undefined : `product photo ${i + 1} / ${count}`}
+                    eager={i === 0}
+                    fit={slides ? "contain" : "cover"}
+                    className="size-full"
+                  />
+                </div>
               </button>
             ))}
           </div>
@@ -72,7 +88,9 @@ export function Gallery({ images, tone, name }: { images: ProductImage[]; tone: 
       <div className="hidden gap-2.5 overflow-x-auto md:flex">
         {Array.from({ length: count }, (_, i) => (
           <button key={i} type="button" aria-label={`Show image ${i + 1}`} aria-current={i === index} onClick={() => go(i)} className={clsx("flex-none overflow-hidden rounded-xl border-2", i === index ? "border-ink" : "border-transparent")}>
-            <Media src={slides?.[i]?.url} alt="" tone={slides ? undefined : i === 0 ? tone : TONES[i % TONES.length]} className="h-[72px] w-[88px]" />
+            <Media src={slides?.[i]?.url} alt="" tone={slides ? undefined : i === 0 ? tone : TONES[i % TONES.length]} className="h-[88px] bg-white" fit={slides ? "contain" : "cover"}>
+              <div style={{ width: Math.round(88 * frame) }} />
+            </Media>
           </button>
         ))}
       </div>
