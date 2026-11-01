@@ -311,7 +311,7 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
 
       <PriceComparison azyloPrice={variant?.priceInr ?? product.fromPriceInr} comparisons={product.comparisons} points={product.comparisonPoints} />
 
-      {/* Real spaces */}
+      {/* Live photos (image type real_space) */}
       {realSpaces.length > 0 && <RealSpaces images={realSpaces.map((i) => i.url)} name={name} />}
 
       {/* See in your home (coming soon) */}
@@ -459,7 +459,7 @@ function RealSpaces({ images, name }: { images: string[]; name: string }) {
           <div className="mt-8 grid grid-cols-2 gap-3 md:grid-cols-6">
             {shown.map((src, i) => (
               <button key={i} type="button" onClick={() => setOpen(i)} className={clsx("group relative overflow-hidden rounded-tile", i < 2 ? "md:col-span-3" : "md:col-span-2", i === 4 && "col-span-2 md:col-span-2")}>
-                <img src={src} alt={`${name} — real space ${i + 1}`} loading="lazy" className="h-[160px] w-full object-cover transition-transform duration-500 group-hover:scale-105 md:h-[280px]" />
+                <img src={src} alt={`${name} — live photo ${i + 1}`} loading="lazy" className="h-[160px] w-full object-cover transition-transform duration-500 group-hover:scale-105 md:h-[280px]" />
                 <span className="absolute right-3 top-3 flex size-9 items-center justify-center rounded-full bg-white/90 opacity-0 transition-opacity group-hover:opacity-100">
                   <Search size={15} aria-hidden />
                 </span>

@@ -11,7 +11,7 @@ import { removeMedia, uploadMedia } from "@/lib/upload";
 
 export const IMAGE_TYPES = [
   ["studio", "Studio / gallery"],
-  ["real_space", "Real space (in-home)"],
+  ["real_space", "Live photo (real home)"],
   ["swatch", "Swatch / fabric"],
   ["detail", "Detail / mechanism / spec"],
 ] as const;

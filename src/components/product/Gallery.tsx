@@ -17,7 +17,7 @@ const clampRatio = (r: number) => Math.min(1.6, Math.max(0.7, r));
 /** Gallery category tabs, in display order. Only categories that have photos are shown. */
 const CATEGORIES = [
   ["studio", "Studio"],
-  ["real_space", "Real spaces"],
+  ["real_space", "Live"],
   ["swatch", "Swatch"],
   ["detail", "Detail"],
 ] as const;
