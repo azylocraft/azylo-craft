@@ -49,16 +49,15 @@ export async function payWithRazorpay(opts: {
       description: `Order #${opts.orderNumber}`,
       prefill: opts.prefill,
       theme: { color: "#151412" },
-      // Show UPI, then credit and debit cards as separate options, then the rest.
+      // Show UPI, then one card option that accepts credit and debit cards, then the rest.
       config: {
         display: {
           blocks: {
             // "collect" = type a UPI ID (name@bank); "intent" = open GPay/PhonePe on phones; "qr" = scan on desktop.
             upi: { name: "Pay using UPI", instruments: [{ method: "upi", flows: ["collect", "intent", "qr"] }] },
-            credit: { name: "Credit card", instruments: [{ method: "card", types: ["credit"] }] },
-            debit: { name: "Debit card", instruments: [{ method: "card", types: ["debit"] }] },
+            cards: { name: "Credit / Debit card (both accepted)", instruments: [{ method: "card", types: ["credit", "debit"] }] },
           },
-          sequence: ["block.upi", "block.credit", "block.debit"],
+          sequence: ["block.upi", "block.cards"],
           hide: [{ method: "card" }],
           preferences: { show_default_blocks: true },
         },
