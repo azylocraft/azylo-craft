@@ -98,9 +98,9 @@ where description_en is null or description_en like 'Demo collection description
 
 -- Store details from the design mock-ups
 update public.store_settings set
-  store_email = 'hello@azylo.ca',
-  phone = '+1 514 555-0182',
-  address = '4200 Rue Saint-Denis, Montréal, QC H2J 2K8',
+  store_email = 'azylocraft@gmail.com',
+  phone = null,
+  address = null,
   opening_hours_en = 'Mon–Fri 9:00–18:00 · Sat 10:00–16:00',
   shipping_methods = '[{"code":"standard","label_en":"Free standard delivery","label_fr":"Livraison standard gratuite","price_inr":0,"days_min":45,"days_max":55}]',
   is_demo = true

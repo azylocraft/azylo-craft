@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { ArrowRight, ArrowUpRight, Check, Headset, Mail, MapPin, Phone, Receipt, Smartphone, Truck } from "lucide-react";
-import { Eyebrow, H, Logo, Missing, P, Serif } from "@/components/ui/primitives";
+import { Eyebrow, H, Logo, P, Serif } from "@/components/ui/primitives";
 import { useT } from "@/lib/i18n";
 import { footerColumns, routes } from "@/lib/routes";
 import { supabaseBrowser } from "@/lib/supabase/client";
@@ -171,11 +171,13 @@ export function Footer({ contact = {}, year }: { contact?: StoreContact; year: n
   );
 }
 
-function ContactRow({ icon: Icon, value, field, href }: { icon: typeof Mail; value?: string; field: string; href?: string }) {
+/** A store contact line; hidden when the detail isn't set in Admin → Settings. */
+function ContactRow({ icon: Icon, value, href }: { icon: typeof Mail; value?: string; field: string; href?: string }) {
+  if (!value) return null;
   return (
     <span className="flex items-center gap-3 text-[13px] text-on-dark">
       <Icon size={16} className="flex-none text-gold" aria-hidden />
-      {value ? href ? <a href={href} className="hover:text-white">{value}</a> : value : <Missing field={field} />}
+      {href ? <a href={href} className="hover:text-white">{value}</a> : value}
     </span>
   );
 }

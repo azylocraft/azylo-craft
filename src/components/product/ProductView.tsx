@@ -605,7 +605,7 @@ function SpeakModal({ onClose }: { onClose: () => void }) {
               {settings.phone}
             </a>
           ) : (
-            <Missing field="store phone" />
+            null
           )}
           {settings.email ? (
             <a href={`mailto:${settings.email}`} className="flex items-center gap-3 rounded-field border border-line p-4 font-bold hover:border-ink">
@@ -613,7 +613,7 @@ function SpeakModal({ onClose }: { onClose: () => void }) {
               {settings.email}
             </a>
           ) : (
-            <Missing field="store email" />
+            null
           )}
           <Link href={routes.contact} onClick={onClose} className="flex items-center gap-3 rounded-field border border-line p-4 font-bold hover:border-ink">
             <MessageCircle size={18} className="text-gold" aria-hidden />

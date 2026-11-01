@@ -59,7 +59,7 @@ export function ContactView() {
           <H className="text-[30px] text-white md:text-[38px]">{t("contact.panelTitle")}</H>
           <P className="text-on-dark-muted">{t("contact.panelSub")}</P>
           <div className="mt-2 flex flex-col gap-4">
-            {rows.map(([Icon, label, value, href]) => (
+            {rows.filter(([, , value]) => value).map(([Icon, label, value, href]) => (
               <div key={label} className="flex items-center gap-4">
                 <span className="flex size-11 flex-none items-center justify-center rounded-full bg-gold text-white">
                   <Icon size={18} aria-hidden />
