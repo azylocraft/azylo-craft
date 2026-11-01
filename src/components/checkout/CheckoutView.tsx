@@ -24,6 +24,7 @@ type Quote = {
 };
 
 const EMPTY: Addr = { first_name: "", last_name: "", line1: "", line2: "", city: "", province: "", postal_code: "", country: "IN", phone: "" };
+const SAVE_KEY = "azylo-checkout-details";
 
 function addrErrors(a: Addr) {
   const e: Record<string, string> = {};
@@ -87,16 +88,55 @@ export function CheckoutView() {
   const [summaryOpen, setSummaryOpen] = useState(false);
   const sb = supabaseBrowser();
 
-  // Prefill from the signed-in account (email + default address).
+  // Prefill from details saved on this device by a previous checkout.
+  const [saveInfo, setSaveInfo] = useState(true);
+  const localLoaded = useRef(false);
+  useEffect(() => {
+    if (!hydrated || localLoaded.current) return;
+    localLoaded.current = true;
+    try {
+      const saved = JSON.parse(localStorage.getItem(SAVE_KEY) ?? "null") as { email?: string; ship?: Partial<Addr>; news?: boolean } | null;
+      if (saved) {
+        queueMicrotask(() => {
+          if (saved.email) setEmail((e) => e || saved.email!);
+          if (saved.ship) setShip((s) => (s.line1 ? s : { ...EMPTY, ...saved.ship, country: "IN" }));
+          if (saved.news) setNews(true);
+        });
+      }
+    } catch {
+      /* storage unavailable — start with an empty form */
+    }
+  }, [hydrated]);
+
+  // Prefill from the signed-in account (email + default address); account data wins over device data.
   const prefilled = useRef(false);
   useEffect(() => {
     if (!user || prefilled.current) return;
     prefilled.current = true;
     if (user.email) queueMicrotask(() => setEmail((e) => e || user.email!));
     sb.from("addresses").select("*").eq("is_default", true).maybeSingle().then(({ data }) => {
-      if (data) setShip({ ...EMPTY, ...Object.fromEntries(Object.entries(data).map(([k, v]) => [k, v ?? ""])) } as Addr);
+      if (data) setShip({ ...EMPTY, ...Object.fromEntries(Object.entries(data).map(([k, v]) => [k, v ?? ""])), country: "IN" } as Addr);
     });
   }, [user, sb]);
+
+  /** Remember details for next time: on this device, and in the account when signed in. */
+  const rememberDetails = async () => {
+    try {
+      if (saveInfo) localStorage.setItem(SAVE_KEY, JSON.stringify({ email, ship, news }));
+      else localStorage.removeItem(SAVE_KEY);
+    } catch {
+      /* ignore storage errors */
+    }
+    if (!saveInfo || !user) return;
+    const row = {
+      user_id: user.id, first_name: ship.first_name.trim(), last_name: ship.last_name.trim(), line1: ship.line1.trim(), line2: ship.line2.trim() || null,
+      city: ship.city.trim(), province: ship.province, postal_code: ship.postal_code.trim(), country: "IN", phone: ship.phone.trim() || null,
+    };
+    const { data: existing } = await sb.from("addresses").select("id, line1, postal_code, is_default");
+    const same = (existing ?? []).find((a: { line1: string; postal_code: string }) => a.line1.trim().toLowerCase() === row.line1.toLowerCase() && a.postal_code === row.postal_code);
+    if (same) await sb.from("addresses").update(row).eq("id", same.id);
+    else await sb.from("addresses").insert({ ...row, is_default: !(existing ?? []).some((a: { is_default: boolean }) => a.is_default) });
+  };
   useEffect(() => {
     if (savedCode) queueMicrotask(() => { setCode(savedCode); setAppliedCode(savedCode); });
   }, [savedCode]);
@@ -138,6 +178,7 @@ export function CheckoutView() {
     }
     if (state !== "idle") return; // never double-submit
     setState("creating");
+    await rememberDetails().catch(() => {});
     try {
       const clean = (a: Addr) => ({ ...a, postal_code: a.postal_code.trim().toUpperCase(), line2: a.line2 || null, phone: a.phone || null, province: a.province || null });
       const { data, error } = await sb.functions.invoke("checkout", {
@@ -247,6 +288,15 @@ export function CheckoutView() {
         <section>
           <h2 className="mb-3 text-xl font-extrabold">Delivery</h2>
           <AddressFields a={ship} set={setShip} errors={shipErrors} show={showErrors} prefix="shipping" />
+          <label className="mt-4 flex items-start gap-2.5 text-sm">
+            <input type="checkbox" checked={saveInfo} onChange={(e) => setSaveInfo(e.target.checked)} className="mt-0.5 size-4 accent-[var(--az-ink)]" />
+            <span>
+              Save my information for a faster checkout
+              <span className="block text-xs text-muted">
+                {user ? "Saved on this device and to your account's addresses." : "Saved on this device only. Sign in to keep it across devices."}
+              </span>
+            </span>
+          </label>
         </section>
 
         {addressValid && quote?.methods && (
