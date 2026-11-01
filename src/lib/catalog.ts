@@ -25,7 +25,7 @@ type Row = any;
 
 const studioImages = (row: Row) =>
   [...(row.product_images ?? [])]
-    .filter((i: Row) => i.image_type === "studio" || i.image_type === "live" || i.image_type === "real_space")
+    .filter((i: Row) => i.image_type === "studio" || i.image_type === "real_space")
     .sort((a: Row, b: Row) => (a.image_type === "studio" ? 0 : 1) - (b.image_type === "studio" ? 0 : 1) || a.sort_order - b.sort_order);
 
 export function toCard(row: Row): ProductCardData {

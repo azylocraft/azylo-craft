@@ -14,17 +14,28 @@ const TONES = ["#E7DFD1", "#DCD0BE", "#CDBEA6", "#E2D7C4", "#D3C2AB"];
 const DEFAULT_RATIO = 4 / 3.4;
 const clampRatio = (r: number) => Math.min(1.6, Math.max(0.7, r));
 
-/** Main image + thumbnails, arrows, swipe, click-to-zoom lightbox. */
+/** Gallery category tabs, in display order. Only categories that have photos are shown. */
+const CATEGORIES = [
+  ["studio", "Studio"],
+  ["real_space", "Real spaces"],
+  ["swatch", "Swatch"],
+  ["detail", "Detail"],
+] as const;
+
+/** Category tabs, main image + thumbnails, arrows, swipe, click-to-zoom lightbox. */
 export function Gallery({ images, tone, name }: { images: ProductImage[]; tone: string | null; name: string }) {
   const text = useText();
-  const slides = images.length ? images : null;
+  const [category, setCategory] = useState<string>("all");
+  const tabs = CATEGORIES.map(([key, label]) => ({ key, label, n: images.filter((i) => i.type === key).length })).filter((c) => c.n > 0);
+  const visible = category === "all" ? images : images.filter((i) => i.type === category);
+  const slides = visible.length ? visible : null;
   const count = slides?.length ?? 5;
   const [ref, api] = useEmblaCarousel({ loop: false });
   const [index, setIndex] = useState(0);
   const [zoom, setZoom] = useState<number | null>(null);
-  // The frame takes the shape of the first photo (e.g. 4:5 portrait); other photos are shown whole inside it.
+  // The frame takes the shape of the product's first photo (e.g. 4:5 portrait); every photo is shown whole inside it.
   const [ratio, setRatio] = useState<number | null>(null);
-  const firstUrl = slides?.[0]?.url;
+  const firstUrl = images[0]?.url;
   useEffect(() => {
     if (!firstUrl) return;
     const img = new Image();
@@ -44,10 +55,34 @@ export function Gallery({ images, tone, name }: { images: ProductImage[]; tone: 
 
   const go = useCallback((i: number) => api?.scrollTo(i), [api]);
 
+  const pick = (key: string) => {
+    setCategory(key);
+    setIndex(0);
+  };
+
   return (
     <div className="flex flex-col gap-3">
+      {tabs.length > 1 && (
+        <div role="tablist" aria-label="Photo categories" className="flex gap-2 overflow-x-auto [scrollbar-width:none]">
+          {[{ key: "all", label: "All", n: images.length }, ...tabs].map((c) => (
+            <button
+              key={c.key}
+              type="button"
+              role="tab"
+              aria-selected={category === c.key}
+              onClick={() => pick(c.key)}
+              className={clsx(
+                "inline-flex h-9 flex-none items-center gap-1.5 rounded-full border px-4 text-[13px] transition-colors",
+                category === c.key ? "border-ink bg-ink text-white" : "border-line bg-white text-ink2 hover:border-ink",
+              )}
+            >
+              {c.label} <span className={category === c.key ? "text-white/60" : "text-faint"}>· {c.n}</span>
+            </button>
+          ))}
+        </div>
+      )}
       <div className="relative overflow-hidden rounded-block bg-white">
-        <div ref={ref} className="overflow-hidden">
+        <div key={category} ref={ref} className="overflow-hidden">
           <div className="flex touch-pan-y">
             {Array.from({ length: count }, (_, i) => (
               <button key={i} type="button" onClick={() => setZoom(i)} className="relative min-w-0 flex-[0_0_100%] cursor-zoom-in" aria-label={`Zoom image ${i + 1}`}>

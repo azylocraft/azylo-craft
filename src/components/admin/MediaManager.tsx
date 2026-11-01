@@ -12,10 +12,8 @@ import { removeMedia, uploadMedia } from "@/lib/upload";
 export const IMAGE_TYPES = [
   ["studio", "Studio / gallery"],
   ["real_space", "Real space (in-home)"],
-  ["live", "Live photo (factory)"],
   ["swatch", "Swatch / fabric"],
-  ["detail", "Detail / mechanism"],
-  ["dimension", "Dimension drawing"],
+  ["detail", "Detail / mechanism / spec"],
 ] as const;
 
 export type Img = { id: string; storage_path: string; image_type: string; alt_en: string | null; sort_order: number };

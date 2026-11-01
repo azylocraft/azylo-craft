@@ -84,8 +84,7 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
 
   const name = text(product.name, "product name");
   const realSpaces = product.images.filter((i) => i.type === "real_space");
-  const livePhotos = product.images.filter((i) => i.type === "live");
-  const galleryImages = product.images.filter((i) => i.type !== "real_space");
+  const galleryImages = product.images;
 
   const fmtDate = (d: Date) => d.toLocaleDateString(lang === "fr" ? "fr-FR" : "en-IN", { month: "short", day: "numeric" });
   const delivery =
@@ -313,19 +312,7 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
       <PriceComparison azyloPrice={variant?.priceInr ?? product.fromPriceInr} comparisons={product.comparisons} points={product.comparisonPoints} />
 
       {/* Real spaces */}
-      <RealSpaces images={realSpaces.map((i) => i.url)} name={name} />
-
-      {livePhotos.length > 0 && (
-        <section className="px-4 pt-16 md:px-12">
-          <Eyebrow>{t("product.liveEyebrow")}</Eyebrow>
-          <H className="mt-3 text-[28px] md:text-[40px]">{t("product.liveTitle")}</H>
-          <div className="mt-7 grid grid-cols-2 gap-3 md:grid-cols-4">
-            {livePhotos.map((img) => (
-              <Media key={img.id} src={img.url} alt={text(img.alt, "image alt")} className="aspect-square rounded-tile" />
-            ))}
-          </div>
-        </section>
-      )}
+      {realSpaces.length > 0 && <RealSpaces images={realSpaces.map((i) => i.url)} name={name} />}
 
       {/* See in your home (coming soon) */}
       <section className="px-4 pt-16 md:px-12">
