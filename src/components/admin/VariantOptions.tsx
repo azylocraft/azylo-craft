@@ -63,7 +63,6 @@ export function VariantOptions({
   const sb = supabaseBrowser();
   const [index, setIndex] = useState<IndexRow[] | null>(null);
   const [savedIndex, setSavedIndex] = useState("");
-  const [showIndex, setShowIndex] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
   // What is being typed in the price box (kept as typed; other materials are rounded to ₹10).
   const [typed, setTyped] = useState<string | null>(null);
@@ -114,8 +113,9 @@ export function VariantOptions({
   }
 
   /** Rebuild the variant list for the chosen materials × colours at the given base price. */
-  const rebuild = (mats: string[], cols: Colour[], newBase: number | null, typedExact: number | null = null) => {
-    const ordered = index.map((m) => m.name).filter((n) => mats.includes(n));
+  const rebuild = (mats: string[], cols: Colour[], newBase: number | null, typedExact: number | null = null, idx: IndexRow[] = index) => {
+    const pct = (name: string) => idx.find((m) => m.name === name)?.index ?? 0;
+    const ordered = idx.map((m) => m.name).filter((n) => mats.includes(n));
     const next: OptionVariant[] = [];
     const used = new Set<OptionVariant>();
     for (const m of ordered)
@@ -123,7 +123,7 @@ export function VariantOptions({
         const old = live.find((v) => v.model_en.trim() === m && v.color_en.trim() === c.name);
         // The material whose price was typed keeps it exactly; the others are rounded to ₹10.
         const exact = m === basisMaterial && typedExact != null ? typedExact : null;
-        const price = newBase == null ? "" : String(exact ?? round10((newBase * indexOf(m)) / 100));
+        const price = newBase == null ? "" : String(exact ?? round10((newBase * pct(m)) / 100));
         if (old) used.add(old);
         next.push(
           old
@@ -158,13 +158,26 @@ export function VariantOptions({
     rebuild(materials, colours, n && idx ? (n / idx) * 100 : null, n || null);
   };
 
+  /** Edit a material's percentage: the typed (basis) material keeps its price, the others follow the new index. */
+  const changeIndex = (name: string, value: string) => {
+    const next = index.map((x) => (x.name === name ? { ...x, index: Number(value.replace(/\D/g, "")) || 0 } : x));
+    setIndex(next);
+    const basisPrice = priceOf(basisMaterial);
+    const basisPct = next.find((m) => m.name === basisMaterial)?.index ?? 0;
+    if (basisPrice != null && basisPct) rebuild(materials, colours, (basisPrice / basisPct) * 100, basisPrice, next);
+    else setMsg("Changed — click “Save product” to apply.");
+  };
+
   const indexChanged = JSON.stringify(index) !== savedIndex;
-  const saveIndex = async () => {
-    const { error } = await sb.from("store_settings").update({ material_price_index: index }).eq("id", 1);
-    if (error) return setMsg(error.message);
-    setSavedIndex(JSON.stringify(index));
-    if (base != null) rebuild(materials, colours, base);
-    setMsg("Price index saved (used for every product) — click “Save product” to update this product's prices.");
+  /** Save product; a changed price index is saved first (it is shared by every product). */
+  const saveAll = async () => {
+    if (indexChanged) {
+      const { error } = await sb.from("store_settings").update({ material_price_index: index }).eq("id", 1);
+      if (error) return setMsg(error.message);
+      setSavedIndex(JSON.stringify(index));
+    }
+    setMsg(null);
+    onSave();
   };
 
   return (
@@ -200,44 +213,38 @@ export function VariantOptions({
 
       {/* 2. Materials */}
       <div className="mt-5">
-        <div className="mb-2 flex items-center justify-between">
+        <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
           <span className="text-xs font-bold text-ink2">Materials</span>
-          <button type="button" className="text-xs font-bold underline" onClick={() => setShowIndex(!showIndex)}>
-            {showIndex ? "Hide price index" : "Edit price index"}
-          </button>
+          <span className="text-[11px] text-muted">% = price compared with the 100% material. Changing a % updates prices here and for every product (saved with “Save product”).</span>
         </div>
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {index.map((m) => {
             const on = materials.includes(m.name);
             const p = priceOf(m.name);
             return (
-              <label key={m.name} className={`flex cursor-pointer items-center gap-3 rounded-tile border p-3 text-sm ${on ? "border-ink bg-white" : "border-line bg-bg2 text-muted"}`}>
-                <input type="checkbox" checked={on} onChange={() => toggleMaterial(m.name)} className="size-4 accent-[var(--az-ink)]" />
-                <span className="flex-1">{m.name}</span>
-                {showIndex ? (
-                  <span className="inline-flex items-center gap-1 text-xs">
-                    <input
-                      className="field !min-h-8 !w-16 py-0.5 text-right"
-                      inputMode="numeric"
-                      aria-label={`${m.name} price index`}
-                      value={m.index}
-                      onClick={(e) => e.preventDefault()}
-                      onChange={(e) => setIndex(index.map((x) => (x.name === m.name ? { ...x, index: Number(e.target.value.replace(/[^\d.]/g, "")) || 0 } : x)))}
-                    />
-                    %
+              <div key={m.name} className={`flex items-center gap-2 rounded-tile border p-2.5 pl-3 text-sm ${on ? "border-ink bg-white" : "border-line bg-bg2 text-muted"}`}>
+                <label className="flex min-w-0 flex-1 cursor-pointer items-center gap-2.5">
+                  <input type="checkbox" checked={on} onChange={() => toggleMaterial(m.name)} className="size-4 flex-none accent-[var(--az-ink)]" />
+                  <span className="truncate" title={m.name}>
+                    {m.name}
                   </span>
-                ) : (
-                  <span className="text-xs font-bold">{on && p != null ? inr(p) : `${m.index}%`}</span>
-                )}
-              </label>
+                </label>
+                <span className="inline-flex flex-none items-center gap-1 text-xs">
+                  <input
+                    className="field !min-h-8 !w-16 py-0.5 text-right"
+                    inputMode="numeric"
+                    aria-label={`${m.name} price index`}
+                    value={m.index || ""}
+                    onChange={(e) => changeIndex(m.name, e.target.value)}
+                  />
+                  %
+                </span>
+                <span className="w-[72px] flex-none text-right text-xs font-bold">{on && p != null ? inr(p) : "—"}</span>
+              </div>
             );
           })}
         </div>
-        {showIndex && indexChanged && (
-          <Btn size="sm" kind="light" className="mt-2" onClick={saveIndex}>
-            Save price index
-          </Btn>
-        )}
+        {indexChanged && <p className="mt-2 text-[11px] font-bold text-gold">Price index changed — it will be saved for all products when you click “Save product”.</p>}
       </div>
 
       {/* 3. Colours */}
@@ -258,7 +265,7 @@ export function VariantOptions({
       </div>
 
       <div className="mt-5 flex flex-wrap items-center gap-3 border-t border-line2 pt-4">
-        <Btn iconL={Save} onClick={onSave} disabled={saving}>
+        <Btn iconL={Save} onClick={saveAll} disabled={saving}>
           {saving ? "Saving…" : "Save product"}
         </Btn>
         <span className="text-xs text-muted">
