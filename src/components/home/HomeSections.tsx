@@ -33,15 +33,18 @@ function Section({ children, className }: { children: React.ReactNode; className
   return <section className={clsx("px-4 pt-16 md:px-12 md:pt-24", className)}>{children}</section>;
 }
 
+/** Bau section head: "02/ label" + title on the left, short description (and actions) on the right. */
 function SecHead({ eb, title, sub, right }: { eb?: string; title: React.ReactNode; sub?: string; right?: React.ReactNode }) {
   return (
-    <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end md:gap-8">
-      <div className="flex max-w-[760px] flex-col gap-3.5">
+    <div className="grid gap-5 md:grid-cols-2 md:gap-10">
+      <div className="flex flex-col gap-1.5">
         {eb && <Eyebrow>{eb}</Eyebrow>}
-        <H className="text-[32px] md:text-[48px]">{title}</H>
-        {sub && <P>{sub}</P>}
+        <H className="text-[30px] md:text-[40px]">{title}</H>
       </div>
-      {right && <div className="flex flex-none items-center gap-2.5">{right}</div>}
+      <div className="flex flex-col items-start gap-5 md:pt-6">
+        {sub && <P className="max-w-[420px] lowercase text-ink2">{sub}</P>}
+        {right && <div className="flex flex-wrap items-center gap-2.5">{right}</div>}
+      </div>
     </div>
   );
 }

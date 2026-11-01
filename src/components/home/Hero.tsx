@@ -21,7 +21,7 @@ export function Hero({ featured = null }: { featured?: FeaturedProduct }) {
   return (
     <section className="px-4 pt-4 md:px-12 md:pt-6">
       <div className="relative overflow-hidden rounded-t-[28px] bg-white px-5 pb-8 pt-6 md:rounded-t-hero lg:h-[clamp(470px,42vw,600px)] lg:p-0">
-        <h1 className="az-h text-center text-[22vw] font-extrabold leading-none tracking-[-0.06em] lg:absolute lg:inset-x-0 lg:top-10 lg:text-[clamp(120px,17.4vw,250px)]">
+        <h1 className="az-h relative z-[3] text-center text-[22vw] font-[700] leading-none tracking-[-0.06em] lg:absolute lg:inset-x-0 lg:top-10 lg:text-[clamp(120px,17.4vw,250px)]">
           {HERO_WORDS.map((w, i) => (
             <span key={w}>
               {i > 0 && " "}
@@ -61,15 +61,15 @@ export function Hero({ featured = null }: { featured?: FeaturedProduct }) {
 
       <div className="grid items-center gap-8 rounded-b-[28px] bg-dark px-6 py-10 text-white md:rounded-b-hero md:px-16 md:py-14 lg:grid-cols-2 lg:gap-10">
         <div className="flex flex-col gap-1.5">
-          <span className="text-[12.5px] text-on-dark-muted">01/ who we are</span>
+          <Eyebrow>who we are</Eyebrow>
           <div className="flex flex-wrap items-center gap-x-10 gap-y-4">
-            <H className="text-[30px] text-white md:text-[36px]">what about us</H>
+            <H className="text-[30px] text-white md:text-[38px]">what about us</H>
             <BtnLink href={routes.about} kind="ghostW" size="sm" icon={ArrowRight} className="border-white">
               more about azylo
             </BtnLink>
           </div>
         </div>
-        <P className="text-[18px] leading-[1.45] text-white">
+        <P className="max-w-[520px] text-[18px] leading-[1.45] text-white">
           made-to-order recliners, sofa beds and small-space sofas. delivered free across india, sized for real homes.
         </P>
       </div>

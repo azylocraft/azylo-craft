@@ -3,21 +3,21 @@
 // variables, and globals.css maps those variables onto Tailwind utilities.
 
 export const colors = {
-  bg: "#F2F2F0",
-  bg2: "#FAFAF9",
+  bg: "#FFFFFF",
+  bg2: "#F7F7F5",
   card: "#FFFFFF",
   ink: "#151412",
   ink2: "#2B2926",
   muted: "#6E685F",
   faint: "#A19A8F",
-  line: "#E7E1D6",
-  line2: "#EFEAE1",
+  line: "#E6E5E1",
+  line2: "#EFEEEA",
   // "gold" is the brand accent token; in the Bau theme it is olive (the logo dot).
   gold: "#6B6A33",
-  goldSoft: "#ECECE4",
-  goldLine: "#B9B88A",
+  goldSoft: "#F1F1EA",
+  goldLine: "#CFCEB4",
   goldBright: "#B9B88A",
-  cream: "#EBEBE8",
+  cream: "#EFEFEC",
   dark: "#1A1917",
   dark2: "#232220",
   darkLine: "#2E2D2B",
@@ -30,8 +30,8 @@ export const colors = {
   blue: "#2F6FE4",
   red: "#B93A2B",
   redSoft: "#FBEDEA",
-  skeleton: "#ECE7DE",
-  skeletonHi: "#F5F1EA",
+  skeleton: "#EEEEEB",
+  skeletonHi: "#F7F7F5",
   toggleOff: "#D8D2C7",
   checkLine: "#CFC8BC",
 } as const;
@@ -43,20 +43,20 @@ export const fonts = {
 } as const;
 
 export const shadows = {
-  card: "0 1px 2px rgba(26,25,23,.04), 0 12px 32px -14px rgba(26,25,23,.14)",
-  float: "0 30px 80px -20px rgba(26,25,23,.35)",
-  soft: "0 8px 24px -12px rgba(26,25,23,.18)",
-  bar: "0 6px 18px -14px rgba(0,0,0,.25)",
+  card: "none",
+  float: "0 30px 80px -20px rgba(26,25,23,.30)",
+  soft: "0 14px 34px -18px rgba(26,25,23,.20)",
+  bar: "none",
 } as const;
 
 export const radii = {
-  field: "14px",
-  tile: "18px",
-  card: "20px",
-  panel: "22px",
-  block: "30px",
-  section: "26px",
-  modal: "28px",
+  field: "16px",
+  tile: "22px",
+  card: "28px",
+  panel: "28px",
+  block: "32px",
+  section: "32px",
+  modal: "32px",
   hero: "36px",
   pill: "999px",
 } as const;

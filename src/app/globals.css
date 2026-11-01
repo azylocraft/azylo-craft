@@ -48,6 +48,11 @@
   --radius-section: var(--az-radius-section);
   --radius-modal: var(--az-radius-modal);
   --radius-hero: var(--az-radius-hero);
+
+  /* Bau feel: nothing heavier than semibold except the wordmark and hero headline. */
+  --font-weight-extrabold: 600;
+  --font-weight-bold: 600;
+  --font-weight-semibold: 500;
 }
 
 html {
@@ -140,6 +145,19 @@ select.field { appearance: none; background-image: linear-gradient(45deg, transp
   text-transform: lowercase;
 }
 
+/* Small labels read as quiet lowercase text, never tracked capitals. */
+.uppercase {
+  text-transform: lowercase;
+  letter-spacing: 0;
+}
+
+/* Section labels read "01/ who we are" — numbered per page. */
+main { counter-reset: az-sec; }
+main .az-eb[data-n] { counter-increment: az-sec; }
+main .az-eb[data-n]::before { content: counter(az-sec, decimal-leading-zero) "/"; margin-right: -0.2em; }
+
+a:focus-visible { outline-offset: 4px; border-radius: 8px; }
+
 /* Muted labels stay readable on dark surfaces. */
 .bg-dark .az-eb, .bg-dark2 .az-eb, .bg-ink .az-eb { color: var(--az-on-dark-muted); }
 
@@ -167,7 +185,7 @@ a:hover .az-logo-dot { animation: az-dot-hop .6s cubic-bezier(.3, 1.6, .5, 1); }
 .az-card:hover { transform: translateY(-4px); }
 .az-card:hover img { transform: scale(1.05); }
 .az-card .az-card-go { transition: transform .4s cubic-bezier(.2, .7, .2, 1); }
-.az-card:hover .az-card-go { transform: rotate(-45deg); }
+.az-card:hover .az-card-go { transform: rotate(45deg); }
 
 /* Hero: words rise out of a mask, the photo settles in. */
 .az-mask { display: inline-block; overflow: hidden; vertical-align: bottom; padding-bottom: .06em; }

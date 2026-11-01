@@ -26,9 +26,9 @@ export function Eyebrow({
 }) {
   return (
     <div
-      className={clsx("az-eb flex items-center gap-3 text-[12.5px] font-medium lowercase tracking-normal text-muted", center && "justify-center", className)}
+      data-n={line ? "" : undefined}
+      className={clsx("az-eb flex items-center gap-[0.45em] text-[12.5px] font-normal lowercase tracking-normal text-muted", center && "justify-center", className)}
     >
-      {line && <span aria-hidden className="size-1.5 flex-none rounded-full bg-gold" />}
       {children}
     </div>
   );
@@ -37,7 +37,7 @@ export function Eyebrow({
 type HeadingTag = "h1" | "h2" | "h3" | "div";
 export function H({ as: Tag = "h2", children, className }: { as?: HeadingTag; children: ReactNode; className?: string }) {
   return (
-    <Tag className={clsx("az-h text-balance font-bold leading-[1.02] tracking-[-0.05em]", className)}>{children}</Tag>
+    <Tag className={clsx("az-h text-balance font-medium leading-[1.04] tracking-[-0.04em]", className)}>{children}</Tag>
   );
 }
 
@@ -60,8 +60,8 @@ const btnKinds: Record<BtnKind, string> = {
 };
 const btnSizes: Record<BtnSize, string> = {
   sm: "h-9 px-4 text-[12.5px]",
-  md: "h-[46px] px-[26px] text-[13.5px]",
-  lg: "h-[54px] px-[26px] text-[13.5px]",
+  md: "h-[44px] px-[24px] text-[13.5px]",
+  lg: "h-[52px] px-[26px] text-[14px]",
 };
 
 export function btnClass(kind: BtnKind = "dark", size: BtnSize = "md", full?: boolean) {
@@ -77,7 +77,7 @@ export function btnClass(kind: BtnKind = "dark", size: BtnSize = "md", full?: bo
 type BtnOwn = { kind?: BtnKind; size?: BtnSize; full?: boolean; icon?: LucideIcon; iconL?: LucideIcon };
 
 /** Trailing arrow in a ringed circle at the pill's right edge (the "to gallery ↗" button). */
-const arrowEdge: Record<BtnSize, string> = { sm: "-mr-[13px]", md: "-mr-[23px]", lg: "-mr-[23px]" };
+const arrowEdge: Record<BtnSize, string> = { sm: "-mr-[13px]", md: "-mr-[21px]", lg: "-mr-[23px]" };
 
 export function BtnArrow({ Icon, size = "md" }: { Icon: LucideIcon; size?: BtnSize }) {
   return (
@@ -181,7 +181,7 @@ export function Badge({ children, tone = "gold", className }: { children: ReactN
 }
 
 export function Card({ children, className }: { children: ReactNode; className?: string }) {
-  return <div className={clsx("rounded-block border border-line2 bg-white p-7 shadow-card", className)}>{children}</div>;
+  return <div className={clsx("rounded-block border border-line2 bg-white p-7", className)}>{children}</div>;
 }
 
 export function Skel({ className }: { className?: string }) {
@@ -197,8 +197,8 @@ export function Logo({ className, light, size = 20 }: { className?: string; ligh
   const fs = Math.round(size * 1.25);
   return (
     <span
-      className={clsx("az-logo inline-flex items-baseline gap-[2px] font-extrabold lowercase leading-none tracking-[-0.055em]", light ? "text-white" : "text-ink", className)}
-      style={{ fontSize: fs }}
+      className={clsx("az-logo inline-flex items-baseline gap-[2px] lowercase leading-none tracking-[-0.055em]", light ? "text-white" : "text-ink", className)}
+      style={{ fontSize: fs, fontWeight: 800 }}
     >
       azylo
       <span aria-hidden className="az-logo-dot inline-block flex-none rounded-full bg-gold" style={{ width: size * 0.32, height: size * 0.32 }} />

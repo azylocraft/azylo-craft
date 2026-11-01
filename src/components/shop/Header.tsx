@@ -129,7 +129,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-30">
       {/* Mobile bar (< 768px) */}
-      <div className="flex h-[60px] items-center justify-between border-b border-line bg-bg2 px-[18px] md:hidden">
+      <div className="flex h-[60px] items-center justify-between border-b border-line bg-white px-[18px] md:hidden">
         <button type="button" aria-label={t("header.menu")} aria-expanded={drawer} onClick={() => setDrawer(true)} className="p-1 -ml-1">
           <Menu size={22} aria-hidden />
         </button>
@@ -145,7 +145,7 @@ export function Header() {
       </div>
 
       {/* Desktop row 1 */}
-      <div className="hidden h-[76px] items-center gap-8 bg-bg2 px-6 md:flex lg:px-12">
+      <div className="hidden h-[76px] items-center gap-8 bg-white px-6 md:flex lg:px-12">
         <div className="flex-none lg:w-[260px]">
           <Link href={routes.home} aria-label="AZYLO home">
             <Logo />
@@ -155,7 +155,7 @@ export function Header() {
           <button
             type="button"
             onClick={() => openDrawer("search")}
-            className="flex h-[46px] w-full max-w-[560px] items-center gap-3 rounded-full border border-ink bg-white px-5 text-left text-sm text-muted hover:border-gold"
+            className="flex h-[42px] w-full max-w-[520px] items-center gap-3 rounded-full border border-line bg-bg2 px-5 text-left text-[13px] lowercase text-muted transition-colors hover:border-ink"
           >
             <span className="flex-1 truncate">{t("header.search")}</span>
             <Search size={18} className="text-ink" aria-hidden />
@@ -170,14 +170,14 @@ export function Header() {
       </div>
 
       {/* Desktop row 2 */}
-      <div className="relative hidden h-[60px] items-center gap-1.5 border-b border-line bg-white px-6 shadow-bar md:flex lg:px-10">
+      <div className="relative hidden h-[56px] items-center gap-1.5 border-b border-line bg-white px-6 md:flex lg:px-12">
         <div ref={catRef} className="relative flex-none">
           <button
             type="button"
             aria-expanded={menu === "cat"}
             aria-controls="az-cat-panel"
             onClick={() => toggle("cat")}
-            className="inline-flex h-10 items-center gap-2.5 rounded-full bg-dark px-[18px] text-[13px] font-bold text-white"
+            className="inline-flex h-9 items-center gap-2 rounded-full bg-ink px-4 text-[12.5px] font-medium lowercase text-white"
           >
             <Grip size={16} className="text-gold-line" aria-hidden />
             {t("header.categories")}
@@ -219,11 +219,10 @@ export function Header() {
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 className={clsx(
-                  "inline-flex h-[38px] flex-none items-center gap-[7px] whitespace-nowrap rounded-full border px-[11px] text-xs font-bold text-ink2 hover:border-ink",
-                  active ? "border-ink bg-gold-soft" : "border-line bg-white",
+                  "inline-flex h-9 flex-none items-center whitespace-nowrap rounded-full border px-3.5 text-[12.5px] font-normal lowercase transition-colors hover:border-ink",
+                  active ? "border-ink bg-ink text-white" : "border-line bg-white text-ink2",
                 )}
               >
-                <span aria-hidden className="size-[5px] rounded-full bg-gold" />
                 {t(item.key)}
               </Link>
             );
@@ -236,7 +235,7 @@ export function Header() {
             aria-expanded={menu === "disc"}
             aria-controls="az-disc-panel"
             onClick={() => toggle("disc")}
-            className="inline-flex h-[38px] items-center gap-2 rounded-full border border-gold-line bg-gold-soft px-3.5 text-[12.5px] font-bold text-gold"
+            className="inline-flex h-9 items-center gap-2 rounded-full border border-line bg-white px-3.5 text-[12.5px] font-normal lowercase text-ink2 hover:border-ink"
           >
             <Diamond size={12} aria-hidden />
             {t("header.discover")}

@@ -2,10 +2,9 @@
 
 import clsx from "clsx";
 import Link from "next/link";
-import { ArrowRight, ArrowUpRight, Heart, ShieldCheck, Truck } from "lucide-react";
+import { ArrowUpRight, Heart } from "lucide-react";
 import { Media } from "@/components/shop/Media";
-import { Price, T, useHydrated, useLocale, useText } from "@/components/shop/ShopContext";
-import { Badge, BtnArrow, btnClass, Divider } from "@/components/ui/primitives";
+import { Price, T, useHydrated, useText } from "@/components/shop/ShopContext";
 import { useT } from "@/lib/i18n";
 import { useShop } from "@/lib/shop-store";
 import type { ProductCardData } from "@/lib/types";
@@ -37,138 +36,107 @@ export function WishHeart({ productId, size = 36, className }: { productId: stri
   );
 }
 
-/** Carousel card (spec §4.1 / design PCard). */
+
+function OffPrice({ p, size = "text-[16px]" }: { p: ProductCardData; size?: string }) {
+  const off = p.compareAtInr && p.fromPriceInr != null && p.compareAtInr > p.fromPriceInr ? Math.round(((p.compareAtInr - p.fromPriceInr) / p.compareAtInr) * 100) : 0;
+  return (
+    <span className={clsx("inline-flex flex-wrap items-baseline gap-x-1.5 font-semibold tracking-[-0.02em]", size)}>
+      <Price cad={p.fromPriceInr} withCode={false} />
+      {off > 0 && (
+        <>
+          <s className="text-[11px] font-normal text-faint">
+            <Price cad={p.compareAtInr} withCode={false} />
+          </s>
+          <span className="text-[11px] font-medium text-red">−{off}%</span>
+        </>
+      )}
+    </span>
+  );
+}
+
+/** Round black arrow that sits over the tile's bottom edge (Bau tile). */
+function TileArrow({ size = 36 }: { size?: number }) {
+  return (
+    <span
+      aria-hidden
+      style={{ width: size, height: size, marginLeft: -size / 2, bottom: -size / 2 }}
+      className="absolute left-1/2 flex items-center justify-center rounded-full bg-ink text-white ring-4 ring-bg"
+    >
+      <span className="az-card-go flex">
+        <ArrowUpRight size={Math.round(size * 0.44)} />
+      </span>
+    </span>
+  );
+}
+
+/** Carousel tile: name + note on top, photo, price, round arrow on the bottom edge. */
 export function PCard({ p, imgH = 300 }: { p: ProductCardData; imgH?: number }) {
   const t = useT();
   const text = useText();
   return (
-    <Link
-      href={`/products/${p.slug}`}
-      className="az-card group flex h-full flex-col overflow-hidden rounded-card border border-line2 bg-white shadow-card hover:shadow-soft"
-    >
-      <Media src={p.image} alt={text(p.name, "product name")} tone={p.tone} label={p.image ? undefined : t("card.photoLabel")} className="flex-none" >
-        <div style={{ height: imgH }} />
-        {p.image2 && (
-          <img
-            src={p.image2}
-            alt=""
-            loading="lazy"
-            className="absolute inset-0 size-full object-cover opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-          />
-        )}
-        {p.imageCount > 1 && (
-          <span className="absolute bottom-3 right-3 rounded-full bg-white/90 px-2 py-0.5 text-[11px] font-bold">1/{p.imageCount}</span>
-        )}
-        <WishHeart productId={p.id} className="absolute right-3 top-3" />
-      </Media>
-      <div className="flex flex-1 flex-col gap-2.5 p-[18px]">
-        <span className="text-[10.5px] font-extrabold uppercase tracking-[.14em] text-gold">
-          <T text={p.eyebrow} field="category tag" fallback />
-        </span>
-        <div className="line-clamp-2 min-h-[42px] text-base font-extrabold leading-[1.3] tracking-[-0.01em]">
-          <T text={p.name} field="product name" fallback />
-        </div>
-        <span className="flex flex-wrap gap-1.5">
-          {p.chips.map((c) => (
-            <Badge key={c} tone="grey" className="normal-case tracking-normal">
-              {c}
-            </Badge>
-          ))}
-        </span>
-        <Divider />
-        <div className="flex items-end justify-between">
-          <div>
-            <div className="text-[10px] font-bold tracking-[.1em] text-muted">{t("card.from")}</div>
-            <div className="text-[19px] font-extrabold">
-              <Price cad={p.fromPriceInr} withCode={false} />
-              {p.compareAtInr && p.fromPriceInr != null && p.compareAtInr > p.fromPriceInr ? (
-                <span className="ml-1.5 inline-flex items-center gap-1.5 align-middle">
-                  <s className="text-[11px] font-semibold text-faint"><Price cad={p.compareAtInr} withCode={false} /></s>
-                  <span className="rounded-full bg-red px-1.5 py-0.5 text-[10px] font-extrabold text-white">-{Math.round(((p.compareAtInr - p.fromPriceInr) / p.compareAtInr) * 100)}%</span>
-                </span>
-              ) : null}
-            </div>
+    <div className="h-full pb-5">
+      <Link href={`/products/${p.slug}`} className="az-card group relative flex h-full flex-col rounded-card bg-cream p-2 pb-8">
+        <div className="flex items-start justify-between gap-4 px-3 pb-3 pt-2.5">
+          <div className="line-clamp-2 text-[16px] font-semibold lowercase leading-[1.2] tracking-[-0.03em]">
+            <T text={p.name} field="product name" fallback />
           </div>
-          <span className="flex items-center gap-1.5 text-[11px] text-muted">
-            <span aria-hidden className="size-1.5 rounded-full bg-green" />
-            {t("card.madeToOrder")}
+          <span className="max-w-[42%] flex-none text-right text-[10.5px] lowercase leading-[1.35] text-muted">
+            <T text={p.eyebrow} field="category tag" fallback />
           </span>
         </div>
-        <span className="flex items-center gap-2 text-[11.5px] text-muted">
-          <Truck size={15} className="text-gold" aria-hidden />
-          {t("card.freeDelivery")}
-        </span>
-        <span className="flex items-start gap-2 text-[11.5px] leading-[1.4] text-muted">
-          <ShieldCheck size={15} className="flex-none text-gold" aria-hidden />
-          {t("card.dutiesNote")}
-        </span>
-        <span className={clsx(btnClass("dark", "md", true), "mt-auto")}>
-          {t("card.viewSofa")}
-          <BtnArrow Icon={ArrowUpRight} />
-        </span>
-      </div>
-    </Link>
+        <Media src={p.image} alt={text(p.name, "product name")} tone={p.tone} label={p.image ? undefined : t("card.photoLabel")} className="flex-none rounded-[22px]">
+          <div style={{ height: imgH }} />
+          {p.image2 && (
+            <img src={p.image2} alt="" loading="lazy" className="absolute inset-0 size-full object-cover opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+          )}
+          <WishHeart productId={p.id} className="absolute right-3 top-3" />
+        </Media>
+        <div className="flex items-baseline justify-between gap-3 px-3 pt-3.5">
+          <OffPrice p={p} />
+          <span className="flex-none text-[11px] lowercase text-muted">{t("card.madeToOrder")}</span>
+        </div>
+        <TileArrow />
+      </Link>
+    </div>
   );
 }
 
-/** Grid card (spec §4.2 / design GCard). */
+/** Grid tile (collections, search, related). */
 export function GCard({ p, imgH = 270 }: { p: ProductCardData; imgH?: number }) {
   const t = useT();
   const text = useText();
-  const { lang } = useLocale();
   return (
-    <Link
-      href={`/products/${p.slug}`}
-      className="az-card group flex h-full flex-col overflow-hidden rounded-card border border-line2 bg-white shadow-card hover:shadow-soft"
-    >
-      <Media src={p.image} alt={text(p.name, "product name")} tone={p.tone} label={p.image ? undefined : t("card.photoLabel")}>
-        <div className="h-[150px] sm:h-[210px] lg:h-[var(--img-h)]" style={{ ["--img-h" as string]: `${imgH}px` }} />
-        {p.isNew && (
-          <Badge tone="blue" className="absolute left-3 top-3 normal-case tracking-normal">
-            {t("card.new")}
-          </Badge>
-        )}
-        <WishHeart productId={p.id} className="absolute right-2 top-2 sm:right-3 sm:top-3" />
-      </Media>
-      <div className="flex flex-1 flex-col gap-2 p-3 sm:px-[18px] sm:pb-[18px] sm:pt-4">
-        <span className="text-[9.5px] font-extrabold tracking-[.16em] text-gold sm:text-[10.5px]">AZYLO</span>
-        <div className="line-clamp-2 min-h-[32px] text-[12.5px] font-bold leading-[1.35] sm:min-h-[39px] sm:text-[14.5px]">
-          <T text={p.name} field="product name" fallback />
+    <div className="h-full pb-4">
+      <Link href={`/products/${p.slug}`} className="az-card group relative flex h-full flex-col rounded-[22px] bg-cream p-1.5 pb-7 sm:rounded-card sm:p-2 sm:pb-8">
+        <div className="flex items-start justify-between gap-3 px-2 pb-2 pt-1.5 sm:px-3 sm:pb-3 sm:pt-2.5">
+          <div className="line-clamp-2 text-[12.5px] font-semibold lowercase leading-[1.25] tracking-[-0.02em] sm:text-[15px]">
+            <T text={p.name} field="product name" fallback />
+          </div>
+          {p.isNew && <span className="flex-none text-[10px] lowercase text-gold sm:text-[11px]">{t("card.new")}</span>}
         </div>
-        {p.reviewCount > 0 && (
-          <span className="inline-flex h-6 self-start items-center gap-1.5 rounded-full bg-gold-soft px-2.5 text-[11px] font-bold text-gold">
-            ★ {t("card.experiences", { n: p.reviewCount })}
-          </span>
-        )}
-        <div className="mt-auto flex items-end justify-between gap-2 pt-1.5">
-          <span className="text-[11px] font-extrabold tracking-[.04em] sm:text-xs">
-            {lang === "fr" ? "À PARTIR DE " : "FROM "}
-            <Price cad={p.fromPriceInr} />
-            {p.compareAtInr && p.fromPriceInr != null && p.compareAtInr > p.fromPriceInr ? (
-                <span className="ml-1.5 inline-flex items-center gap-1.5 align-middle">
-                  <s className="text-[11px] font-semibold text-faint"><Price cad={p.compareAtInr} withCode={false} /></s>
-                  <span className="rounded-full bg-red px-1.5 py-0.5 text-[10px] font-extrabold text-white">-{Math.round(((p.compareAtInr - p.fromPriceInr) / p.compareAtInr) * 100)}%</span>
-                </span>
-              ) : null}
-          </span>
-          <span className="az-card-go hidden size-[38px] flex-none items-center justify-center rounded-full bg-ink text-white sm:flex">
-            <ArrowRight size={15} aria-hidden />
-          </span>
+        <Media src={p.image} alt={text(p.name, "product name")} tone={p.tone} label={p.image ? undefined : t("card.photoLabel")} className="rounded-[16px] sm:rounded-[22px]">
+          <div className="h-[150px] sm:h-[210px] lg:h-[var(--img-h)]" style={{ ["--img-h" as string]: `${imgH}px` }} />
+          <WishHeart productId={p.id} size={32} className="absolute right-2 top-2 sm:right-3 sm:top-3" />
+        </Media>
+        <div className="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-0.5 px-2 pt-2.5 sm:px-3 sm:pt-3.5">
+          <OffPrice p={p} size="text-[13px] sm:text-[15px]" />
+          {p.reviewCount > 0 && <span className="text-[10.5px] text-muted">★ {p.reviewCount}</span>}
         </div>
-      </div>
-    </Link>
+        <TileArrow size={32} />
+      </Link>
+    </div>
   );
 }
 
 export function GCardSkeleton() {
   return (
-    <div className="overflow-hidden rounded-card border border-line2 bg-white">
-      <div className="az-skeleton h-[150px] sm:h-[270px]" />
-      <div className="flex flex-col gap-2.5 p-4">
-        <div className="az-skeleton h-2.5 w-12 rounded" />
-        <div className="az-skeleton h-3.5 w-full rounded" />
+    <div className="rounded-card bg-cream p-2">
+      <div className="flex flex-col gap-2 p-3">
         <div className="az-skeleton h-3.5 w-2/3 rounded" />
-        <div className="az-skeleton mt-3 h-3 w-1/2 rounded" />
+      </div>
+      <div className="az-skeleton h-[150px] rounded-[22px] sm:h-[270px]" />
+      <div className="p-3">
+        <div className="az-skeleton h-3 w-1/2 rounded" />
       </div>
     </div>
   );
