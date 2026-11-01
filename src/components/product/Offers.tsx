@@ -100,7 +100,13 @@ export function OfferStack({ price, bonuses, guaranteeDays, guaranteeText }: { p
           <li key={b.title} className="flex items-center justify-between gap-3 px-4 py-2.5">
             <span className="flex items-center gap-2">
               <BadgeCheck size={16} className="flex-none text-green" aria-hidden />
-              {b.title}
+              {b.href ? (
+                <a href={b.href} target="_blank" rel="noreferrer" className="underline decoration-gold-line underline-offset-2 hover:text-gold">
+                  {b.title}
+                </a>
+              ) : (
+                b.title
+              )}
             </span>
             <span className="flex-none text-right">
               {b.value_inr ? (

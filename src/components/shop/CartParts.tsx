@@ -3,10 +3,10 @@
 import clsx from "clsx";
 import Link from "next/link";
 import { useState } from "react";
-import { CircleAlert, CircleCheck, Minus, Plus, ShoppingBag, Tag, Trash2, X } from "lucide-react";
+import { CircleAlert, CircleCheck, Gift, Minus, Plus, ShoppingBag, Tag, Trash2, X } from "lucide-react";
 import { Media } from "@/components/shop/Media";
 import { Modal, Overlay } from "@/components/shop/Overlay";
-import { Price, T, useText } from "@/components/shop/ShopContext";
+import { Price, T, useShopCtx, useText } from "@/components/shop/ShopContext";
 import { Btn, BtnLink, H, P } from "@/components/ui/primitives";
 import { useCartDetails } from "@/lib/cart-details";
 import { useT } from "@/lib/i18n";
@@ -131,6 +131,7 @@ export function CartLines({ compact }: { compact?: boolean }) {
                 <span className="text-[11.5px] text-muted">
                   <T text={d.color} field="colour" fallback /> / <T text={d.model} field="model" fallback />
                   {l.customColor && ` · ${t("product.customColor")}`}
+                  {l.gift && <GiftLine giftKey={l.gift} qty={l.quantity} />}
                 </span>
               )}
               {d && (
@@ -263,3 +264,16 @@ export function TotalRow({ subtotal, missingPrice }: { subtotal: number; missing
   );
 }
 
+
+/** "+ FREE: Bouclé ottoman" under a cart line that carries a free gift. */
+function GiftLine({ giftKey, qty }: { giftKey: string; qty: number }) {
+  const { settings } = useShopCtx();
+  const g = settings.freeGifts.find((x) => x.key === giftKey);
+  if (!g) return null;
+  return (
+    <span className="mt-1 flex items-center gap-1.5 text-[11.5px] font-bold text-green">
+      <Gift size={12} aria-hidden /> + FREE: {g.title}
+      {qty > 1 ? ` ×${qty}` : ""}
+    </span>
+  );
+}

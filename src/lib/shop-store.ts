@@ -8,6 +8,8 @@ export type CartLine = {
   productId: string;
   quantity: number;
   customColor?: boolean;
+  /** Key of the free gift chosen with this piece (see store_settings.free_gifts). */
+  gift?: string;
 };
 
 type ShopState = {

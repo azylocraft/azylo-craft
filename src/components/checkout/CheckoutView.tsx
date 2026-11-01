@@ -143,7 +143,7 @@ export function CheckoutView() {
 
   const shipErrors = addrErrors(ship);
   const addressValid = Object.keys(shipErrors).length === 0;
-  const items = useMemo(() => cart.map((l) => ({ variantId: l.variantId, quantity: l.quantity, customColor: !!l.customColor })), [cart]);
+  const items = useMemo(() => cart.map((l) => ({ variantId: l.variantId, quantity: l.quantity, customColor: !!l.customColor, gift: l.gift })), [cart]);
 
   // Server quote, refreshed (debounced) whenever cart, destination, shipping or code changes.
   useEffect(() => {

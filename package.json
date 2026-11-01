@@ -12,7 +12,8 @@
     "demo:seed": "bash scripts/sql.sh -f supabase/demo/demo_seed.sql",
     "demo:remove": "bash scripts/sql.sh -f supabase/demo/demo_remove.sql",
     "demo:media": "node scripts/seed-demo-media.mjs",
-    "demo:content": "node supabase/demo/product_recliner.mjs && node supabase/demo/articles.mjs"
+    "demo:content": "node supabase/demo/product_recliner.mjs && node supabase/demo/articles.mjs",
+    "demo:gifts": "node scripts/seed-gifts.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

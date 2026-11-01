@@ -27,6 +27,7 @@ import { VideoModal } from "@/components/product/VideoModal";
 import { PriceCompareHint, PriceComparison } from "@/components/product/PriceComparison";
 import { BuyMoreSaveMore, EmiLine, LaunchPriceTimer, LowStock, OfferStack, PriceBlock, RatingSummary, RecentBuyers, ReviewsSection, TrustBadges } from "@/components/product/Offers";
 import { WriteReview } from "@/components/product/WriteReview";
+import { FreeGiftPicker } from "@/components/product/Gifts";
 import { RelatedCarousel } from "@/components/product/Related";
 import { Stepper } from "@/components/shop/CartParts";
 import { Crumb, RecentlyViewed } from "@/components/shop/Listing";
@@ -69,6 +70,7 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
   const [model, setModel] = useState(models[0]?.[0] ?? "");
   const [color, setColor] = useState(colors[0]?.[0] ?? "");
   const [qty, setQty] = useState(1);
+  const [gift, setGift] = useState<string | null>(null);
   const [video, setVideo] = useState(false);
   const [deliveryOpen, setDeliveryOpen] = useState(false);
   const isCustom = color === CUSTOM;
@@ -99,7 +101,8 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
 
   const add = () => {
     if (!variant || !canBuy) return;
-    addToCart({ variantId: variant.id, productId: product.id, quantity: qty, customColor: isCustom || undefined });
+    const chosenGift = product.freeGiftEnabled && settings.freeGifts.length ? (gift ?? settings.freeGifts[0].key) : undefined;
+    addToCart({ variantId: variant.id, productId: product.id, quantity: qty, customColor: isCustom || undefined, gift: chosenGift });
     openDrawer("cart");
   };
 
@@ -249,6 +252,7 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
               </fieldset>
             )}
 
+            {product.freeGiftEnabled && <FreeGiftPicker value={gift ?? settings.freeGifts[0]?.key ?? null} onChange={setGift} quantity={qty} />}
             <OfferStack price={variant?.priceInr ?? null} bonuses={[...product.bonuses, ...settings.bonusesDefault]} guaranteeDays={product.guaranteeDays} guaranteeText={product.guaranteeText} />
             <LowStock stock={variant?.stock ?? null} />
 

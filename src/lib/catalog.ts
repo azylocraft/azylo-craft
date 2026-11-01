@@ -176,6 +176,7 @@ export async function getProduct(slug: string): Promise<ProductDetail | null> {
         includesGst: !!c.includes_gst, notes: c.notes, checkedOn: c.checked_on,
       })),
     bonuses: Array.isArray(row.bonuses) ? row.bonuses : [],
+    freeGiftEnabled: row.free_gift_enabled !== false,
     guaranteeDays: row.guarantee_days ?? null,
     guaranteeText: row.guarantee_text ?? null,
     reviews: [],
@@ -312,6 +313,7 @@ export async function getStoreSettings(): Promise<StoreSettings> {
     lowStockThreshold: data?.low_stock_threshold ?? 5,
     emiMonths: data?.emi_months ?? 3,
     emiNoCost: !!data?.emi_no_cost,
+    freeGifts: (Array.isArray(data?.free_gifts) ? data.free_gifts : []).map((g: Row) => ({ key: String(g.key), title: String(g.title), value_inr: g.value_inr == null ? null : Number(g.value_inr), image: mediaUrl(g.image_path) })),
     bundleTiers: Array.isArray(data?.bundle_tiers) ? data.bundle_tiers.map((t: Row) => ({ min: Number(t.min), pct: Number(t.pct) })).filter((t: { min: number; pct: number }) => t.min >= 2 && t.pct > 0) : [],
     emailPopup: { enabled: data?.email_popup_enabled ?? false, code: data?.email_popup_code ? String(data.email_popup_code) : null },
   };

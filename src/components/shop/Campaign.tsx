@@ -116,10 +116,23 @@ export function EmailPopup() {
         <span className="mx-auto flex size-14 items-center justify-center rounded-full bg-gold-soft text-gold">
           <Gift size={24} aria-hidden />
         </span>
-        <H className="mt-4 text-[28px]">A welcome gift</H>
+        <H className="mt-4 text-[28px]">{state === "done" ? "Your gift is unlocked" : "A welcome gift for you"}</H>
+        {settings.freeGifts.length > 0 && (
+          <div className="mt-4 grid grid-cols-4 gap-2">
+            {settings.freeGifts.slice(0, 4).map((g) => (
+              <div key={g.key} className="flex flex-col items-center gap-1">
+                <span className="aspect-square w-full overflow-hidden rounded-lg bg-cream">
+                  {g.image && <img src={g.image} alt={g.title} className="size-full object-cover" />}
+                </span>
+                <span className="text-[10px] font-bold leading-tight">{g.title}</span>
+                <b className="text-[10px] text-green">FREE</b>
+              </div>
+            ))}
+          </div>
+        )}
         {state === "done" ? (
           <>
-            <P className="mt-2">Use this code at checkout:</P>
+            <P className="mt-3">Pick your free gift on any sofa page. Plus, use this code at checkout:</P>
             <button
               type="button"
               onClick={async () => {
@@ -138,7 +151,10 @@ export function EmailPopup() {
           </>
         ) : (
           <form onSubmit={submit} className="mt-2 flex flex-col gap-3">
-            <P>Join the AZYLO list for new arrivals and guides, and get a welcome code for your first order.</P>
+            <P>
+              Get one of these <b className="text-ink">free</b> with your first sofa — tea table, bean bag, ottoman or cushion set — plus a welcome discount code. Just
+              join the AZYLO list.
+            </P>
             <input type="email" required className="field text-center" placeholder="Your email address" value={email} onChange={(e) => setEmail(e.target.value)} aria-label="Email" />
             {state === "error" && <p className="text-sm text-red">Enter a valid email address.</p>}
             <Btn type="submit" full disabled={state === "busy"}>{state === "busy" ? "…" : "Get my code"}</Btn>

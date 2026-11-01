@@ -54,6 +54,7 @@ export type ProductDetail = ProductCardData & {
   comparisons: Comparison[];
   comparisonPoints: string[];
   bonuses: Bonus[];
+  freeGiftEnabled: boolean;
   guaranteeDays: number | null;
   guaranteeText: string | null;
   reviews: Review[];
@@ -95,6 +96,7 @@ export type StoreSettings = {
   lowStockThreshold: number;
   emiMonths: number;
   emiNoCost: boolean;
+  freeGifts: FreeGift[];
   bundleTiers: { min: number; pct: number }[];
   emailPopup: { enabled: boolean; code: string | null };
 };
@@ -103,7 +105,8 @@ export type Rates = Record<string, number | null>;
 
 export type Comparison = { id: string; seller: string; url: string | null; priceInr: number; includesDelivery: boolean; includesGst: boolean; notes: string | null; checkedOn: string };
 
-export type Bonus = { title: string; value_inr?: number | null };
+export type Bonus = { title: string; value_inr?: number | null; href?: string | null };
+export type FreeGift = { key: string; title: string; value_inr: number | null; image: string | null };
 export type Review = {
   id: string; rating: number; title: string | null; body: string | null; reason: string | null; photos: string[];
   verified: boolean; location: string | null; author: string | null; createdAt: string;

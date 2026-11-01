@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { AboutView } from "@/components/pages/AboutView";
+import { CareGuide } from "@/components/pages/CareGuide";
 import { ComingSoon } from "@/components/pages/ComingSoon";
+import { GiftsShowcase } from "@/components/pages/GiftsShowcase";
 import { ContactView } from "@/components/pages/ContactView";
 import { FaqView } from "@/components/pages/FaqView";
 import { JournalView } from "@/components/pages/JournalView";
@@ -18,7 +20,8 @@ const TITLES: Record<string, string> = {
   faq: "FAQ",
   blogs: "The Sofa Journal",
   "sofa-materials-guide": "Sofa Materials Guide",
-  "gift-cards": "Gift cards",
+  "gift-cards": "Free gifts & gift cards",
+  "sofa-care-guide": "Free e-book: 10 steps to choosing and caring for your sofa",
   app: "AZYLO App",
   "electric-sofa-catalog": "2026 Electric Sofa Catalog",
 };
@@ -48,7 +51,9 @@ export default async function ContentPage({ params, searchParams }: PageProps<"/
     case "sofa-materials-guide":
       return <MaterialsView materials={await listMaterials()} />;
     case "gift-cards":
-      return <ComingSoon kind="giftCards" />;
+      return <GiftsShowcase />;
+    case "sofa-care-guide":
+      return <CareGuide />;
     case "app":
       return <ComingSoon kind="app" />;
     case "electric-sofa-catalog":
