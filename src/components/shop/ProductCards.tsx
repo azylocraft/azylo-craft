@@ -80,7 +80,7 @@ function TileArrow({ size = 36 }: { size?: number }) {
 }
 
 /** Carousel tile: name + note on top, photo, price, round arrow on the bottom edge. */
-export function PCard({ p, imgH = 300 }: { p: ProductCardData; imgH?: number }) {
+export function PCard({ p }: { p: ProductCardData; /** @deprecated cards use a 4:5 photo area */ imgH?: number }) {
   const t = useT();
   const text = useText();
   return (
@@ -98,10 +98,11 @@ export function PCard({ p, imgH = 300 }: { p: ProductCardData; imgH?: number }) 
             </span>
           )}
         </div>
-        <Media src={p.image} alt={text(p.name, "product name")} tone={p.tone} label={p.image ? undefined : t("card.photoLabel")} className="flex-none rounded-[22px]">
-          <div style={{ height: imgH }} />
+        {/* 4:5 photo area showing the whole photo (product shots are 4:5; white cut-outs sit on white). */}
+        <Media src={p.image} alt={text(p.name, "product name")} tone={p.tone} label={p.image ? undefined : t("card.photoLabel")} fit={p.image ? "contain" : "cover"} className="flex-none rounded-[22px] bg-white">
+          <div className="aspect-[4/5] w-full" />
           {p.image2 && (
-            <img src={p.image2} alt="" loading="lazy" className="absolute inset-0 size-full object-cover opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+            <img src={p.image2} alt="" loading="lazy" className="absolute inset-0 size-full bg-white object-contain opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
           )}
           <WishHeart productId={p.id} className="absolute right-3 top-3" />
         </Media>
@@ -116,7 +117,7 @@ export function PCard({ p, imgH = 300 }: { p: ProductCardData; imgH?: number }) 
 }
 
 /** Grid tile (collections, search, related). */
-export function GCard({ p, imgH = 270 }: { p: ProductCardData; imgH?: number }) {
+export function GCard({ p }: { p: ProductCardData; /** @deprecated cards use a 4:5 photo area */ imgH?: number }) {
   const t = useT();
   const text = useText();
   return (
@@ -128,8 +129,11 @@ export function GCard({ p, imgH = 270 }: { p: ProductCardData; imgH?: number }) 
           </div>
           {p.color ? <ColourTag p={p} /> : p.isNew && <span className="flex-none text-[10px] lowercase text-gold sm:text-[11px]">{t("card.new")}</span>}
         </div>
-        <Media src={p.image} alt={text(p.name, "product name")} tone={p.tone} label={p.image ? undefined : t("card.photoLabel")} className="rounded-[16px] sm:rounded-[22px]">
-          <div className="h-[150px] sm:h-[210px] lg:h-[var(--img-h)]" style={{ ["--img-h" as string]: `${imgH}px` }} />
+        <Media src={p.image} alt={text(p.name, "product name")} tone={p.tone} label={p.image ? undefined : t("card.photoLabel")} fit={p.image ? "contain" : "cover"} className="rounded-[16px] bg-white sm:rounded-[22px]">
+          <div className="aspect-[4/5] w-full" />
+          {p.image2 && (
+            <img src={p.image2} alt="" loading="lazy" className="absolute inset-0 size-full bg-white object-contain opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+          )}
           <WishHeart productId={p.id} size={32} className="absolute right-2 top-2 sm:right-3 sm:top-3" />
         </Media>
         <div className="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-0.5 px-2 pt-2.5 sm:px-3 sm:pt-3.5">
