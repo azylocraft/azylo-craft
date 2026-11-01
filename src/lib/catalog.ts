@@ -16,7 +16,7 @@ import {
 const CARD_SELECT = `
   id, slug, name_en, name_fr, eyebrow_en, eyebrow_fr, chips, functions, is_new, is_best_seller, is_featured,
   placeholder_tone, sort_order, created_at,
-  product_variants ( price_inr, stock, material, color_en, is_active ),
+  product_variants ( price_inr, compare_at_inr, stock, material, color_en, is_active ),
   product_images ( storage_path, image_type, sort_order ),
   reviews ( count )
 `;
@@ -29,9 +29,9 @@ const studioImages = (row: Row) =>
     .sort((a: Row, b: Row) => (a.image_type === "studio" ? 0 : 1) - (b.image_type === "studio" ? 0 : 1) || a.sort_order - b.sort_order);
 
 export function toCard(row: Row): ProductCardData {
-  const prices = (row.product_variants ?? [])
-    .filter((v: Row) => v.is_active !== false && v.price_inr != null)
-    .map((v: Row) => Number(v.price_inr));
+  const priced = (row.product_variants ?? []).filter((v: Row) => v.is_active !== false && v.price_inr != null);
+  const prices = priced.map((v: Row) => Number(v.price_inr));
+  const cheapest = priced.reduce((a: Row, v: Row) => (!a || Number(v.price_inr) < Number(a.price_inr) ? v : a), null);
   const imgs = studioImages(row);
   return {
     id: row.id,
@@ -39,6 +39,7 @@ export function toCard(row: Row): ProductCardData {
     name: tx(row.name_en, row.name_fr),
     eyebrow: tx(row.eyebrow_en, row.eyebrow_fr),
     fromPriceInr: prices.length ? Math.min(...prices) : null,
+    compareAtInr: cheapest?.compare_at_inr != null && Number(cheapest.compare_at_inr) > Number(cheapest.price_inr) ? Number(cheapest.compare_at_inr) : null,
     isNew: !!row.is_new,
     isBestSeller: !!row.is_best_seller,
     reviewCount: row.reviews?.[0]?.count ?? 0,
@@ -145,6 +146,7 @@ export async function getProduct(slug: string): Promise<ProductDetail | null> {
       colorHex: v.color_hex,
       material: v.material,
       priceInr: v.price_inr == null ? null : Number(v.price_inr),
+      compareAtInr: v.compare_at_inr == null ? null : Number(v.compare_at_inr),
       stock: v.stock,
     }));
   const images = [...(row.product_images ?? [])]
@@ -308,7 +310,9 @@ export async function getStoreSettings(): Promise<StoreSettings> {
     bundleMinItems: data?.bundle_min_items ?? 2,
     bundlePercent: Number(data?.bundle_percent ?? 0),
     lowStockThreshold: data?.low_stock_threshold ?? 5,
-    emiMonths: data?.emi_months ?? 12,
+    emiMonths: data?.emi_months ?? 3,
+    emiNoCost: !!data?.emi_no_cost,
+    bundleTiers: Array.isArray(data?.bundle_tiers) ? data.bundle_tiers.map((t: Row) => ({ min: Number(t.min), pct: Number(t.pct) })).filter((t: { min: number; pct: number }) => t.min >= 2 && t.pct > 0) : [],
     emailPopup: { enabled: data?.email_popup_enabled ?? false, code: data?.email_popup_code ? String(data.email_popup_code) : null },
   };
 }
@@ -324,11 +328,17 @@ export async function getRates(): Promise<Rates> {
 export async function productSocialProof(productId: string) {
   const db = supabasePublic();
   const [{ data: reviews }, { data: recent }] = await Promise.all([
-    db.from("reviews").select("id, rating, title, body, author_name, created_at").eq("product_id", productId).eq("is_published", true).order("created_at", { ascending: false }).limit(20),
+    db.from("reviews").select("id, rating, title, body, reason, photos, verified, location, author_name, created_at").eq("product_id", productId).eq("status", "published").order("created_at", { ascending: false }).limit(200),
     db.rpc("product_recent_orders", { p_product: productId, p_days: 30 }),
   ]);
   return {
-    reviews: (reviews ?? []).map((r: Row) => ({ id: r.id, rating: r.rating, title: r.title, body: r.body, author: r.author_name, createdAt: r.created_at })),
+    reviews: (reviews ?? []).map((r: Row) => ({
+      id: r.id, rating: r.rating, title: r.title, body: r.body, reason: r.reason, verified: !!r.verified, location: r.location,
+      photos: (r.photos ?? []).map((p: string) => reviewPhotoUrl(p)), author: r.author_name, createdAt: r.created_at,
+    })),
     recentOrders: typeof recent === "number" ? recent : 0,
   };
 }
+
+export const reviewPhotoUrl = (path: string) =>
+  path.startsWith("http://") || path.startsWith("https://") ? path : `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/review-media/${path}`;

@@ -178,3 +178,9 @@ update public.store_settings set
   bundle_percent = 5, bundle_min_items = 2, email_popup_enabled = true, email_popup_code = 'WELCOME10',
   bonuses_default = '[{"title":"Free delivery to your door","value_inr":null},{"title":"Free fabric samples before you decide","value_inr":null},{"title":"1-to-1 help choosing size and fabric","value_inr":null}]'::jsonb
 where id = 1;
+
+-- Demo offers v2: quantity tiers, free-delivery-only bonus, demo MRP (replace with genuine prices in Admin)
+update public.store_settings set bonuses_default = '[{"title":"Free delivery to your door","value_inr":null}]'::jsonb,
+  bundle_tiers = '[{"min":2,"pct":10},{"min":3,"pct":15}]'::jsonb, bundle_percent = 0, emi_months = 3, emi_no_cost = false where id = 1;
+update public.product_variants v set compare_at_inr = round(price_inr * 1.6 / 100) * 100
+from public.products p where p.id = v.product_id and p.is_demo and v.price_inr >= 100;

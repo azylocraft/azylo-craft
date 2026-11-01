@@ -77,6 +77,7 @@ type Settings = {
   campaign_title: string; campaign_code: string; campaign_ends_at: string;
   bundle_min_items: string; bundle_percent: string; low_stock_threshold: string; emi_months: string;
   email_popup_enabled: boolean; email_popup_code: string; bonuses_default: Bonus[];
+  tiers: { min: string; pct: string }[]; emi_no_cost: boolean;
 };
 
 /** Admin → Settings: launch campaign, bundle rule, store-wide bonuses, email popup, thresholds. */
@@ -95,6 +96,8 @@ export function GrowthSettings() {
         low_stock_threshold: String(d.low_stock_threshold ?? 5), emi_months: String(d.emi_months ?? 12),
         email_popup_enabled: !!d.email_popup_enabled, email_popup_code: d.email_popup_code ?? "",
         bonuses_default: ((d.bonuses_default as { title: string; value_inr?: number | null }[]) ?? []).map((b) => ({ title: b.title, value_inr: b.value_inr ? String(b.value_inr) : "" })),
+        tiers: ((d.bundle_tiers as { min: number; pct: number }[]) ?? []).map((t) => ({ min: String(t.min), pct: String(t.pct) })),
+        emi_no_cost: !!d.emi_no_cost,
       });
     });
   }, [sb]);
@@ -115,13 +118,14 @@ export function GrowthSettings() {
         campaign_title: s.campaign_title.trim() || null,
         campaign_code: s.campaign_code.trim() || null,
         campaign_ends_at: s.campaign_ends_at ? new Date(s.campaign_ends_at).toISOString() : null,
-        bundle_min_items: Math.max(2, Number(s.bundle_min_items) || 2),
-        bundle_percent: Math.min(50, Number(s.bundle_percent) || 0),
         low_stock_threshold: Number(s.low_stock_threshold) || 0,
         emi_months: Math.min(36, Math.max(3, Number(s.emi_months) || 12)),
         email_popup_enabled: s.email_popup_enabled,
         email_popup_code: s.email_popup_code.trim() || null,
         bonuses_default: s.bonuses_default.filter((b) => b.title.trim()).map((b) => ({ title: b.title.trim(), value_inr: b.value_inr ? Number(b.value_inr) : null })),
+        bundle_tiers: s.tiers.filter((t) => Number(t.min) >= 2 && Number(t.pct) > 0).map((t) => ({ min: Number(t.min), pct: Math.min(50, Number(t.pct)) })),
+        bundle_percent: 0,
+        emi_no_cost: s.emi_no_cost,
       })
       .eq("id", 1);
     setMsg(error ? error.message : "Saved ✓ — live on the store within a minute.");
@@ -144,15 +148,32 @@ export function GrowthSettings() {
         {field("campaign_title", "Campaign banner text", { placeholder: "e.g. Launch offer: 10% off everything" })}
         {field("campaign_code", "Campaign discount code", { placeholder: "e.g. WELCOME10" })}
         {field("campaign_ends_at", "Campaign ends (date & time)", { type: "datetime-local" })}
-        {field("bundle_percent", "Bundle discount %", { inputMode: "decimal", placeholder: "0 = off" })}
-        {field("bundle_min_items", "Bundle minimum pieces", { inputMode: "numeric" })}
         {field("emi_months", "EMI months shown", { inputMode: "numeric" })}
         {field("low_stock_threshold", "Show 'Only N left' at or below", { inputMode: "numeric" })}
         {field("email_popup_code", "Welcome popup code", { placeholder: "e.g. WELCOME10" })}
         <label className="flex items-center gap-3 self-end pb-3 text-sm font-bold">
+          <input type="checkbox" checked={s.emi_no_cost} onChange={(e) => setS({ ...s, emi_no_cost: e.target.checked })} className="size-5 accent-[var(--az-ink)]" />
+          Show &quot;No-cost EMI&quot; (enable it in Razorpay first)
+        </label>
+        <label className="flex items-center gap-3 self-end pb-3 text-sm font-bold">
           <input type="checkbox" checked={s.email_popup_enabled} onChange={(e) => setS({ ...s, email_popup_enabled: e.target.checked })} className="size-5 accent-[var(--az-ink)]" />
           Show welcome email popup
         </label>
+      </div>
+      <div className="mt-5">
+        <div className="mb-2 flex items-center justify-between">
+          <span className="text-xs font-bold">Buy more, save more (quantity tiers — highest matching tier applies to the whole order)</span>
+          <Btn size="sm" kind="light" iconL={Plus} onClick={() => setS({ ...s, tiers: [...s.tiers, { min: "", pct: "" }] })}>Add tier</Btn>
+        </div>
+        {s.tiers.map((t, i) => (
+          <div key={i} className="mb-2 flex items-center gap-2 text-sm">
+            <input className="field !min-h-10 w-24" inputMode="numeric" placeholder="2" value={t.min} onChange={(e) => setS({ ...s, tiers: s.tiers.map((x, j) => (j === i ? { ...x, min: e.target.value.replace(/[^0-9]/g, "") } : x)) })} aria-label="Minimum pieces" />
+            <span>or more pieces →</span>
+            <input className="field !min-h-10 w-24" inputMode="decimal" placeholder="10" value={t.pct} onChange={(e) => setS({ ...s, tiers: s.tiers.map((x, j) => (j === i ? { ...x, pct: e.target.value.replace(/[^0-9.]/g, "") } : x)) })} aria-label="Percent off" />
+            <span>% off</span>
+            <button type="button" aria-label="Remove tier" onClick={() => setS({ ...s, tiers: s.tiers.filter((_, j) => j !== i) })} className="p-2 text-red"><Trash2 size={15} aria-hidden /></button>
+          </div>
+        ))}
       </div>
       <div className="mt-5">
         <div className="mb-2 flex items-center justify-between">

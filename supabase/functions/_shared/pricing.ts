@@ -68,7 +68,7 @@ export async function priceCart(db: SupabaseClient, lines: LineInput[], opts: { 
   }
 
   // Shipping (methods from store_settings; free standard delivery by default)
-  const { data: settings } = await db.from("store_settings").select("shipping_methods, bundle_min_items, bundle_percent").eq("id", 1).maybeSingle();
+  const { data: settings } = await db.from("store_settings").select("shipping_methods, bundle_min_items, bundle_percent, bundle_tiers").eq("id", 1).maybeSingle();
   const methods: { code: string; label_en?: string; price_inr: number; days_min?: number; days_max?: number }[] =
     settings?.shipping_methods?.length ? settings.shipping_methods : [{ code: "standard", label_en: "Free standard delivery", price_inr: 0 }];
   const method = methods.find((m) => m.code === opts.shippingCode) ?? methods[0];
@@ -79,9 +79,13 @@ export async function priceCart(db: SupabaseClient, lines: LineInput[], opts: { 
   const tax = 0;
   // Bundle offer: buy N or more pieces, get X% off the subtotal (on top of a discount code, capped at the subtotal).
   const pieces = items.reduce((n, i) => n + i.quantity, 0);
-  const bundlePct = Number(settings?.bundle_percent ?? 0);
-  const bundleMin = Number(settings?.bundle_min_items ?? 2);
-  const bundleDiscount = bundlePct > 0 && pieces >= bundleMin ? round(Math.min((subtotal * bundlePct) / 100, subtotal - discount)) : 0;
+  // Tiered quantity discount ("buy more, save more"): the highest tier whose minimum is met.
+  const tiers: { min: number; pct: number }[] = Array.isArray(settings?.bundle_tiers) && settings.bundle_tiers.length
+    ? settings.bundle_tiers
+    : [{ min: Number(settings?.bundle_min_items ?? 2), pct: Number(settings?.bundle_percent ?? 0) }];
+  const tier = tiers.filter((t) => pieces >= Number(t.min) && Number(t.pct) > 0).sort((a, b) => Number(b.pct) - Number(a.pct))[0];
+  const bundlePct = tier ? Number(tier.pct) : 0;
+  const bundleDiscount = bundlePct > 0 ? round(Math.min((subtotal * bundlePct) / 100, subtotal - discount)) : 0;
   discount = round(discount + bundleDiscount);
   const total = round(subtotal - discount + shipping + tax);
 

@@ -12,6 +12,7 @@ export type ProductCardData = {
   name: I18nText;
   eyebrow: I18nText;
   fromPriceInr: number | null;
+  compareAtInr?: number | null;
   isNew: boolean;
   isBestSeller: boolean;
   reviewCount: number;
@@ -30,6 +31,7 @@ export type Variant = {
   colorHex: string | null;
   material: string | null;
   priceInr: number | null;
+  compareAtInr?: number | null;
   stock: number | null;
 };
 
@@ -92,6 +94,8 @@ export type StoreSettings = {
   bundlePercent: number;
   lowStockThreshold: number;
   emiMonths: number;
+  emiNoCost: boolean;
+  bundleTiers: { min: number; pct: number }[];
   emailPopup: { enabled: boolean; code: string | null };
 };
 
@@ -100,4 +104,7 @@ export type Rates = Record<string, number | null>;
 export type Comparison = { id: string; seller: string; url: string | null; priceInr: number; includesDelivery: boolean; includesGst: boolean; notes: string | null; checkedOn: string };
 
 export type Bonus = { title: string; value_inr?: number | null };
-export type Review = { id: string; rating: number; title: string | null; body: string | null; author: string | null; createdAt: string };
+export type Review = {
+  id: string; rating: number; title: string | null; body: string | null; reason: string | null; photos: string[];
+  verified: boolean; location: string | null; author: string | null; createdAt: string;
+};

@@ -81,6 +81,12 @@ export function PCard({ p, imgH = 300 }: { p: ProductCardData; imgH?: number }) 
             <div className="text-[10px] font-bold tracking-[.1em] text-muted">{t("card.from")}</div>
             <div className="text-[19px] font-extrabold">
               <Price cad={p.fromPriceInr} withCode={false} />
+              {p.compareAtInr && p.fromPriceInr != null && p.compareAtInr > p.fromPriceInr ? (
+                <span className="ml-1.5 inline-flex items-center gap-1.5 align-middle">
+                  <s className="text-[11px] font-semibold text-faint"><Price cad={p.compareAtInr} withCode={false} /></s>
+                  <span className="rounded-full bg-red px-1.5 py-0.5 text-[10px] font-extrabold text-white">-{Math.round(((p.compareAtInr - p.fromPriceInr) / p.compareAtInr) * 100)}%</span>
+                </span>
+              ) : null}
             </div>
           </div>
           <span className="flex items-center gap-1.5 text-[11px] text-muted">
@@ -138,6 +144,12 @@ export function GCard({ p, imgH = 270 }: { p: ProductCardData; imgH?: number }) 
           <span className="text-[11px] font-extrabold tracking-[.04em] sm:text-xs">
             {lang === "fr" ? "À PARTIR DE " : "FROM "}
             <Price cad={p.fromPriceInr} />
+            {p.compareAtInr && p.fromPriceInr != null && p.compareAtInr > p.fromPriceInr ? (
+                <span className="ml-1.5 inline-flex items-center gap-1.5 align-middle">
+                  <s className="text-[11px] font-semibold text-faint"><Price cad={p.compareAtInr} withCode={false} /></s>
+                  <span className="rounded-full bg-red px-1.5 py-0.5 text-[10px] font-extrabold text-white">-{Math.round(((p.compareAtInr - p.fromPriceInr) / p.compareAtInr) * 100)}%</span>
+                </span>
+              ) : null}
           </span>
           <span className="hidden size-[38px] flex-none items-center justify-center rounded-full bg-ink text-white sm:flex">
             <ArrowRight size={15} aria-hidden />

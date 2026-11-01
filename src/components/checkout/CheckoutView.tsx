@@ -246,7 +246,7 @@ export function CheckoutView() {
           {(quote.bundleDiscount ?? 0) > 0 && <div className="flex justify-between text-green"><dt>Bundle offer ({quote.bundlePercent}% off)</dt><dd>−<Price cad={quote.bundleDiscount!} /></dd></div>}
           <div className="flex justify-between"><dt className="text-muted">Shipping</dt><dd>{addressValid ? (quote.shipping === 0 ? "Free" : <Price cad={quote.shipping} />) : <span className="text-muted">Enter address</span>}</dd></div>
           {quote.taxesIncluded ? (
-            <div className="flex justify-between"><dt className="text-muted">GST</dt><dd className="text-muted">Included</dd></div>
+            <div className="flex justify-between"><dt className="text-muted">Extra charges</dt><dd className="text-muted">None</dd></div>
           ) : quote.taxBreakdown.length ? (
             quote.taxBreakdown.map((t) => <div key={t.label} className="flex justify-between"><dt className="text-muted">{t.label} ({t.rate}%)</dt><dd><Price cad={t.amount} /></dd></div>)
           ) : (
@@ -256,7 +256,7 @@ export function CheckoutView() {
             <dt>Total</dt>
             <dd><span className="mr-1.5 text-xs font-bold text-muted">INR</span><Price cad={quote.total} /></dd>
           </div>
-          <p className="text-[11.5px] text-faint">All prices are in INR and include GST.</p>
+          <p className="text-[11.5px] text-faint">All prices are in INR. No hidden charges.</p>
         </dl>
       )}
     </div>

@@ -107,7 +107,7 @@ export function PriceComparison({
               <th className="p-4">Seller</th>
               <th className="p-4">Price</th>
               <th className="p-4 text-center">Free delivery</th>
-              <th className="p-4 text-center">GST included</th>
+              <th className="p-4 text-center">Taxes in price</th>
               <th className="p-4">Notes</th>
             </tr>
           </thead>

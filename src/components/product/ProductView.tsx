@@ -25,7 +25,8 @@ import {
 import { Gallery, Lightbox } from "@/components/product/Gallery";
 import { VideoModal } from "@/components/product/VideoModal";
 import { PriceCompareHint, PriceComparison } from "@/components/product/PriceComparison";
-import { BundleHint, EmiLine, LowStock, OfferStack, RecentBuyers, ReviewsSection, TrustBadges } from "@/components/product/Offers";
+import { BuyMoreSaveMore, EmiLine, LaunchPriceTimer, LowStock, OfferStack, PriceBlock, RatingSummary, RecentBuyers, ReviewsSection, TrustBadges } from "@/components/product/Offers";
+import { WriteReview } from "@/components/product/WriteReview";
 import { RelatedCarousel } from "@/components/product/Related";
 import { Stepper } from "@/components/shop/CartParts";
 import { Crumb, RecentlyViewed } from "@/components/shop/Listing";
@@ -145,12 +146,9 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
             <H as="h1" className="text-[28px] md:text-[38px]">
               <T text={product.name} field="product name" fallback />
             </H>
-            {product.reviewCount > 0 && (
-              <span className="inline-flex h-7 self-start items-center gap-1.5 rounded-full bg-gold-soft px-3 text-xs font-bold text-gold">★ {t("card.experiences", { n: product.reviewCount })}</span>
-            )}
-            <div className="text-[28px] font-extrabold" aria-live="polite">
-              {variant ? <Price cad={variant.priceInr} /> : <Missing field="variants" />}
-            </div>
+            <RatingSummary reviews={product.reviews} />
+            {variant ? <PriceBlock price={variant.priceInr} compareAt={variant.compareAtInr} /> : <Missing field="variants" />}
+            <LaunchPriceTimer />
             <PriceCompareHint price={variant?.priceInr ?? null} comparisons={product.comparisons} />
             <EmiLine price={variant?.priceInr ?? null} />
             <RecentBuyers count={product.recentOrders} />
@@ -262,7 +260,7 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
               <WishHeart productId={product.id} size={54} className="flex-none border border-line" />
               <ShareMenu name={name} onCopied={() => showToast(t("product.linkCopied"))} />
             </div>
-            <BundleHint />
+            <BuyMoreSaveMore price={variant?.priceInr ?? null} />
             <TrustBadges />
             {noPrice && variant && (
               <p className="text-xs text-red">
@@ -376,7 +374,7 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
         </div>
       </section>
 
-      <ReviewsSection reviews={product.reviews} />
+      <ReviewsSection reviews={product.reviews} writeButton={<WriteReview productId={product.id} productName={name} />} />
       <RecentlyViewed excludeId={product.id} />
       {related.length > 0 && <RelatedCarousel title={t("product.alsoLike")} products={related} />}
 

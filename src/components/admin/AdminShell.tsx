@@ -3,13 +3,14 @@
 import clsx from "clsx";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ExternalLink, Inbox, LayoutGrid, Package, Settings, ShoppingBag } from "lucide-react";
+import { ExternalLink, Inbox, LayoutGrid, Package, Settings, ShoppingBag, Star } from "lucide-react";
 import { Logo } from "@/components/ui/primitives";
 
 const NAV = [
   ["/admin", "Products", Package],
   ["/admin/collections", "Collections", LayoutGrid],
   ["/admin/orders", "Orders", ShoppingBag],
+  ["/admin/reviews", "Reviews", Star],
   ["/admin/inbox", "Inbox", Inbox],
   ["/admin/settings", "Settings", Settings],
 ] as const;

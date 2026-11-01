@@ -118,7 +118,7 @@ export function ComparisonEditor({ productId }: { productId: string }) {
                 <th className="p-2">Link</th>
                 <th className="p-2">Price ₹</th>
                 <th className="p-2">Free delivery</th>
-                <th className="p-2">GST incl.</th>
+                <th className="p-2">Taxes in price</th>
                 <th className="p-2">Notes</th>
                 <th className="p-2">Checked on</th>
                 <th />
@@ -149,7 +149,7 @@ export function ComparisonEditor({ productId }: { productId: string }) {
           className="field h-32 resize-y"
           value={points}
           onChange={(e) => setPoints(e.target.value)}
-          placeholder={"Solid wood frame instead of engineered wood\nFree delivery and GST included in the price\nMade to order in your colour"}
+          placeholder={"Solid wood frame instead of engineered wood\nFree delivery with no hidden charges\nMade to order in your colour"}
         />
       </label>
       <div className="mt-4 flex items-center justify-end gap-3">
