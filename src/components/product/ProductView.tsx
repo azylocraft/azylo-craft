@@ -43,6 +43,7 @@ type Faq = { id: string; slug: string; group: string; question: I18nText; answer
 
 const CUSTOM = "__custom__";
 const keyOf = (t: I18nText) => t.en ?? t.fr ?? "";
+const slugOf = (s: string) => s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
 export function ProductView({ product, related, faqs }: { product: ProductDetail; related: ProductCardData[]; faqs: Faq[] }) {
   const t = useT();
@@ -69,6 +70,27 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
   const [deliveryOpen, setDeliveryOpen] = useState(false);
   const isCustom = color === CUSTOM;
 
+  // ?colour=olive-green (from a per-colour collection card) preselects that colour; choosing a colour updates the link.
+  // The link is read once, before this effect ever rewrites it.
+  const wantedColour = useRef<string | null | undefined>(undefined);
+  useEffect(() => {
+    if (wantedColour.current === undefined) wantedColour.current = new URLSearchParams(location.search).get("colour");
+    const wanted = wantedColour.current;
+    if (wanted) {
+      wantedColour.current = null;
+      const match = colors.find(([k]) => slugOf(k) === wanted);
+      if (match && match[0] !== color) {
+        queueMicrotask(() => setColor(match[0]));
+        return;
+      }
+    }
+    if (!color || isCustom || colors.length < 2) return;
+    const url = new URL(location.href);
+    if (url.searchParams.get("colour") === slugOf(color)) return;
+    url.searchParams.set("colour", slugOf(color));
+    history.replaceState(history.state, "", url);
+  }, [color, isCustom, colors]);
+
   const variant: Variant | undefined =
     product.variants.find((v) => keyOf(v.model) === model && (isCustom || keyOf(v.color) === color)) ??
     product.variants.find((v) => keyOf(v.model) === model);
@@ -78,7 +100,9 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
 
   const name = text(product.name, "product name");
   const realSpaces = product.images.filter((i) => i.type === "real_space");
-  const galleryImages = product.images;
+  // The chosen colour's photo leads the gallery (and becomes the main image).
+  const colourPhoto = isCustom ? undefined : product.images.find((i) => i.color && i.color.toLowerCase() === color.toLowerCase());
+  const galleryImages = colourPhoto ? [colourPhoto, ...product.images.filter((i) => i !== colourPhoto)] : product.images;
 
   const fmtDate = (d: Date) => d.toLocaleDateString(lang === "fr" ? "fr-FR" : "en-IN", { month: "short", day: "numeric" });
   const delivery =
@@ -143,7 +167,7 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
                 </a>
               )}
             </div>
-            <Gallery images={galleryImages} tone={product.tone} name={name} />
+            <Gallery images={galleryImages} ratioFrom={product.images[0]?.url} tone={product.tone} name={name} />
           </div>
 
           {/* Buy box */}

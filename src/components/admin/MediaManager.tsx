@@ -16,13 +16,13 @@ export const IMAGE_TYPES = [
   ["detail", "Detail / mechanism / spec"],
 ] as const;
 
-export type Img = { id: string; storage_path: string; image_type: string; alt_en: string | null; sort_order: number };
+export type Img = { id: string; storage_path: string; image_type: string; alt_en: string | null; sort_order: number; color_en?: string | null };
 export type Vid = { id: string; storage_path: string; poster_path: string | null; title_en: string | null; sort_order: number };
 
 type Job = { name: string; pct: number; error?: string };
 
 /** Upload, type, caption, reorder (drag) and delete product photos and videos. */
-export function MediaManager({ productId, slug, images, videos, onChange }: { productId: string; slug: string; images: Img[]; videos: Vid[]; onChange: () => void }) {
+export function MediaManager({ productId, slug, images, videos, onChange, colors = [] }: { productId: string; slug: string; images: Img[]; videos: Vid[]; onChange: () => void; colors?: string[] }) {
   const sb = supabaseBrowser();
   const [type, setType] = useState<string>("studio");
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -175,6 +175,21 @@ export function MediaManager({ productId, slug, images, videos, onChange }: { pr
               >
                 {IMAGE_TYPES.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
               </select>
+              {colors.length > 0 && (
+                <select
+                  aria-label="Colour shown in this photo"
+                  title="Colour shown in this photo — choosing that colour on the product page shows this photo first"
+                  value={img.color_en ?? ""}
+                  onChange={async (e) => {
+                    await sb.from("product_images").update({ color_en: e.target.value || null }).eq("id", img.id);
+                    onChange();
+                  }}
+                  className="h-8 rounded-lg border border-line px-2 text-xs"
+                >
+                  <option value="">No colour</option>
+                  {colors.map((c) => <option key={c} value={c}>Colour: {c}</option>)}
+                </select>
+              )}
               <input
                 aria-label="Alt text"
                 defaultValue={img.alt_en ?? ""}

@@ -292,7 +292,7 @@
     "deliveryDetails": "Delivery details",
     "days": "{a}–{b} days",
     "deliveryDetailsBody": "Each piece is made to order, then shipped free to your building entrance. We'll email you tracking details once it leaves production.",
-    "model": "Model",
+    "model": "Material",
     "colour": "Colour",
     "customColor": "Custom color",
     "customNote": "Custom colour selected — we'll contact you after ordering to confirm your colour before production starts.",

@@ -265,7 +265,7 @@ export function ProductGrid({ items }: { items: ProductCardData[] }) {
   return (
     <div className="grid grid-cols-2 gap-2.5 sm:gap-5 lg:grid-cols-4">
       {items.map((p) => (
-        <GCard key={p.id} p={p} />
+        <GCard key={p.id + (p.color ?? "")} p={p} />
       ))}
     </div>
   );
@@ -337,7 +337,7 @@ export function RecentlyViewed({ excludeId }: { excludeId?: string }) {
       </div>
       <Carousel label={t("recent.title")}>
         {cards.map((p) => (
-          <GCard key={p.id} p={p} imgH={220} />
+          <GCard key={p.id + (p.color ?? "")} p={p} imgH={220} />
         ))}
       </Carousel>
     </section>

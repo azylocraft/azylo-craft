@@ -8,6 +8,7 @@ import { AdminTitle, Panel } from "@/components/admin/AdminShell";
 import { MediaManager, type Img, type Vid } from "@/components/admin/MediaManager";
 import { ComparisonEditor } from "@/components/admin/ComparisonEditor";
 import { MarkdownField } from "@/components/admin/MarkdownField";
+import { MaterialPricing } from "@/components/admin/MaterialPricing";
 import { ProductReviews } from "@/components/admin/ProductReviews";
 import { OfferEditor } from "@/components/admin/OfferEditor";
 import { Btn, BtnLink } from "@/components/ui/primitives";
@@ -83,7 +84,7 @@ export default function ProductEditor() {
     setStatus(null);
     try {
       if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(p.slug)) throw new Error("Slug: lowercase letters, numbers and dashes only.");
-      const fields = ["slug", "name_en", "name_fr", "eyebrow_en", "short_description_en", "overview_en", "delivery_access_en", "functions", "chips", "lead_time_min_days", "lead_time_max_days", "is_featured", "is_best_seller", "is_new", "is_published", "sort_order"];
+      const fields = ["slug", "name_en", "name_fr", "eyebrow_en", "short_description_en", "overview_en", "delivery_access_en", "functions", "chips", "lead_time_min_days", "lead_time_max_days", "is_featured", "is_best_seller", "is_new", "is_published", "list_by_colour", "sort_order"];
       const row = Object.fromEntries(fields.map((f) => [f, p[f] === "" ? null : p[f]]));
       const { error } = await sb.from("products").update(row).eq("id", id);
       if (error) throw new Error(error.message);
@@ -156,12 +157,12 @@ export default function ProductEditor() {
               </p>
             </div>
           </Panel>
-          <MediaManager productId={id} slug={p.slug} images={images} videos={videos} onChange={loadMedia} />
+          <MediaManager productId={id} slug={p.slug} images={images} videos={videos} onChange={loadMedia} colors={[...new Set(variants.map((v) => v.color_en.trim()).filter(Boolean))]} />
         </div>
 
         <div className="flex flex-col gap-5">
           <Panel title="Visibility">
-            {[["is_published", "Published (visible in the store)"], ["is_featured", "Featured (home hero)"], ["is_best_seller", "Best seller"], ["is_new", "New arrival"]].map(([k, l]) => (
+            {[["is_published", "Published (visible in the store)"], ["is_featured", "Featured (home hero)"], ["is_best_seller", "Best seller"], ["is_new", "New arrival"], ["list_by_colour", "Show each colour as its own card in collections"]].map(([k, l]) => (
               <label key={k} className="flex items-center justify-between gap-3 border-b border-line2 py-2.5 text-sm last:border-0">
                 {l}
                 <input type="checkbox" checked={!!p[k]} onChange={(e) => set(k, e.target.checked)} className="size-5 accent-[var(--az-ink)]" />
@@ -200,6 +201,8 @@ export default function ProductEditor() {
       <OfferEditor productId={id} />
       <ComparisonEditor productId={id} />
       <ProductReviews productId={id} productName={p.name_en ?? "This product"} />
+
+      <MaterialPricing productId={id} variants={variants} setVariants={setVariants} />
 
       <Panel title="Variants & inventory" className="mt-5" actions={<Btn size="sm" kind="light" iconL={Plus} onClick={() => setVariants([...variants, { model_en: "", color_en: "", color_hex: "#C9B48F", material: "fabric", price_inr: "", compare_at_inr: "", stock: "", sku: "", is_active: true }])}>Add variant</Btn>}>
         <p className="mb-3 text-xs text-muted">Price in INR (empty = MISSING: price, can&apos;t be bought). MRP / was price is optional and shown struck through — it must be a genuine earlier or regular price. Stock empty = made to order; 0 = out of stock.</p>

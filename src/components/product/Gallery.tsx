@@ -23,7 +23,7 @@ const CATEGORIES = [
 ] as const;
 
 /** Category tabs, main image + thumbnails, arrows, swipe, click-to-zoom lightbox. */
-export function Gallery({ images, tone, name }: { images: ProductImage[]; tone: string | null; name: string }) {
+export function Gallery({ images, tone, name, ratioFrom }: { images: ProductImage[]; tone: string | null; name: string; ratioFrom?: string }) {
   const text = useText();
   const [category, setCategory] = useState<string>("all");
   const tabs = CATEGORIES.map(([key, label]) => ({ key, label, n: images.filter((i) => i.type === key).length })).filter((c) => c.n > 0);
@@ -35,7 +35,7 @@ export function Gallery({ images, tone, name }: { images: ProductImage[]; tone: 
   const [zoom, setZoom] = useState<number | null>(null);
   // The frame takes the shape of the product's first photo (e.g. 4:5 portrait); every photo is shown whole inside it.
   const [ratio, setRatio] = useState<number | null>(null);
-  const firstUrl = images[0]?.url;
+  const firstUrl = ratioFrom ?? images[0]?.url;
   useEffect(() => {
     if (!firstUrl) return;
     const img = new Image();
@@ -43,6 +43,11 @@ export function Gallery({ images, tone, name }: { images: ProductImage[]; tone: 
     img.src = firstUrl;
   }, [firstUrl]);
   const frame = ratio ?? DEFAULT_RATIO;
+  // When the lead photo changes (e.g. a new colour is chosen), jump back to it.
+  const lead = images[0]?.url;
+  useEffect(() => {
+    api?.scrollTo(0, true);
+  }, [api, lead]);
 
   useEffect(() => {
     if (!api) return;

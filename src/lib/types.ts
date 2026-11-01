@@ -22,6 +22,10 @@ export type ProductCardData = {
   image2: string | null;
   imageCount: number;
   createdAt: string;
+  /** Set when a collection shows one card per colour: the colour, its swatch hex and a link that preselects it. */
+  color?: string | null;
+  colorHex?: string | null;
+  href?: string;
 };
 
 export type Variant = {
@@ -35,7 +39,8 @@ export type Variant = {
   stock: number | null;
 };
 
-export type ProductImage = { id: string; url: string; type: string; alt: I18nText };
+/** `color` = the colour this photo shows (e.g. "Grey"); selecting that colour puts it first. */
+export type ProductImage = { id: string; url: string; type: string; alt: I18nText; color: string | null };
 export type ProductVideo = { id: string; url: string; poster: string | null; title: I18nText };
 
 export type ProductDetail = ProductCardData & {

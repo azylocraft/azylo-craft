@@ -54,6 +54,16 @@ function OffPrice({ p, size = "text-[16px]" }: { p: ProductCardData; size?: stri
   );
 }
 
+/** Colour dot + name, shown on per-colour cards. */
+function ColourTag({ p }: { p: ProductCardData }) {
+  return (
+    <span className="flex flex-none items-center gap-1.5 text-[10.5px] lowercase text-muted sm:text-[11px]">
+      <span aria-hidden className="size-2.5 rounded-full ring-1 ring-black/10" style={{ background: p.colorHex ?? "#ccc" }} />
+      {p.color}
+    </span>
+  );
+}
+
 /** Round black arrow that sits over the tile's bottom edge (Bau tile). */
 function TileArrow({ size = 36 }: { size?: number }) {
   return (
@@ -75,14 +85,18 @@ export function PCard({ p, imgH = 300 }: { p: ProductCardData; imgH?: number }) 
   const text = useText();
   return (
     <div className="h-full pb-5">
-      <Link href={`/products/${p.slug}`} className="az-card group relative flex h-full flex-col rounded-card bg-cream p-2 pb-8">
+      <Link href={p.href ?? `/products/${p.slug}`} className="az-card group relative flex h-full flex-col rounded-card bg-cream p-2 pb-8">
         <div className="flex items-start justify-between gap-4 px-3 pb-3 pt-2.5">
           <div className="line-clamp-2 text-[16px] font-semibold lowercase leading-[1.2] tracking-[-0.03em]">
             <T text={p.name} field="product name" fallback />
           </div>
-          <span className="max-w-[42%] flex-none text-right text-[10.5px] lowercase leading-[1.35] text-muted">
-            <T text={p.eyebrow} field="category tag" fallback />
-          </span>
+          {p.color ? (
+            <ColourTag p={p} />
+          ) : (
+            <span className="max-w-[42%] flex-none text-right text-[10.5px] lowercase leading-[1.35] text-muted">
+              <T text={p.eyebrow} field="category tag" fallback />
+            </span>
+          )}
         </div>
         <Media src={p.image} alt={text(p.name, "product name")} tone={p.tone} label={p.image ? undefined : t("card.photoLabel")} className="flex-none rounded-[22px]">
           <div style={{ height: imgH }} />
@@ -107,12 +121,12 @@ export function GCard({ p, imgH = 270 }: { p: ProductCardData; imgH?: number }) 
   const text = useText();
   return (
     <div className="h-full pb-4">
-      <Link href={`/products/${p.slug}`} className="az-card group relative flex h-full flex-col rounded-[22px] bg-cream p-1.5 pb-7 sm:rounded-card sm:p-2 sm:pb-8">
+      <Link href={p.href ?? `/products/${p.slug}`} className="az-card group relative flex h-full flex-col rounded-[22px] bg-cream p-1.5 pb-7 sm:rounded-card sm:p-2 sm:pb-8">
         <div className="flex items-start justify-between gap-3 px-2 pb-2 pt-1.5 sm:px-3 sm:pb-3 sm:pt-2.5">
           <div className="line-clamp-2 text-[12.5px] font-semibold lowercase leading-[1.25] tracking-[-0.02em] sm:text-[15px]">
             <T text={p.name} field="product name" fallback />
           </div>
-          {p.isNew && <span className="flex-none text-[10px] lowercase text-gold sm:text-[11px]">{t("card.new")}</span>}
+          {p.color ? <ColourTag p={p} /> : p.isNew && <span className="flex-none text-[10px] lowercase text-gold sm:text-[11px]">{t("card.new")}</span>}
         </div>
         <Media src={p.image} alt={text(p.name, "product name")} tone={p.tone} label={p.image ? undefined : t("card.photoLabel")} className="rounded-[16px] sm:rounded-[22px]">
           <div className="h-[150px] sm:h-[210px] lg:h-[var(--img-h)]" style={{ ["--img-h" as string]: `${imgH}px` }} />
