@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { Gallery, Lightbox } from "@/components/product/Gallery";
 import { VideoModal } from "@/components/product/VideoModal";
+import { PriceComparison } from "@/components/product/PriceComparison";
 import { RelatedCarousel } from "@/components/product/Related";
 import { Stepper } from "@/components/shop/CartParts";
 import { Crumb, RecentlyViewed } from "@/components/shop/Listing";
@@ -284,6 +285,8 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
           </div>
         </div>
       </div>
+
+      <PriceComparison azyloPrice={variant?.priceInr ?? product.fromPriceInr} comparisons={product.comparisons} points={product.comparisonPoints} />
 
       {/* Real spaces */}
       <RealSpaces images={realSpaces.map((i) => i.url)} name={name} />

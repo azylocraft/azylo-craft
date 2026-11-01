@@ -129,7 +129,7 @@ export async function getProduct(slug: string): Promise<ProductDetail | null> {
     .from("products")
     .select(
       `*, product_variants ( * ), product_images ( * ), product_videos ( * ), reviews ( count ),
-       product_collections ( collection_id, collections ( slug ) )`,
+       product_collections ( collection_id, collections ( slug ) ), product_comparisons ( * )`,
     )
     .eq("slug", slug)
     .maybeSingle();
@@ -167,6 +167,16 @@ export async function getProduct(slug: string): Promise<ProductDetail | null> {
     videos,
     collectionIds: (row.product_collections ?? []).map((c: Row) => c.collection_id),
     collectionSlugs: (row.product_collections ?? []).map((c: Row) => c.collections?.slug).filter(Boolean),
+    comparisons: [...(row.product_comparisons ?? [])]
+      .sort((a: Row, b: Row) => a.sort_order - b.sort_order)
+      .map((c: Row) => ({
+        id: c.id, seller: c.seller_name, url: c.url, priceInr: Number(c.price_inr), includesDelivery: !!c.includes_delivery,
+        includesGst: !!c.includes_gst, notes: c.notes, checkedOn: c.checked_on,
+      })),
+    comparisonPoints: String(row.comparison_points_en ?? "")
+      .split(String.fromCharCode(10))
+      .map((l: string) => l.trim().replace(/^[-*•]/, "").trim())
+      .filter(Boolean),
   };
 }
 

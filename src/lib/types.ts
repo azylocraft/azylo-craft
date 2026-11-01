@@ -49,6 +49,8 @@ export type ProductDetail = ProductCardData & {
   videos: ProductVideo[];
   collectionIds: string[];
   collectionSlugs: string[];
+  comparisons: Comparison[];
+  comparisonPoints: string[];
 };
 
 export type Collection = {
@@ -82,3 +84,5 @@ export type StoreSettings = {
 };
 
 export type Rates = Record<string, number | null>;
+
+export type Comparison = { id: string; seller: string; url: string | null; priceInr: number; includesDelivery: boolean; includesGst: boolean; notes: string | null; checkedOn: string };
