@@ -53,7 +53,8 @@ export async function payWithRazorpay(opts: {
       config: {
         display: {
           blocks: {
-            upi: { name: "Pay using UPI", instruments: [{ method: "upi" }] },
+            // "collect" = type a UPI ID (name@bank); "intent" = open GPay/PhonePe on phones; "qr" = scan on desktop.
+            upi: { name: "Pay using UPI", instruments: [{ method: "upi", flows: ["collect", "intent", "qr"] }] },
             credit: { name: "Credit card", instruments: [{ method: "card", types: ["credit"] }] },
             debit: { name: "Debit card", instruments: [{ method: "card", types: ["debit"] }] },
           },
