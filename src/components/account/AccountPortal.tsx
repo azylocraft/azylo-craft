@@ -69,6 +69,59 @@ export function AccountPortal() {
   );
 }
 
+const STEP_HELP: Record<string, string> = {
+  paid: "We've received your order and payment.",
+  confirmed: "Your order is confirmed and being prepared.",
+  in_production: "Your made-to-order piece is being made.",
+  shipped: "On its way — tracking is emailed when available.",
+  delivered: "Delivered. Enjoy your new piece!",
+};
+
+/** Order progress: Placed → Confirmed → In production → Shipped → Delivered, with dates. */
+export function OrderTracker({ status, events, compact }: { status: string; events?: { status: string; created_at: string }[]; compact?: boolean }) {
+  if (status === "cancelled" || status === "refunded")
+    return <p className="text-sm font-bold text-red">{STATUS_LABEL[status]}</p>;
+  const at = STATUS_STEPS.indexOf(status as (typeof STATUS_STEPS)[number]);
+  const dateOf = (s: string) => events?.find((e) => e.status === s)?.created_at;
+  const pct = at <= 0 ? 0 : (at / (STATUS_STEPS.length - 1)) * 100;
+  return (
+    <div className={compact ? "" : "mt-6"}>
+      <div className="relative">
+        <div aria-hidden className="absolute left-[10%] right-[10%] top-4 h-0.5 bg-line" />
+        <div aria-hidden className="absolute left-[10%] top-4 h-0.5 bg-gold transition-[width] duration-700" style={{ width: `${pct * 0.8}%` }} />
+        <ol className="relative grid grid-cols-5 gap-1">
+          {STATUS_STEPS.map((s, i) => {
+            const done = i < at || (i === at && s === "delivered");
+            const current = i === at && s !== "delivered";
+            const d = dateOf(s);
+            return (
+              <li key={s} className="flex flex-col items-center gap-1.5 text-center">
+                <span
+                  className={clsx(
+                    "relative flex size-8 items-center justify-center rounded-full border-2",
+                    done ? "border-gold bg-gold text-white" : current ? "border-gold bg-white text-gold" : "border-line bg-white text-faint",
+                  )}
+                >
+                  {done ? <Check size={14} aria-hidden /> : <span className="text-[11px] font-bold">{i + 1}</span>}
+                  {current && <span aria-hidden className="absolute inset-0 animate-ping rounded-full border-2 border-gold opacity-40" />}
+                </span>
+                <span className={clsx("text-[11.5px] font-bold leading-tight sm:text-[13px]", i > at && "text-faint")}>{STATUS_LABEL[s]}</span>
+                {!compact && (
+                  <>
+                    {d && i <= at && <span className="text-[11px] text-muted">{new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}</span>}
+                    {current && <span className="hidden text-[11px] leading-snug text-muted sm:block">{STEP_HELP[s]}</span>}
+                  </>
+                )}
+              </li>
+            );
+          })}
+        </ol>
+      </div>
+      {!compact && at >= 0 && <p className="mt-4 rounded-field bg-gold-soft px-4 py-3 text-sm sm:hidden">{STEP_HELP[STATUS_STEPS[at]]}</p>}
+    </div>
+  );
+}
+
 function Orders() {
   const { user, profile } = useAuth();
   const [orders, setOrders] = useState<OrderRow[] | null>(null);
@@ -92,12 +145,15 @@ function Orders() {
   return (
     <div className="flex flex-col gap-3">
       {orders.map((o) => (
-        <Link key={o.id} href={`/account?order=${o.id}`} className="grid grid-cols-2 gap-3 rounded-card border border-line2 bg-white p-5 hover:border-ink md:grid-cols-5 md:items-center">
-          <b>#{o.order_number}</b>
-          <span className="text-sm text-muted">{new Date(o.created_at).toLocaleDateString("en-CA", { dateStyle: "medium" })}</span>
-          <span><Badge tone={o.status === "delivered" ? "green" : o.status === "cancelled" ? "red" : "gold"}>{STATUS_LABEL[o.status]}</Badge></span>
-          <span className="text-sm text-muted">{o.order_items.reduce((n, i) => n + i.quantity, 0)} item(s)</span>
-          <b className="md:text-right"><Price cad={Number(o.total_inr)} /></b>
+        <Link key={o.id} href={`/account?order=${o.id}`} className="flex flex-col gap-4 rounded-card border border-line2 bg-white p-5 hover:border-ink">
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-5 md:items-center">
+            <b>#{o.order_number}</b>
+            <span className="text-sm text-muted">{new Date(o.created_at).toLocaleDateString("en-IN", { dateStyle: "medium" })}</span>
+            <span><Badge tone={o.status === "delivered" ? "green" : o.status === "cancelled" ? "red" : "gold"}>{STATUS_LABEL[o.status]}</Badge></span>
+            <span className="text-sm text-muted">{o.order_items.reduce((n, i) => n + i.quantity, 0)} item(s)</span>
+            <b className="md:text-right"><Price cad={Number(o.total_inr)} /></b>
+          </div>
+          <OrderTracker status={o.status} compact />
         </Link>
       ))}
     </div>
@@ -116,7 +172,6 @@ function OrderDetail({ id }: { id: string }) {
   }, [id]);
   if (o === undefined) return <div className="az-skeleton h-[300px] rounded-block" />;
   if (!o) return <P>Order not found.</P>;
-  const reached = new Set(o.order_status_events.map((e) => e.status));
   const a = o.shipping_address;
   return (
     <div className="flex flex-col gap-5">
@@ -128,19 +183,7 @@ function OrderDetail({ id }: { id: string }) {
           <H className="text-[26px]">Order #{o.order_number}</H>
           <Badge>{STATUS_LABEL[o.status]}</Badge>
         </div>
-        <ol className="mt-6 grid gap-3 sm:grid-cols-5">
-          {STATUS_STEPS.map((s) => {
-            const on = reached.has(s) || STATUS_STEPS.indexOf(s) <= STATUS_STEPS.indexOf(o.status as (typeof STATUS_STEPS)[number]);
-            return (
-              <li key={s} className="flex items-center gap-2 sm:flex-col sm:items-start">
-                <span className={clsx("flex size-8 items-center justify-center rounded-full", on ? "bg-ink text-white" : "border border-line text-faint")}>
-                  {on ? <Check size={14} aria-hidden /> : null}
-                </span>
-                <span className={clsx("text-sm font-bold", !on && "text-faint")}>{STATUS_LABEL[s]}</span>
-              </li>
-            );
-          })}
-        </ol>
+        <OrderTracker status={o.status} events={o.order_status_events} />
         {o.tracking_number && (
           <p className="mt-5 text-sm">
             Tracking: <b>{o.tracking_number}</b>{" "}
