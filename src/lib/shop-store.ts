@@ -10,6 +10,8 @@ export type CartLine = {
   customColor?: boolean;
   /** Key of the free gift chosen with this piece (see store_settings.free_gifts). */
   gift?: string;
+  /** The 2 gifts won on the gift wheel, included with this piece. */
+  gifts?: string[];
 };
 
 type ShopState = {
@@ -18,6 +20,9 @@ type ShopState = {
   note: string;
   discountCode: string | null;
   recentlyViewed: string[];
+  /** Gift keys won on the gift wheel (2 once complete). */
+  wonGifts: string[];
+  setWonGifts: (keys: string[]) => void;
   setNote: (note: string) => void;
   setDiscountCode: (code: string | null) => void;
   addRecentlyViewed: (productId: string) => void;
@@ -40,6 +45,8 @@ export const useShop = create<ShopState>()(
       note: "",
       discountCode: null,
       recentlyViewed: [],
+      wonGifts: [],
+      setWonGifts: (wonGifts) => set({ wonGifts: wonGifts.slice(0, 2) }),
       setNote: (note) => set({ note }),
       setDiscountCode: (discountCode) => set({ discountCode }),
       addRecentlyViewed: (id) => set((s) => ({ recentlyViewed: [id, ...s.recentlyViewed.filter((x) => x !== id)].slice(0, 12) })),

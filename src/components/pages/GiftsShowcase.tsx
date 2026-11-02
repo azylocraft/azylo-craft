@@ -2,6 +2,7 @@
 
 import { ArrowRight, BadgeCheck, Gift, Sparkles } from "lucide-react";
 import { GiftCard } from "@/components/product/Gifts";
+import { GiftWheel } from "@/components/product/GiftWheel";
 import { Price, useShopCtx } from "@/components/shop/ShopContext";
 import { Badge, BtnLink, Eyebrow, H, P, Serif } from "@/components/ui/primitives";
 
@@ -22,13 +23,19 @@ export function GiftsShowcase() {
           A free gift <Serif gold>with every sofa.</Serif>
         </H>
         <P className="max-w-[560px] text-on-dark-muted">
-          Choose one of these with each sofa you order{top ? <> — worth up to <b className="text-white"><Price cad={top} /></b></> : null}. It&apos;s delivered with your sofa, at no
+          Spin the wheel and win 2 of these with each sofa you order{top ? <> — worth up to <b className="text-white"><Price cad={top} /></b></> : null}. It&apos;s delivered with your sofa, at no
           extra cost.
         </P>
-        <BtnLink href="/collections/all" kind="white" icon={ArrowRight}>
-          Choose your sofa
+        <BtnLink href="#gift-wheel" kind="white" icon={ArrowRight}>
+          Spin to win
         </BtnLink>
       </section>
+
+      {gifts.length >= 2 && (
+        <section id="gift-wheel" className="mx-auto mt-10 max-w-[1100px] scroll-mt-40 rounded-hero border border-line2 bg-white px-5 py-10 md:px-10 md:py-14">
+          <GiftWheel />
+        </section>
+      )}
 
       {gifts.length > 0 && (
         <section className="mx-auto mt-10 grid max-w-[980px] grid-cols-2 gap-3 md:grid-cols-4">

@@ -128,7 +128,10 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
   const add = () => {
     if (!variant || !canBuy) return;
     const chosenGift = product.freeGiftEnabled && settings.freeGifts.length ? (gift ?? settings.freeGifts[0].key) : undefined;
-    addToCart({ variantId: variant.id, productId: product.id, quantity: qty, customColor: isCustom || undefined, gift: chosenGift });
+    // 2 gifts won on the gift wheel replace the single chosen gift.
+    const won = useShop.getState().wonGifts.filter((k) => settings.freeGifts.some((g) => g.key === k));
+    const wonGifts = product.freeGiftEnabled && won.length >= 2 ? won.slice(0, 2) : undefined;
+    addToCart({ variantId: variant.id, productId: product.id, quantity: qty, customColor: isCustom || undefined, gift: wonGifts ? undefined : chosenGift, gifts: wonGifts });
     openDrawer("cart");
   };
 

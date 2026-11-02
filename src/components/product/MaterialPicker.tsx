@@ -55,32 +55,35 @@ export function MaterialPicker({
               aria-pressed={on}
               onClick={() => onSelect(m)}
               className={clsx(
-                "group flex flex-col gap-3 rounded-card border p-2.5 text-left transition-[border-color,box-shadow,background-color] duration-200",
+                "group flex items-center gap-3 rounded-tile border p-2 pr-3.5 text-left transition-[border-color,box-shadow,background-color] duration-200",
                 on ? "border-gold bg-gold-soft/60 shadow-[0_0_0_3px_var(--az-gold-soft)]" : "border-line bg-white hover:border-ink",
               )}
             >
-              <span className="relative block aspect-[5/2] overflow-hidden rounded-[14px]" style={{ background: tint ? `color-mix(in srgb, ${tint} 62%, #fff)` : "#e4e1da" }}>
+              {/* Small textured swatch, tinted with the selected colour */}
+              <span className="relative size-14 flex-none overflow-hidden rounded-xl ring-1 ring-black/5" style={{ background: tint ? `color-mix(in srgb, ${tint} 62%, #fff)` : "#e4e1da" }}>
                 <img
                   src={mi.texture}
                   alt=""
                   loading="lazy"
-                  className="size-full object-cover mix-blend-multiply transition-transform duration-700 group-hover:scale-[1.04]"
+                  className="size-full scale-[1.6] object-cover mix-blend-multiply transition-transform duration-700 group-hover:scale-[1.8]"
                 />
-                <span className="absolute left-2.5 top-2.5 rounded-full bg-white/90 px-2.5 py-0.5 text-[11.5px] font-medium text-ink backdrop-blur">{mi.badge}</span>
                 {on && (
-                  <span className="absolute right-2.5 top-2.5 flex size-7 items-center justify-center rounded-full bg-gold text-white">
-                    <Check size={15} aria-hidden />
+                  <span className="absolute inset-0 flex items-center justify-center bg-black/15">
+                    <span className="flex size-6 items-center justify-center rounded-full bg-gold text-white">
+                      <Check size={13} aria-hidden />
+                    </span>
                   </span>
                 )}
               </span>
-              <span className="flex items-start justify-between gap-2 px-1.5 pb-1">
-                <span className="min-w-0">
-                  <span className="block text-[15px] font-semibold leading-tight">{materialLabel(m)}</span>
-                  <span className="mt-1 block text-[12.5px] text-muted">{mi.tagline}</span>
+              <span className="min-w-0 flex-1">
+                <span className="flex items-baseline justify-between gap-2">
+                  <span className="truncate text-[14px] font-semibold leading-tight">{materialLabel(m)}</span>
+                  <span className={clsx("flex-none text-[12.5px]", price === base ? "font-semibold text-gold" : "text-muted")}>
+                    {price == null || base == null ? "" : price === base ? "Included" : <>+<Price cad={price - base} withCode={false} /></>}
+                  </span>
                 </span>
-                <span className={clsx("flex-none text-[13px]", price === base ? "font-semibold text-gold" : "text-muted")}>
-                  {price == null || base == null ? "" : price === base ? "Included" : <>+<Price cad={price - base} withCode={false} /></>}
-                </span>
+                <span className="mt-0.5 block truncate text-[12px] text-muted">{mi.tagline}</span>
+                <span className="mt-1 inline-block rounded-full bg-bg2 px-2 py-px text-[10.5px] text-ink2">{mi.badge}</span>
               </span>
             </button>
           );

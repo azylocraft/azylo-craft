@@ -2,7 +2,8 @@
 // nothing the browser sends about prices is trusted.
 import type { SupabaseClient } from "npm:@supabase/supabase-js@2";
 
-export type LineInput = { variantId: string; quantity: number; customColor?: boolean; gift?: string };
+/** `gifts`: up to 2 free-gift keys won on the gift wheel (`gift` = older single choice). */
+export type LineInput = { variantId: string; quantity: number; customColor?: boolean; gift?: string; gifts?: string[] };
 export type Address = {
   first_name: string; last_name: string; line1: string; line2?: string | null; city: string;
   province?: string | null; postal_code: string; country: string; phone?: string | null;
@@ -71,19 +72,22 @@ export async function priceCart(db: SupabaseClient, lines: LineInput[], opts: { 
   const { data: settings } = await db.from("store_settings").select("shipping_methods, bundle_min_items, bundle_percent, bundle_tiers, free_gifts").eq("id", 1).maybeSingle();
   const methods: { code: string; label_en?: string; price_inr: number; days_min?: number; days_max?: number }[] =
     settings?.shipping_methods?.length ? settings.shipping_methods : [{ code: "standard", label_en: "Free standard delivery", price_inr: 0 }];
-  // Free gift with purchase: one chosen gift per piece on eligible products, added as a ₹0 line.
+  // Free gifts with purchase: up to 2 different gifts per piece on eligible products, added as ₹0 lines.
   const gifts: { key: string; title: string; image_path?: string | null }[] = Array.isArray(settings?.free_gifts) ? settings.free_gifts : [];
   for (const l of clean) {
-    if (!l.gift) continue;
-    const gift = gifts.find((g) => g.key === l.gift);
+    const keys = [...new Set((Array.isArray(l.gifts) && l.gifts.length ? l.gifts : l.gift ? [l.gift] : []).filter((k) => typeof k === "string"))].slice(0, 2);
     // deno-lint-ignore no-explicit-any
     const v: any = variants?.find((x) => x.id === l.variantId);
-    if (!gift || !v || v.products?.free_gift_enabled === false) continue;
+    if (!v || v.products?.free_gift_enabled === false) continue;
+    for (const key of keys) {
+    const gift = gifts.find((g) => g.key === key);
+    if (!gift) continue;
     items.push({
       product_id: v.products.id, variant_id: null as unknown as string, product_name: `Free gift: ${gift.title}`,
       variant_label: `With ${v.products.name_en ?? v.products.slug}`, image_path: gift.image_path ?? null,
       unit_price_inr: 0, quantity: l.quantity, custom_color: false, is_gift: true,
     } as (typeof items)[number]);
+    }
   }
 
   const method = methods.find((m) => m.code === opts.shippingCode) ?? methods[0];
