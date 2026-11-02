@@ -19,6 +19,8 @@ import {
   Truck,
 } from "lucide-react";
 import { Gallery, Lightbox } from "@/components/product/Gallery";
+import { MaterialPicker } from "@/components/product/MaterialPicker";
+import { MATERIAL_INFO } from "@/lib/material-info";
 import { VideoModal } from "@/components/product/VideoModal";
 import { PriceCompareHint, PriceComparison } from "@/components/product/PriceComparison";
 import { BuyMoreSaveMore, EmiLine, LaunchPriceTimer, LowStock, OfferStack, PriceBlock, RatingSummary, RecentBuyers, ReviewsSection, TrustBadges } from "@/components/product/Offers";
@@ -228,7 +230,16 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
             </div>
 
             {/* Model */}
-            {models.length > 0 && (
+            {models.length > 0 &&
+              (models.every(([k]) => MATERIAL_INFO[k]) ? (
+                <MaterialPicker
+                  materials={models.map(([k]) => k)}
+                  selected={model}
+                  onSelect={setModel}
+                  priceOf={(m) => product.variants.find((v) => keyOf(v.model) === m && (isCustom || keyOf(v.color) === color))?.priceInr ?? product.variants.find((v) => keyOf(v.model) === m)?.priceInr ?? null}
+                  tint={isCustom ? null : (colors.find(([k]) => k === color)?.[1].hex ?? null)}
+                />
+              ) : (
               <fieldset className="flex flex-col gap-2.5">
                 <legend className="mb-2.5 text-[13px] font-bold">
                   {t("product.model")}: <span className="font-medium text-muted">{variant ? text(variant.model, "model") : ""}</span>
@@ -254,7 +265,7 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
                   })}
                 </div>
               </fieldset>
-            )}
+              ))}
 
             {/* Colour */}
             {colors.length > 0 && (
