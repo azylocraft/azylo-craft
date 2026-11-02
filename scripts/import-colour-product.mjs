@@ -12,6 +12,7 @@
 // Re-runnable: photos are replaced, existing variants are kept (prices only set when --price is given).
 import fs from "node:fs";
 import path from "node:path";
+import crypto from "node:crypto";
 import sharp from "sharp";
 import { createClient } from "@supabase/supabase-js";
 
@@ -82,8 +83,11 @@ for (const [ci, folder] of folders.entries()) {
       const top = await cropBand(file);
       if (top) { const m = await sharp(file).metadata(); img = sharp(file).extract({ left: 0, top, width: m.width, height: m.height - top }); }
     }
-    const storage = `products/${slug}/colours/${key}/${base}.webp`;
-    const { error } = await db.storage.from(BUCKET).upload(storage, await img.webp({ quality: 86 }).toBuffer(), { contentType: "image/webp", upsert: true, cacheControl: "31536000" });
+    const buf = await img.webp({ quality: 86 }).toBuffer();
+    // Content hash in the name: files are cached for a year, so a replaced photo needs a new URL.
+    const hash = crypto.createHash("sha1").update(buf).digest("hex").slice(0, 8);
+    const storage = `products/${slug}/colours/${key}/${base}-${hash}.webp`;
+    const { error } = await db.storage.from(BUCKET).upload(storage, buf, { contentType: "image/webp", upsert: true, cacheControl: "31536000" });
     if (error) throw new Error(`${folder}/${f}: ${error.message}`);
     const what = base.split("-").slice(2).join(" ");
     rows.push({ product_id: PID, storage_path: storage, image_type: type, color_en: colour, alt_en: `${colour} ${name.toLowerCase()} — ${what}`, sort_order: ci * 100 + fi });
