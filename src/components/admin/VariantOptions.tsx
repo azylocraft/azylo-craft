@@ -66,6 +66,7 @@ export function VariantOptions({
   const [msg, setMsg] = useState<string | null>(null);
   // What is being typed in the price box (kept as typed; other materials are rounded to ₹10).
   const [typed, setTyped] = useState<string | null>(null);
+  const [mrpTyped, setMrpTyped] = useState<string | null>(null);
 
   useEffect(() => {
     sb.from("store_settings")
@@ -158,6 +159,28 @@ export function VariantOptions({
     rebuild(materials, colours, n && idx ? (n / idx) * 100 : null, n || null);
   };
 
+  /** MRP of a material, as saved on its options. */
+  const mrpOf = (name: string) => {
+    const v = live.find((x) => x.model_en.trim() === name && x.compare_at_inr !== "");
+    return v ? Number(v.compare_at_inr) : null;
+  };
+  /** Typing one material's MRP sets every option's MRP from the price index (empty clears it). */
+  const typeMrp = (value: string) => {
+    const digits = value.replace(/\D/g, "");
+    setMrpTyped(digits);
+    const n = Number(digits);
+    const basisPct = indexOf(basisMaterial);
+    setVariants(
+      variants.map((v) => {
+        if (v._delete) return v;
+        if (!n || !basisPct) return { ...v, compare_at_inr: "" };
+        const m = v.model_en.trim();
+        return { ...v, compare_at_inr: String(m === basisMaterial ? n : round10((n * indexOf(m)) / basisPct)) };
+      }),
+    );
+    setMsg("Changed — click “Save product” to apply.");
+  };
+
   /** Edit a material's percentage: the typed (basis) material keeps its price, the others follow the new index. */
   const changeIndex = (name: string, value: string) => {
     const next = index.map((x) => (x.name === name ? { ...x, index: Number(value.replace(/\D/g, "")) || 0 } : x));
@@ -208,6 +231,24 @@ export function VariantOptions({
             onBlur={() => setTyped(null)}
           />
           {!materials.length || !colours.length ? <span className="text-xs text-muted">Choose at least one material and one colour first.</span> : null}
+        </div>
+        {/* Optional MRP: shown struck through beside the price, with the % off */}
+        <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-line2 pt-3">
+          <span className="text-xs font-bold text-ink2">MRP / was price for {basisMaterial || "this material"} (optional)</span>
+          <span className="text-sm">₹</span>
+          <input
+            className="field !min-h-10 !w-36 text-right"
+            inputMode="numeric"
+            placeholder="e.g. 75000"
+            aria-label="MRP"
+            disabled={!materials.length || !colours.length}
+            value={mrpTyped ?? mrpOf(basisMaterial) ?? ""}
+            onChange={(e) => typeMrp(e.target.value)}
+            onBlur={() => setMrpTyped(null)}
+          />
+          <span className="w-full text-[11px] text-muted">
+            Shown crossed out with the % off; other materials follow your price index. Use only a genuine price this product has been listed or sold at — a made-up MRP is not allowed under consumer law. Leave empty for no strike-through.
+          </span>
         </div>
       </div>
 
