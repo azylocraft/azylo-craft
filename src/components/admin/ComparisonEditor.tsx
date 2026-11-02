@@ -27,13 +27,14 @@ export function ComparisonEditor({ productId }: { productId: string }) {
   const [points, setPoints] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [saved, setSaved] = useState("");
 
   const load = useCallback(async () => {
     const [{ data: c }, { data: p }] = await Promise.all([
       sb.from("product_comparisons").select("*").eq("product_id", productId).order("sort_order"),
       sb.from("products").select("comparison_points_en").eq("id", productId).maybeSingle(),
     ]);
-    setRows(
+    const loaded =
       (c ?? []).map((r: Record<string, unknown>) => ({
         id: r.id as string,
         seller_name: (r.seller_name as string) ?? "",
@@ -43,13 +44,23 @@ export function ComparisonEditor({ productId }: { productId: string }) {
         includes_gst: !!r.includes_gst,
         notes: (r.notes as string) ?? "",
         checked_on: (r.checked_on as string) ?? today(),
-      })),
-    );
+      }));
+    setRows(loaded);
     setPoints((p?.comparison_points_en as string) ?? "");
+    setSaved(JSON.stringify([loaded, (p?.comparison_points_en as string) ?? ""]));
   }, [sb, productId]);
   useEffect(() => {
     queueMicrotask(() => void load());
   }, [load]);
+
+  const dirty = saved !== "" && JSON.stringify([rows, points]) !== saved;
+  // Warn before leaving the page with an unsaved comparison.
+  useEffect(() => {
+    if (!dirty) return;
+    const warn = (e: BeforeUnloadEvent) => e.preventDefault();
+    addEventListener("beforeunload", warn);
+    return () => removeEventListener("beforeunload", warn);
+  }, [dirty]);
 
   const set = (i: number, k: keyof Row, v: unknown) => setRows(rows.map((r, j) => (j === i ? { ...r, [k]: v } : r)));
 
@@ -154,6 +165,7 @@ export function ComparisonEditor({ productId }: { productId: string }) {
       </label>
       <div className="mt-4 flex items-center justify-end gap-3">
         {msg && <span role="status" className={`text-sm font-bold ${msg.startsWith("Saved") ? "text-green" : "text-red"}`}>{msg}</span>}
+        {dirty && <span className="text-xs font-bold text-red">Not saved yet — click “Save comparison” to show it on the product page.</span>}
         <Btn iconL={Save} onClick={save} disabled={busy}>{busy ? "Saving…" : "Save comparison"}</Btn>
       </div>
     </Panel>
