@@ -4,7 +4,7 @@
 //
 // Usage:
 //   node scripts/import-colour-product.mjs "<product folder>" --slug <url-slug> --name "<Product Name>" \
-//        --collection <collection-slug> [--price <PF price>] [--mrp <genuine PF MRP>]
+//        --collection <collection-slug> [--price <PF price>] [--mrp <genuine PF MRP>] [--materials "Bouclé,Velvet"]
 //
 // Filenames: NN-<category>-<what>.jpg where category is studio | swatch | live | detail
 // (e.g. 01-studio-front.jpg, 04-swatch-colour.jpg, 05-live-in-home-bed.jpg, 08-detail-armrest.jpg).
@@ -25,13 +25,14 @@ const arg = (k) => { const i = rest.indexOf(`--${k}`); return i >= 0 ? rest[i + 
 const slug = arg("slug"), name = arg("name"), collection = arg("collection");
 const price = arg("price") ? Number(arg("price")) : null;
 const mrp = arg("mrp") ? Number(arg("mrp")) : null;
+const onlyMaterials = arg("materials")?.split(",").map((m) => m.trim()).filter(Boolean) ?? null; // default: every material in the index
 if (!dir || !slug || !name || !collection) {
-  console.error('Usage: node scripts/import-colour-product.mjs "<folder>" --slug <slug> --name "<Name>" --collection <collection-slug> [--price N] [--mrp N]');
+  console.error('Usage: node scripts/import-colour-product.mjs "<folder>" --slug <slug> --name "<Name>" --collection <collection-slug> [--price N] [--mrp N] [--materials "Bouclé,…"]');
   process.exit(1);
 }
 
 const COLOUR_HEX = {
-  white: "#ECEAE4", grey: "#A3A3A1", "olive green": "#5E6B3A", orange: "#C4652F", wheat: "#D6B266", beige: "#D8CBB0",
+  white: "#ECEAE4", green: "#6B7A2E", grey: "#A3A3A1", "olive green": "#5E6B3A", orange: "#C4652F", wheat: "#D6B266", beige: "#D8CBB0",
   cream: "#EFE6D2", charcoal: "#3E3D3B", black: "#1C1B1A", brown: "#6B4A33", navy: "#2F3B55", terracotta: "#B5583A",
 };
 const TYPE = { studio: "studio", swatch: "swatch", live: "real_space", detail: "detail" };
@@ -107,8 +108,9 @@ if (stale.length) await db.storage.from(BUCKET).remove(stale);
 
 // 4. Variants: every material × colour (missing ones only); prices from the material price index
 const { data: s } = await db.from("store_settings").select("material_price_index").eq("id", 1).single();
-const index = s.material_price_index;
-const basePct = Math.min(...index.map((m) => m.index));
+const basePct = Math.min(...s.material_price_index.map((m) => m.index)); // prices stay relative to the cheapest (PF)
+const index = onlyMaterials ? s.material_price_index.filter((m) => onlyMaterials.includes(m.name)) : s.material_price_index;
+if (!index.length) throw new Error(`--materials matched none of: ${s.material_price_index.map((m) => m.name).join(", ")}`);
 const { data: existing } = await db.from("product_variants").select("id, model_en, color_en").eq("product_id", PID);
 const code = (t) => t.replace(/\(.*?\)/g, "").trim().split(/\s+/).map((w) => w[0]).join("").toUpperCase();
 let prefix = slug.split("-").map((w) => w[0]).join("").toUpperCase().slice(0, 5);

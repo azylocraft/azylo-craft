@@ -32,6 +32,7 @@ export const categoryPills: NavItem[] = [
   { key: "nav.sofaBeds", href: collectionHref("convertible-sofa-beds") },
   { key: "nav.smallSpace", href: collectionHref("small-space-sofas") },
   { key: "nav.compressed", href: collectionHref("compressed-sofas") },
+  { key: "nav.modular", href: collectionHref("modular-sectional-sofas") },
   { key: "nav.smartTables", href: collectionHref("rolling-side-table-with-storage") },
   { key: "nav.newArrivals", href: collectionHref("new-arrivals") },
 ];
