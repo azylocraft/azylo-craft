@@ -89,19 +89,25 @@ export default function ProductEditor() {
       const { error } = await sb.from("products").update(row).eq("id", id);
       if (error) throw new Error(error.message);
 
-      for (const [i, v] of variants.entries()) {
-        if (v._delete) {
-          if (v.id) await sb.from("product_variants").delete().eq("id", v.id);
-          continue;
-        }
-        const r = {
-          product_id: id, model_en: v.model_en || null, color_en: v.color_en || null, color_hex: /^#[0-9a-f]{6}$/i.test(v.color_hex) ? v.color_hex : null,
-          material: v.material || null, price_inr: v.price_inr === "" ? null : Number(v.price_inr), compare_at_inr: v.compare_at_inr === "" ? null : Number(v.compare_at_inr), stock: v.stock === "" ? null : Math.max(0, Math.floor(Number(v.stock))),
-          sku: v.sku || null, is_active: v.is_active, sort_order: i,
-        };
-        const res = v.id ? await sb.from("product_variants").update(r).eq("id", v.id) : await sb.from("product_variants").insert(r);
-        if (res.error) throw new Error(`Variant ${i + 1}: ${res.error.message}`);
+      // Deletes first (frees SKUs), then all updates/inserts in parallel.
+      const removed = variants.filter((v) => v._delete && v.id).map((v) => v.id!);
+      if (removed.length) {
+        const { error: de } = await sb.from("product_variants").delete().in("id", removed);
+        if (de) throw new Error(de.message);
       }
+      const results = await Promise.all(
+        variants.map((v, i) => {
+          if (v._delete) return null;
+          const r = {
+            product_id: id, model_en: v.model_en || null, color_en: v.color_en || null, color_hex: /^#[0-9a-f]{6}$/i.test(v.color_hex) ? v.color_hex : null,
+            material: v.material || null, price_inr: v.price_inr === "" ? null : Number(v.price_inr), compare_at_inr: v.compare_at_inr === "" ? null : Number(v.compare_at_inr), stock: v.stock === "" ? null : Math.max(0, Math.floor(Number(v.stock))),
+            sku: v.sku || null, is_active: v.is_active, sort_order: i,
+          };
+          return (v.id ? sb.from("product_variants").update(r).eq("id", v.id) : sb.from("product_variants").insert(r)).then((res) => (res.error ? `Variant ${i + 1}: ${res.error.message}` : null));
+        }),
+      );
+      const failed = results.find(Boolean);
+      if (failed) throw new Error(failed);
       await sb.from("product_collections").delete().eq("product_id", id);
       if (linked.length) await sb.from("product_collections").insert(linked.map((collection_id) => ({ product_id: id, collection_id })));
       const { data: vs } = await sb.from("product_variants").select("*").eq("product_id", id).order("sort_order");
