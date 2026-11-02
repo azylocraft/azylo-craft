@@ -54,6 +54,9 @@ function OffPrice({ p, size = "text-[16px]" }: { p: ProductCardData; size?: stri
   );
 }
 
+/** Card title: the product name up to its first " — " / " – " / " - " (e.g. "Modern Convertible Lounge Sofa"). */
+const shortName = (name: string) => name.split(/\s+[—–-]\s+/)[0].trim();
+
 /** Colour dot + name, shown on per-colour cards. */
 function ColourTag({ p }: { p: ProductCardData }) {
   return (
@@ -87,8 +90,8 @@ export function PCard({ p }: { p: ProductCardData; /** @deprecated cards use a 4
     <div className="h-full pb-5">
       <Link href={p.href ?? `/products/${p.slug}`} className="az-card group relative flex h-full flex-col rounded-card bg-cream p-2 pb-8">
         <div className="flex items-start justify-between gap-4 px-3 pb-3 pt-2.5">
-          <div className="line-clamp-2 text-[16px] font-semibold lowercase leading-[1.2] tracking-[-0.03em]">
-            <T text={p.name} field="product name" fallback />
+          <div className="line-clamp-1 text-[16px] font-semibold lowercase leading-[1.2] tracking-[-0.03em]">
+            {shortName(text(p.name, "product name"))}
           </div>
           {p.color ? (
             <ColourTag p={p} />
@@ -98,11 +101,11 @@ export function PCard({ p }: { p: ProductCardData; /** @deprecated cards use a 4
             </span>
           )}
         </div>
-        {/* 4:5 photo area showing the whole photo (product shots are 4:5; white cut-outs sit on white). */}
-        <Media src={p.image} alt={text(p.name, "product name")} tone={p.tone} label={p.image ? undefined : t("card.photoLabel")} fit={p.image ? "contain" : "cover"} className="flex-none rounded-[22px] bg-white">
-          <div className="aspect-[4/5] w-full" />
+        {/* Listing photos are cropped to the lower 6:5 area, hiding the logo band at the top of product shots. */}
+        <Media src={p.image} alt={text(p.name, "product name")} tone={p.tone} label={p.image ? undefined : t("card.photoLabel")} align="bottom" className="flex-none rounded-[22px] bg-white">
+          <div className="aspect-[6/5] w-full" />
           {p.image2 && (
-            <img src={p.image2} alt="" loading="lazy" className="absolute inset-0 size-full bg-white object-contain opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+            <img src={p.image2} alt="" loading="lazy" className="absolute inset-0 size-full bg-white object-cover object-bottom opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
           )}
           <WishHeart productId={p.id} className="absolute right-3 top-3" />
         </Media>
@@ -123,16 +126,16 @@ export function GCard({ p }: { p: ProductCardData; /** @deprecated cards use a 4
   return (
     <div className="h-full pb-4">
       <Link href={p.href ?? `/products/${p.slug}`} className="az-card group relative flex h-full flex-col rounded-[22px] bg-cream p-1.5 pb-7 sm:rounded-card sm:p-2 sm:pb-8">
-        <div className="flex items-start justify-between gap-3 px-2 pb-2 pt-1.5 sm:px-3 sm:pb-3 sm:pt-2.5">
-          <div className="line-clamp-2 text-[12.5px] font-semibold lowercase leading-[1.25] tracking-[-0.02em] sm:text-[15px]">
-            <T text={p.name} field="product name" fallback />
+        <div className="flex flex-col gap-1 px-2 pb-2 pt-1.5 sm:flex-row sm:items-start sm:justify-between sm:gap-3 sm:px-3 sm:pb-3 sm:pt-2.5">
+          <div className="line-clamp-2 text-[12.5px] sm:line-clamp-1 font-semibold lowercase leading-[1.25] tracking-[-0.02em] sm:text-[15px]">
+            {shortName(text(p.name, "product name"))}
           </div>
           {p.color ? <ColourTag p={p} /> : p.isNew && <span className="flex-none text-[10px] lowercase text-gold sm:text-[11px]">{t("card.new")}</span>}
         </div>
-        <Media src={p.image} alt={text(p.name, "product name")} tone={p.tone} label={p.image ? undefined : t("card.photoLabel")} fit={p.image ? "contain" : "cover"} className="rounded-[16px] bg-white sm:rounded-[22px]">
-          <div className="aspect-[4/5] w-full" />
+        <Media src={p.image} alt={text(p.name, "product name")} tone={p.tone} label={p.image ? undefined : t("card.photoLabel")} align="bottom" className="rounded-[16px] bg-white sm:rounded-[22px]">
+          <div className="aspect-[6/5] w-full" />
           {p.image2 && (
-            <img src={p.image2} alt="" loading="lazy" className="absolute inset-0 size-full bg-white object-contain opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+            <img src={p.image2} alt="" loading="lazy" className="absolute inset-0 size-full bg-white object-cover object-bottom opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
           )}
           <WishHeart productId={p.id} size={32} className="absolute right-2 top-2 sm:right-3 sm:top-3" />
         </Media>

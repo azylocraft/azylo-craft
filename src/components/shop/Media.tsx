@@ -13,6 +13,7 @@ export function Media({
   dark,
   eager,
   fit = "cover",
+  align = "center",
   children,
 }: {
   src?: string | null;
@@ -24,12 +25,14 @@ export function Media({
   eager?: boolean;
   /** "contain" shows the whole image (letterboxed) instead of cropping it to fill the box. */
   fit?: "cover" | "contain";
+  /** "bottom" keeps the lower part of a cropped photo (hides a logo band at the top). */
+  align?: "center" | "bottom";
   children?: React.ReactNode;
 }) {
   return (
     <div className={clsx("relative overflow-hidden", className)}>
       {src ? (
-        <img src={src} alt={alt} loading={eager ? "eager" : "lazy"} decoding="async" className={clsx("absolute inset-0 size-full", fit === "contain" ? "object-contain" : "object-cover")} />
+        <img src={src} alt={alt} loading={eager ? "eager" : "lazy"} decoding="async" className={clsx("absolute inset-0 size-full", fit === "contain" ? "object-contain" : "object-cover", align === "bottom" && "object-bottom")} />
       ) : (
         <div
           role="img"
