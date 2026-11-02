@@ -146,7 +146,7 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
     return () => io.disconnect();
   }, []);
 
-  const [openAcc, setOpenAcc] = useState<Set<string>>(() => new Set());
+  const [openAcc, setOpenAcc] = useState<Set<string>>(() => new Set(["overview", "delivery", "shipping"]));
   const accProps = (key: string) => ({
     open: openAcc.has(key),
     onToggle: (o: boolean) =>
