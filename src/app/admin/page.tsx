@@ -10,7 +10,7 @@ import { Badge, Btn } from "@/components/ui/primitives";
 import { mediaUrl } from "@/lib/media";
 import { supabaseBrowser } from "@/lib/supabase/client";
 
-type Variant = { id: string; model_en: string | null; price_inr: number | null; stock: number | null };
+type Variant = { id: string; model_en: string | null; price_inr: number | null; compare_at_inr: number | null; stock: number | null };
 type Row = {
   id: string; slug: string; name_en: string | null; is_published: boolean; is_best_seller: boolean; is_new: boolean; is_featured: boolean; is_demo: boolean;
   product_variants: Variant[];
@@ -52,6 +52,7 @@ export default function AdminProducts() {
   const [picked, setPicked] = useState<Set<string>>(new Set());
   const [action, setAction] = useState<null | "base">(null);
   const [amount, setAmount] = useState("");
+  const [mrpAmount, setMrpAmount] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [creating, setCreating] = useState(false);
@@ -60,7 +61,7 @@ export default function AdminProducts() {
     const [{ data }, { data: cols }, { data: s }] = await Promise.all([
       sb
         .from("products")
-        .select("id, slug, name_en, is_published, is_best_seller, is_new, is_featured, is_demo, product_variants ( id, model_en, price_inr, stock ), product_images ( storage_path, sort_order, image_type ), product_collections ( collection_id )")
+        .select("id, slug, name_en, is_published, is_best_seller, is_new, is_featured, is_demo, product_variants ( id, model_en, price_inr, compare_at_inr, stock ), product_images ( storage_path, sort_order, image_type ), product_collections ( collection_id )")
         .order("sort_order"),
       sb.from("collections").select("id, slug, title_en").order("sort_order"),
       sb.from("store_settings").select("material_price_index").eq("id", 1).maybeSingle(),
@@ -87,33 +88,41 @@ export default function AdminProducts() {
 
   // Preview of the bulk change.
   const n = Number(amount.replace(/[^\d.-]/g, ""));
+  const mrpN = Number(mrpAmount.replace(/\D/g, ""));
   const preview = selected.map((r) => {
-    const next =
-      action === "base" && n > 0
-        ? repriced(r, n, index)
-        : [];
-    const prices = next.map((x) => x.price);
-    return { r, next, from: prices.length ? Math.min(...prices) : null, to: prices.length ? Math.max(...prices) : null };
+    if (action !== "base" || (!(n > 0) && !(mrpN > 0))) return { r, next: [] as { id: string; price?: number; mrp?: number }[], from: null, to: null, off: null };
+    const prices = n > 0 ? new Map(repriced(r, n, index).map((x) => [x.id, x.price])) : null;
+    const mrps = mrpN > 0 ? new Map(repriced(r, mrpN, index).map((x) => [x.id, x.price])) : null;
+    const next = r.product_variants.map((v) => ({ id: v.id, price: prices?.get(v.id), mrp: mrps?.get(v.id) }));
+    const finalPrices = next.map((x, i) => x.price ?? r.product_variants[i].price_inr).filter((x): x is number => x != null).map(Number);
+    const cheapest = next.reduce<{ p: number; m: number | null } | null>((a, x, i) => {
+      const p = x.price ?? (r.product_variants[i].price_inr != null ? Number(r.product_variants[i].price_inr) : null);
+      const m = x.mrp ?? (r.product_variants[i].compare_at_inr != null ? Number(r.product_variants[i].compare_at_inr) : null);
+      return p != null && (!a || p < a.p) ? { p, m } : a;
+    }, null);
+    const off = cheapest?.m && cheapest.m > cheapest.p ? Math.round((1 - cheapest.p / cheapest.m) * 100) : null;
+    return { r, next, from: finalPrices.length ? Math.min(...finalPrices) : null, to: finalPrices.length ? Math.max(...finalPrices) : null, off };
   });
 
   const apply = async () => {
     if (!preview.some((p) => p.next.length)) return;
     setBusy(true);
     setMsg(null);
-    let count = 0;
-    for (const p of preview)
-      for (const v of p.next) {
-        const { error } = await sb.from("product_variants").update({ price_inr: v.price }).eq("id", v.id);
-        if (error) {
-          setBusy(false);
-          return setMsg(error.message);
-        }
-        count++;
-      }
+    const jobs = preview.flatMap((p) =>
+      p.next.map((v) => {
+        const patch: Record<string, number> = {};
+        if (v.price != null) patch.price_inr = v.price;
+        if (v.mrp != null) patch.compare_at_inr = v.mrp;
+        return sb.from("product_variants").update(patch).eq("id", v.id).then((res) => res.error?.message ?? null);
+      }),
+    );
+    const errors = (await Promise.all(jobs)).filter(Boolean);
     setBusy(false);
-    setMsg(`Saved ✓ — ${count} prices updated on ${preview.length} product${preview.length > 1 ? "s" : ""}.`);
+    if (errors.length) return setMsg(errors[0]!);
+    setMsg(`Saved ✓ — ${jobs.length} options updated on ${preview.length} product${preview.length > 1 ? "s" : ""}.`);
     setAction(null);
     setAmount("");
+    setMrpAmount("");
     await load();
   };
 
@@ -186,6 +195,9 @@ export default function AdminProducts() {
                 <span>New base price ({baseMaterial}):</span>
                 <span>₹</span>
                 <input className="field !min-h-9 !w-36 text-right" inputMode="numeric" placeholder="e.g. 45000" value={amount} onChange={(e) => setAmount(e.target.value.replace(/\D/g, ""))} aria-label="New base price" autoFocus />
+                <span className="ml-2">MRP (optional, genuine regular price):</span>
+                <span>₹</span>
+                <input className="field !min-h-9 !w-36 text-right" inputMode="numeric" placeholder="e.g. 71430" value={mrpAmount} onChange={(e) => setMrpAmount(e.target.value.replace(/\D/g, ""))} aria-label="New base MRP" />
                 <Btn size="sm" onClick={apply} disabled={busy || !preview.some((p) => p.next.length)}>{busy ? "Saving…" : "Apply"}</Btn>
               </div>
               <p className="mt-1.5 text-[11px] text-muted">
@@ -196,7 +208,10 @@ export default function AdminProducts() {
                   {preview.map((p) => (
                     <li key={p.r.id} className="flex justify-between gap-3 rounded-lg bg-bg2 px-3 py-1.5">
                       <span className="truncate">{p.r.name_en ?? p.r.slug}</span>
-                      <b className="flex-none">{p.from != null ? (p.from === p.to ? inr(p.from) : `${inr(p.from)} – ${inr(p.to!)}`) : "—"}</b>
+                      <b className="flex-none">
+                        {p.off != null && <span className="mr-1.5 text-green">↓{p.off}%</span>}
+                        {p.from != null ? (p.from === p.to ? inr(p.from) : `${inr(p.from)} – ${inr(p.to!)}`) : "—"}
+                      </b>
                     </li>
                   ))}
                 </ul>
@@ -214,16 +229,16 @@ export default function AdminProducts() {
               <th className="w-10 p-4">
                 <input type="checkbox" checked={allShownPicked} onChange={toggleAll} className="size-4 accent-[var(--az-ink)]" aria-label="Select all shown products" />
               </th>
-              <th className="p-4">Product</th><th className="p-4">Price from</th><th className="p-4">Variants</th><th className="p-4">Stock</th><th className="p-4">Photos</th><th className="p-4">Flags</th><th className="w-12 p-4" />
+              <th className="p-4">Product</th><th className="p-4">Price from</th><th className="p-4">MRP</th><th className="p-4">Off</th><th className="p-4">Variants</th><th className="p-4">Stock</th><th className="p-4">Photos</th><th className="p-4">Flags</th><th className="w-12 p-4" />
             </tr>
           </thead>
           <tbody>
             {rows === null &&
               Array.from({ length: 6 }, (_, i) => (
-                <tr key={i}><td colSpan={8} className="p-4"><div className="az-skeleton h-10 rounded-lg" /></td></tr>
+                <tr key={i}><td colSpan={10} className="p-4"><div className="az-skeleton h-10 rounded-lg" /></td></tr>
               ))}
             {rows && shown.length === 0 && (
-              <tr><td colSpan={8} className="p-8 text-center text-muted">No products in this view.</td></tr>
+              <tr><td colSpan={10} className="p-8 text-center text-muted">No products in this view.</td></tr>
             )}
             {shown.map((r) => {
               const prices = r.product_variants.filter((v) => v.price_inr != null).map((v) => Number(v.price_inr));
@@ -245,6 +260,16 @@ export default function AdminProducts() {
                     </Link>
                   </td>
                   <td className="p-4">{prices.length ? inr(Math.min(...prices)) : <span className="text-red">MISSING</span>}</td>
+                  {(() => {
+                    const cheapest = r.product_variants.filter((v) => v.price_inr != null).reduce<Variant | null>((a, v) => (!a || Number(v.price_inr) < Number(a.price_inr) ? v : a), null);
+                    const mrp = cheapest?.compare_at_inr != null && Number(cheapest.compare_at_inr) > Number(cheapest.price_inr) ? Number(cheapest.compare_at_inr) : null;
+                    return (
+                      <>
+                        <td className="p-4 text-muted">{mrp ? <s>{inr(mrp)}</s> : "—"}</td>
+                        <td className="p-4">{mrp ? <b className="text-green">↓{Math.round((1 - Number(cheapest!.price_inr) / mrp) * 100)}%</b> : "—"}</td>
+                      </>
+                    );
+                  })()}
                   <td className="p-4">{r.product_variants.length}</td>
                   <td className="p-4">{stock}</td>
                   <td className="p-4">{r.product_images.length}</td>
