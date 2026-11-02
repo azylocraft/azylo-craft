@@ -140,14 +140,10 @@ select.field { appearance: none; background-image: linear-gradient(45deg, transp
    Bau theme: lowercase display type, olive accents, motion
    --------------------------------------------------------------------- */
 
-/* Buttons are lowercase, like the wordmark; headings stay in bold sentence case. */
-.az-btn {
-  text-transform: lowercase;
-}
 
-/* Small labels read as quiet lowercase text, never tracked capitals. */
+/* Small labels: quiet sentence-case text instead of tracked capitals. */
 .uppercase {
-  text-transform: lowercase;
+  text-transform: none;
   letter-spacing: 0;
 }
 

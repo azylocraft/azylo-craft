@@ -151,9 +151,9 @@ export function GiftSlotMachine() {
               type="button"
               onClick={pull}
               disabled={spinning}
-              className="mt-1 inline-flex h-10 items-center rounded-full bg-ink px-5 text-[13px] font-semibold lowercase text-white disabled:opacity-60"
+              className="mt-1 inline-flex h-10 items-center rounded-full bg-ink px-5 text-[13px] font-semibold text-white disabled:opacity-60"
             >
-              {spinning ? "spinning…" : "pull the lever"}
+              {spinning ? "Spinning…" : "Pull the lever"}
             </button>
           </>
         )}

@@ -102,9 +102,9 @@ export function GiftWheel() {
           onClick={spin}
           disabled={spinning || done}
           aria-label="Spin the gift clock"
-          className="absolute left-1/2 top-1/2 flex size-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-ink text-[12px] font-semibold lowercase text-white shadow-soft transition-transform hover:scale-105 disabled:hover:scale-100"
+          className="absolute left-1/2 top-1/2 flex size-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-ink text-[12px] font-semibold text-white shadow-soft transition-transform hover:scale-105 disabled:hover:scale-100"
         >
-          {done ? <PartyPopper size={20} aria-hidden /> : spinning ? "…" : "spin"}
+          {done ? <PartyPopper size={20} aria-hidden /> : spinning ? "…" : "Spin"}
         </button>
       </div>
 
@@ -148,7 +148,7 @@ export function GiftWheel() {
         </div>
         {!done ? (
           <Btn onClick={spin} disabled={spinning} iconL={RotateCw}>
-            {spinning ? "spinning…" : wins.length ? "spin again" : "spin the clock"}
+            {spinning ? "Spinning…" : wins.length ? "Spin again" : "Spin the clock"}
           </Btn>
         ) : (
           <p className="text-xs text-muted">Both gifts are added free with every sofa you order and delivered with it.</p>

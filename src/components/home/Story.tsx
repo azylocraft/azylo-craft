@@ -57,7 +57,7 @@ export function Outcomes() {
     <Section>
       <div className="grid gap-5 md:grid-cols-2 md:gap-10">
         <div className="flex flex-col gap-3">
-          <Eyebrow>what you get</Eyebrow>
+          <Eyebrow>What you get</Eyebrow>
           <Title accent="and your budget.">A sofa that fits your room, your body</Title>
         </div>
         <P className="max-w-[440px] self-end text-[16px] text-ink2">
@@ -128,7 +128,7 @@ export function Obstacles() {
     <Section>
       <div className="grid gap-5 md:grid-cols-2 md:gap-10">
         <div className="flex flex-col gap-3">
-          <Eyebrow>the problem</Eyebrow>
+          <Eyebrow>The problem</Eyebrow>
           <Title accent="a gamble.">Buying a sofa online shouldn’t feel like</Title>
         </div>
         <P className="max-w-[440px] self-end text-[16px] text-ink2">These are the worries we hear most — and exactly what we do about each one.</P>
@@ -182,7 +182,7 @@ export function HowItWorks() {
   return (
     <Section>
       <div className="flex flex-col gap-3">
-        <Eyebrow>how it works</Eyebrow>
+        <Eyebrow>How it works</Eyebrow>
         <Title accent="no guesswork.">Four simple steps,</Title>
       </div>
       <ol className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -222,7 +222,7 @@ export function WhyItMatters() {
     <Section>
       <div className="grid gap-8 rounded-hero bg-dark px-6 py-12 text-white md:grid-cols-[1.2fr_1fr] md:items-end md:px-16 md:py-16">
         <div className="flex flex-col gap-4">
-          <Eyebrow>why it matters</Eyebrow>
+          <Eyebrow>Why it matters</Eyebrow>
           <Title accent="Choose it right." className="text-white">
             You&apos;ll use it every day for years.
           </Title>

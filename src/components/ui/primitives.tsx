@@ -27,7 +27,7 @@ export function Eyebrow({
   return (
     <div
       data-n={line ? "" : undefined}
-      className={clsx("az-eb flex items-center gap-[0.45em] text-[12.5px] font-normal lowercase tracking-normal text-muted", center && "justify-center", className)}
+      className={clsx("az-eb flex items-center gap-[0.45em] text-[12.5px] font-normal tracking-normal text-muted", center && "justify-center", className)}
     >
       {children}
     </div>
@@ -116,7 +116,7 @@ export function Chip({ children, active, dot, className }: { children: ReactNode
   return (
     <span
       className={clsx(
-        "inline-flex h-9 items-center gap-2 whitespace-nowrap rounded-full border-[1.5px] border-ink px-4 text-[12.5px] font-medium lowercase",
+        "inline-flex h-9 items-center gap-2 whitespace-nowrap rounded-full border-[1.5px] border-ink px-4 text-[12.5px] font-medium",
         active ? "bg-ink text-white" : "bg-white text-ink",
         className,
       )}

@@ -23,7 +23,7 @@ export function GiftsShowcase() {
       {/* Title row */}
       <header className="grid items-end gap-4 md:grid-cols-[1.3fr_1fr] md:gap-10">
         <div className="flex flex-col gap-3">
-          <Eyebrow>azylo · gifts</Eyebrow>
+          <Eyebrow>AZYLO · Gifts</Eyebrow>
           <h1 className="text-balance text-[38px] font-[800] leading-[1.02] tracking-[-0.045em] md:text-[64px]">
             Play once, take home <span className="text-gold">2 free gifts.</span>
           </h1>
@@ -51,7 +51,7 @@ export function GiftsShowcase() {
         <section className="mt-12 md:mt-16">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
-              <Eyebrow>the gifts</Eyebrow>
+              <Eyebrow>The gifts</Eyebrow>
               <h2 className="mt-1 text-[26px] font-[800] tracking-[-0.03em] md:text-[34px]">What you can win</h2>
             </div>
             {total > 0 && (
@@ -73,7 +73,7 @@ export function GiftsShowcase() {
         <section className="mt-12 grid gap-6 rounded-hero bg-cream p-6 md:mt-16 md:grid-cols-[0.9fr_2fr] md:items-center md:p-10">
           <div className="flex flex-col gap-2">
             <span className="flex items-center gap-2 text-[12.5px] text-gold">
-              <Sparkles size={14} aria-hidden /> also included
+              <Sparkles size={14} aria-hidden /> Also included
             </span>
             <h2 className="text-[24px] font-[800] leading-[1.1] tracking-[-0.03em] md:text-[30px]">With every order, on top of your gifts</h2>
           </div>

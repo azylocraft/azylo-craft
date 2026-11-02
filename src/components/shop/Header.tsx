@@ -155,7 +155,7 @@ export function Header() {
           <button
             type="button"
             onClick={() => openDrawer("search")}
-            className="flex h-[42px] w-full max-w-[520px] items-center gap-3 rounded-full border border-line bg-bg2 px-5 text-left text-[13px] lowercase text-muted transition-colors hover:border-ink"
+            className="flex h-[42px] w-full max-w-[520px] items-center gap-3 rounded-full border border-line bg-bg2 px-5 text-left text-[13px] text-muted transition-colors hover:border-ink"
           >
             <span className="flex-1 truncate">{t("header.search")}</span>
             <Search size={18} className="text-ink" aria-hidden />
@@ -177,7 +177,7 @@ export function Header() {
             aria-expanded={menu === "cat"}
             aria-controls="az-cat-panel"
             onClick={() => toggle("cat")}
-            className="inline-flex h-9 items-center gap-2 rounded-full bg-ink px-4 text-[12.5px] font-medium lowercase text-white"
+            className="inline-flex h-9 items-center gap-2 rounded-full bg-ink px-4 text-[12.5px] font-medium text-white"
           >
             <Grip size={16} className="text-gold-line" aria-hidden />
             {t("header.categories")}
@@ -219,7 +219,7 @@ export function Header() {
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 className={clsx(
-                  "inline-flex h-9 flex-none items-center whitespace-nowrap rounded-full border px-3.5 text-[12.5px] font-normal lowercase transition-colors hover:border-ink",
+                  "inline-flex h-9 flex-none items-center whitespace-nowrap rounded-full border px-3.5 text-[12.5px] font-normal transition-colors hover:border-ink",
                   active ? "border-ink bg-ink text-white" : "border-line bg-white text-ink2",
                 )}
               >
@@ -235,7 +235,7 @@ export function Header() {
             aria-expanded={menu === "disc"}
             aria-controls="az-disc-panel"
             onClick={() => toggle("disc")}
-            className="inline-flex h-9 items-center gap-2 rounded-full border border-line bg-white px-3.5 text-[12.5px] font-normal lowercase text-ink2 hover:border-ink"
+            className="inline-flex h-9 items-center gap-2 rounded-full border border-line bg-white px-3.5 text-[12.5px] font-normal text-ink2 hover:border-ink"
           >
             <Diamond size={12} aria-hidden />
             {t("header.discover")}

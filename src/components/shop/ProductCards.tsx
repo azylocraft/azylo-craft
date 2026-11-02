@@ -60,7 +60,7 @@ const shortName = (name: string) => name.split(/\s+[—–-]\s+/)[0].trim();
 /** Colour dot + name, shown on per-colour cards. */
 function ColourTag({ p }: { p: ProductCardData }) {
   return (
-    <span className="flex flex-none items-center gap-1.5 text-[10.5px] lowercase text-muted sm:text-[11px]">
+    <span className="flex flex-none items-center gap-1.5 text-[10.5px] text-muted sm:text-[11px]">
       <span aria-hidden className="size-2.5 rounded-full ring-1 ring-black/10" style={{ background: p.colorHex ?? "#ccc" }} />
       {p.color}
     </span>
@@ -90,13 +90,13 @@ export function PCard({ p }: { p: ProductCardData; /** @deprecated cards use a 4
     <div className="h-full pb-5">
       <Link href={p.href ?? `/products/${p.slug}`} className="az-card group relative flex h-full flex-col rounded-card bg-cream p-2 pb-8">
         <div className="flex items-start justify-between gap-4 px-3 pb-3 pt-2.5">
-          <div className="line-clamp-1 text-[16px] font-semibold lowercase leading-[1.2] tracking-[-0.03em]">
+          <div className="line-clamp-1 text-[16px] font-semibold leading-[1.2] tracking-[-0.03em]">
             {shortName(text(p.name, "product name"))}
           </div>
           {p.color ? (
             <ColourTag p={p} />
           ) : (
-            <span className="max-w-[42%] flex-none text-right text-[10.5px] lowercase leading-[1.35] text-muted">
+            <span className="max-w-[42%] flex-none text-right text-[10.5px] leading-[1.35] text-muted">
               <T text={p.eyebrow} field="category tag" fallback />
             </span>
           )}
@@ -111,7 +111,7 @@ export function PCard({ p }: { p: ProductCardData; /** @deprecated cards use a 4
         </Media>
         <div className="flex items-baseline justify-between gap-3 px-3 pt-3.5">
           <OffPrice p={p} />
-          <span className="flex-none text-[11px] lowercase text-muted">{t("card.madeToOrder")}</span>
+          <span className="flex-none text-[11px] text-muted">{t("card.madeToOrder")}</span>
         </div>
         <TileArrow />
       </Link>
@@ -127,10 +127,10 @@ export function GCard({ p }: { p: ProductCardData; /** @deprecated cards use a 4
     <div className="h-full pb-4">
       <Link href={p.href ?? `/products/${p.slug}`} className="az-card group relative flex h-full flex-col rounded-[22px] bg-cream p-1.5 pb-7 sm:rounded-card sm:p-2 sm:pb-8">
         <div className="flex flex-col gap-1 px-2 pb-2 pt-1.5 sm:flex-row sm:items-start sm:justify-between sm:gap-3 sm:px-3 sm:pb-3 sm:pt-2.5">
-          <div className="line-clamp-2 text-[12.5px] sm:line-clamp-1 font-semibold lowercase leading-[1.25] tracking-[-0.02em] sm:text-[15px]">
+          <div className="line-clamp-2 text-[12.5px] sm:line-clamp-1 font-semibold leading-[1.25] tracking-[-0.02em] sm:text-[15px]">
             {shortName(text(p.name, "product name"))}
           </div>
-          {p.color ? <ColourTag p={p} /> : p.isNew && <span className="flex-none text-[10px] lowercase text-gold sm:text-[11px]">{t("card.new")}</span>}
+          {p.color ? <ColourTag p={p} /> : p.isNew && <span className="flex-none text-[10px] text-gold sm:text-[11px]">{t("card.new")}</span>}
         </div>
         <Media src={p.image} alt={text(p.name, "product name")} tone={p.tone} label={p.image ? undefined : t("card.photoLabel")} align="bottom" className="rounded-[16px] bg-white sm:rounded-[22px]">
           <div className="aspect-[6/5] w-full" />
