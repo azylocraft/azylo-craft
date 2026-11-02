@@ -1,135 +1,128 @@
 "use client";
 
 import { useState } from "react";
-import { Gift, PartyPopper, RotateCw } from "lucide-react";
+import { Check, PartyPopper, RotateCw } from "lucide-react";
 import { Price, useHydrated, useShopCtx } from "@/components/shop/ShopContext";
 import { Btn } from "@/components/ui/primitives";
+import { drawIndex } from "@/lib/gift-draw";
 import { useShop } from "@/lib/shop-store";
 
-const SPIN_MS = 5200;
-const SLICE_COLOURS = ["#F1EFE6", "#E4E2D4", "#D9D7C2", "#ECEADF"];
+const SPIN_MS = 4200;
 
 /**
- * Gift wheel: every slice is a free gift from Admin → Settings (more gifts = more slices).
- * Two spins win two different gifts — every spin wins. The result is saved on this device and
- * included with every eligible piece added to the cart (the server checks the gift keys).
+ * Gift clock (Gifts page): the free gifts sit around a clock face. Spin 1 sends the long hand
+ * round to gift 1, spin 2 the short hand to gift 2 — two different gifts, every spin wins.
+ * The result is saved on this device (shared with the product page slot machine).
  */
-export function GiftWheel({ compact }: { compact?: boolean }) {
+export function GiftWheel() {
   const { settings } = useShopCtx();
   const hydrated = useHydrated();
   const gifts = settings.freeGifts;
   const won = useShop((s) => s.wonGifts);
   const setWon = useShop((s) => s.setWonGifts);
-  const [angle, setAngle] = useState(0);
+  const [hands, setHands] = useState({ long: 0, short: 90 });
   const [spinning, setSpinning] = useState(false);
-  const [latest, setLatest] = useState<string | null>(null);
 
   if (gifts.length < 2) return null;
   const wins = (hydrated ? won : []).filter((k) => gifts.some((g) => g.key === k));
   const done = wins.length >= 2;
-  const slice = 360 / gifts.length;
-  const size = compact ? 300 : 380;
-  const r = size / 2;
+  const step = 360 / gifts.length;
+  const angleOf = (i: number) => i * step; // 0° = 12 o'clock
 
   const spin = () => {
     if (spinning || done) return;
-    const options = gifts.map((g, i) => ({ g, i })).filter(({ g }) => !wins.includes(g.key));
-    const pick = options[crypto.getRandomValues(new Uint32Array(1))[0] % options.length];
-    // Land the middle of the picked slice under the pointer (top), after several full turns.
-    const target = 360 - (pick.i * slice + slice / 2);
-    const turns = 5 + (crypto.getRandomValues(new Uint8Array(1))[0] % 3);
-    const jitter = ((crypto.getRandomValues(new Uint8Array(1))[0] / 255) - 0.5) * slice * 0.5;
-    const next = angle - (angle % 360) + turns * 360 + target + jitter;
+    const pool = gifts.map((_, i) => i).filter((i) => !wins.includes(gifts[i].key));
+    const pick = drawIndex(pool);
+    const hand = wins.length === 0 ? "long" : "short";
+    const current = hands[hand];
+    const turns = hand === "long" ? 4 : 2;
+    const target = current - (current % 360) + turns * 360 + angleOf(pick);
     setSpinning(true);
-    setAngle(next);
+    setHands((h) => ({ ...h, [hand]: target }));
     setTimeout(() => {
       setSpinning(false);
-      setLatest(pick.g.key);
-      setWon([...wins, pick.g.key]);
+      setWon([...wins, gifts[pick].key]);
     }, SPIN_MS);
   };
 
   const wonGifts = wins.map((k) => gifts.find((g) => g.key === k)!);
-  const latestGift = latest ? gifts.find((g) => g.key === latest) : null;
+  // Hands rest on the won gifts (also when they were won on another page).
+  const rest = (current: number, key?: string) => {
+    const i = key ? gifts.findIndex((g) => g.key === key) : -1;
+    return i < 0 || spinning ? current : current - (((current % 360) + 360) % 360) + angleOf(i);
+  };
+  const shownHands = { long: rest(hands.long, wins[0]), short: rest(hands.short, wins[1]) };
+  const ring = 41; // % radius of the gift ring
 
   return (
-    <div className="flex flex-col items-center gap-6 lg:flex-row lg:items-center lg:justify-center lg:gap-14">
-      {/* Wheel */}
-      <div className="relative flex-none" style={{ width: size, height: size }}>
-        <svg
-          viewBox={`0 0 ${size} ${size}`}
-          className="size-full drop-shadow-[0_24px_40px_rgba(20,19,17,.22)]"
-          style={{ transform: `rotate(${angle}deg)`, transition: spinning ? `transform ${SPIN_MS}ms cubic-bezier(.12,.8,.12,1)` : "none" }}
-          aria-hidden
-        >
-          <defs>
-            {gifts.map((g, i) => (
-              <clipPath key={g.key} id={`gw-clip-${i}`}>
-                <circle cx={0} cy={0} r={r * 0.17} />
-              </clipPath>
-            ))}
-          </defs>
-          <circle cx={r} cy={r} r={r - 2} fill="#fff" stroke="var(--az-ink)" strokeWidth={4} />
-          {gifts.map((g, i) => {
-            const a0 = ((i * slice - 90) * Math.PI) / 180;
-            const a1 = (((i + 1) * slice - 90) * Math.PI) / 180;
-            const R = r - 8;
-            const large = slice > 180 ? 1 : 0;
-            const mid = ((i + 0.5) * slice - 90) * (Math.PI / 180);
-            const cx = r + Math.cos(mid) * R * 0.62;
-            const cy = r + Math.sin(mid) * R * 0.62;
-            const isWon = wins.includes(g.key);
-            return (
-              <g key={g.key}>
-                <path
-                  d={`M${r},${r} L${r + R * Math.cos(a0)},${r + R * Math.sin(a0)} A${R},${R} 0 ${large} 1 ${r + R * Math.cos(a1)},${r + R * Math.sin(a1)} Z`}
-                  fill={isWon ? "var(--az-gold-soft)" : SLICE_COLOURS[i % SLICE_COLOURS.length]}
-                  stroke="#fff"
-                  strokeWidth={3}
-                />
-                <g transform={`translate(${cx} ${cy}) rotate(${(i + 0.5) * slice})`}>
-                  <circle r={r * 0.17 + 3} fill="#fff" />
-                  {g.image ? (
-                    <image href={g.image} x={-r * 0.17} y={-r * 0.17} width={r * 0.34} height={r * 0.34} clipPath={`url(#gw-clip-${i})`} preserveAspectRatio="xMidYMid slice" />
-                  ) : (
-                    <circle r={r * 0.17} fill="var(--az-cream)" />
-                  )}
-                </g>
-              </g>
-            );
-          })}
-          <circle cx={r} cy={r} r={r * 0.15} fill="var(--az-ink)" />
-        </svg>
-        {/* Pointer */}
-        <span aria-hidden className="absolute left-1/2 top-[-6px] -translate-x-1/2" style={{ width: 0, height: 0, borderLeft: "14px solid transparent", borderRight: "14px solid transparent", borderTop: "26px solid var(--az-gold)" }} />
+    <div className="flex flex-col items-center gap-8 lg:flex-row lg:justify-center lg:gap-16">
+      {/* Clock */}
+      <div className="relative aspect-square w-full max-w-[440px] flex-none">
+        <div aria-hidden className="absolute inset-[16%] rounded-full bg-gradient-to-b from-white to-bg2 shadow-[inset_0_2px_12px_rgba(0,0,0,.06)]" />
+        {gifts.map((g, i) => {
+          const a = ((angleOf(i) - 90) * Math.PI) / 180;
+          const isWon = wins.includes(g.key);
+          return (
+            <div
+              key={g.key}
+              className="absolute flex w-[22%] -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-1"
+              style={{ left: `${50 + Math.cos(a) * ring}%`, top: `${50 + Math.sin(a) * ring}%` }}
+            >
+              <span className={`relative block aspect-square w-full overflow-hidden rounded-full bg-white transition-all duration-500 ${isWon ? "scale-110 ring-[3px] ring-gold" : "ring-1 ring-line"}`}>
+                {g.image && <img src={g.image} alt={g.title} className="size-full object-cover" />}
+                {isWon && (
+                  <span className="absolute inset-0 flex items-center justify-center bg-black/25">
+                    <span className="flex size-7 items-center justify-center rounded-full bg-gold text-white">
+                      <Check size={15} aria-hidden />
+                    </span>
+                  </span>
+                )}
+              </span>
+              <span className="hidden text-center text-[11px] leading-tight text-muted sm:block">{g.title.toLowerCase()}</span>
+            </div>
+          );
+        })}
+        {/* Hands */}
+        {(["long", "short"] as const).map((h) => (
+          <span
+            key={h}
+            aria-hidden
+            className="absolute bottom-1/2 left-1/2 origin-bottom rounded-full bg-ink"
+            style={{
+              width: h === "long" ? 4 : 6,
+              height: h === "long" ? "27%" : "18%",
+              marginLeft: h === "long" ? -2 : -3,
+              transform: `rotate(${shownHands[h]}deg)`,
+              transition: spinning ? `transform ${SPIN_MS}ms cubic-bezier(.15,.75,.15,1)` : "none",
+            }}
+          />
+        ))}
         <button
           type="button"
           onClick={spin}
           disabled={spinning || done}
-          className="absolute left-1/2 top-1/2 flex size-[22%] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-ink text-[13px] font-semibold lowercase text-white transition-transform hover:scale-105 disabled:cursor-default disabled:hover:scale-100"
-          aria-label="Spin the gift wheel"
+          aria-label="Spin the gift clock"
+          className="absolute left-1/2 top-1/2 flex size-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-ink text-[12px] font-semibold lowercase text-white shadow-soft transition-transform hover:scale-105 disabled:hover:scale-100"
         >
-          {done ? <Gift size={22} aria-hidden /> : spinning ? "…" : "spin"}
+          {done ? <PartyPopper size={20} aria-hidden /> : spinning ? "…" : "spin"}
         </button>
       </div>
 
       {/* Status */}
       <div className="flex max-w-[380px] flex-col items-center gap-4 text-center lg:items-start lg:text-left">
-        <span className="text-[12.5px] text-muted">
-          {done ? "You've won 2 free gifts" : `Spin ${wins.length + 1} of 2 · every spin wins`}
-        </span>
+        <span className="text-[12.5px] text-muted">{done ? "You've won 2 free gifts" : `Spin ${wins.length + 1} of 2 · every spin wins`}</span>
         <h3 className="text-balance text-[26px] font-[800] leading-[1.1] tracking-[-0.03em] md:text-[32px]">
           {done ? (
             <>
               Your 2 gifts are <span className="text-gold">unlocked.</span>
             </>
-          ) : latestGift ? (
+          ) : wins.length ? (
             <>
-              You won the <span className="text-gold">{latestGift.title.toLowerCase()}!</span> One more spin.
+              You won the <span className="text-gold">{wonGifts[0].title.toLowerCase()}!</span> Spin once more.
             </>
           ) : (
             <>
-              Spin twice, win <span className="text-gold">2 free gifts.</span>
+              Spin the clock, win <span className="text-gold">2 free gifts.</span>
             </>
           )}
         </h3>
@@ -143,31 +136,22 @@ export function GiftWheel({ compact }: { compact?: boolean }) {
                   {g ? (
                     <>
                       <b className="font-semibold">{g.title}</b>
-                      <span className="block text-xs text-green">
-                        {g.value_inr ? (
-                          <>
-                            Worth <Price cad={g.value_inr} /> — FREE
-                          </>
-                        ) : (
-                          "FREE"
-                        )}
-                      </span>
+                      <span className="block text-xs text-green">{g.value_inr ? <>Worth <Price cad={g.value_inr} /> — FREE</> : "FREE"}</span>
                     </>
                   ) : (
                     <span className="text-muted">Gift {n + 1} — spin to reveal</span>
                   )}
                 </span>
-                {g && <PartyPopper size={18} className="text-gold" aria-hidden />}
               </div>
             );
           })}
         </div>
         {!done ? (
           <Btn onClick={spin} disabled={spinning} iconL={RotateCw}>
-            {spinning ? "spinning…" : wins.length ? "spin again" : "spin the wheel"}
+            {spinning ? "spinning…" : wins.length ? "spin again" : "spin the clock"}
           </Btn>
         ) : (
-          <p className="text-xs text-muted">Both gifts are added free with every sofa you order. Delivered with your sofa.</p>
+          <p className="text-xs text-muted">Both gifts are added free with every sofa you order and delivered with it.</p>
         )}
       </div>
     </div>
