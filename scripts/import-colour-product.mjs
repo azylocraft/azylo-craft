@@ -111,7 +111,13 @@ const index = s.material_price_index;
 const basePct = Math.min(...index.map((m) => m.index));
 const { data: existing } = await db.from("product_variants").select("id, model_en, color_en").eq("product_id", PID);
 const code = (t) => t.replace(/\(.*?\)/g, "").trim().split(/\s+/).map((w) => w[0]).join("").toUpperCase();
-const prefix = slug.split("-").map((w) => w[0]).join("").toUpperCase().slice(0, 5);
+let prefix = slug.split("-").map((w) => w[0]).join("").toUpperCase().slice(0, 5);
+// Initials can clash with another product (convertible-leather-sofa vs convertible-lounge-sofa…): lengthen until unique.
+for (let n = 2; ; n++) {
+  const { data: clash } = await db.from("product_variants").select("id").like("sku", `${prefix}-%`).neq("product_id", PID).limit(1);
+  if (!clash?.length) break;
+  prefix = slug.split("-").map((w) => w.slice(0, n)).join("").toUpperCase().slice(0, 8);
+}
 const add = [];
 const updates = [];
 index.forEach((m, mi) => colours.forEach((c, ci) => {
