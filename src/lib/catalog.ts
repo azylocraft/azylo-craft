@@ -130,7 +130,15 @@ function colourCards(row: Row, card: ProductCardData): ProductCardData[] {
             (ofPhotos.find((i: Row) => /bed-mode/i.test(i.storage_path)) ?? ofPhotos[1])?.storage_path,
           ) ?? card.image,
         fromPriceInr: prices.length ? Math.min(...prices) : null,
-        compareAtInr: null,
+        // MRP of this colour's cheapest option (only when one is set and higher than the price).
+        compareAtInr: (() => {
+          const cheapest = ofColour
+            .filter((v: Row) => v.price_inr != null)
+            .reduce((a: Row, v: Row) => (!a || Number(v.price_inr) < Number(a.price_inr) ? v : a), null);
+          return cheapest?.compare_at_inr != null && Number(cheapest.compare_at_inr) > Number(cheapest.price_inr)
+            ? Number(cheapest.compare_at_inr)
+            : null;
+        })(),
       },
     ];
   });

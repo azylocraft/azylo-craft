@@ -41,15 +41,15 @@ function OffPrice({ p, size = "text-[16px]" }: { p: ProductCardData; size?: stri
   const off = p.compareAtInr && p.fromPriceInr != null && p.compareAtInr > p.fromPriceInr ? Math.round(((p.compareAtInr - p.fromPriceInr) / p.compareAtInr) * 100) : 0;
   return (
     <span className={clsx("inline-flex flex-wrap items-baseline gap-x-1.5 font-semibold tracking-[-0.02em]", size)}>
-      <Price cad={p.fromPriceInr} withCode={false} />
       {off > 0 && (
         <>
-          <s className="text-[11px] font-normal text-faint">
+          <span className="text-[12px] font-bold text-green">↓{off}%</span>
+          <s className="text-[12px] font-normal text-faint">
             <Price cad={p.compareAtInr} withCode={false} />
           </s>
-          <span className="text-[11px] font-medium text-red">−{off}%</span>
         </>
       )}
+      <Price cad={p.fromPriceInr} withCode={false} />
     </span>
   );
 }
