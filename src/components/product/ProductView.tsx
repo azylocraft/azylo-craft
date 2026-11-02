@@ -184,6 +184,13 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
             <H as="h1" className="text-[28px] md:text-[38px]">
               <T text={product.name} field="product name" fallback />
             </H>
+            {/* Selected colour, shown under the name (updates with the colour picker). */}
+            {colors.length > 1 && !isCustom && colors.find(([k]) => k === color) && (
+              <span className="-mt-2 flex items-center gap-2 text-[15px] text-ink2">
+                <span aria-hidden className="size-3.5 rounded-full ring-1 ring-black/10" style={{ background: colors.find(([k]) => k === color)![1].hex ?? "#ccc" }} />
+                {text(colors.find(([k]) => k === color)![1].name, "colour")}
+              </span>
+            )}
             <RatingSummary reviews={product.reviews} />
             {variant ? <PriceBlock price={variant.priceInr} compareAt={variant.compareAtInr} /> : <Missing field="variants" />}
             <LaunchPriceTimer />
