@@ -4,7 +4,7 @@ import clsx from "clsx";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Percent, Plus, Search, Tag, Trash2, X } from "lucide-react";
+import { Plus, Search, Tag, Trash2, X } from "lucide-react";
 import { AdminTitle } from "@/components/admin/AdminShell";
 import { Badge, Btn } from "@/components/ui/primitives";
 import { mediaUrl } from "@/lib/media";
@@ -50,7 +50,7 @@ export default function AdminProducts() {
   const [q, setQ] = useState("");
   const [cat, setCat] = useState("all");
   const [picked, setPicked] = useState<Set<string>>(new Set());
-  const [action, setAction] = useState<null | "base" | "percent">(null);
+  const [action, setAction] = useState<null | "base">(null);
   const [amount, setAmount] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -91,9 +91,7 @@ export default function AdminProducts() {
     const next =
       action === "base" && n > 0
         ? repriced(r, n, index)
-        : action === "percent" && n && n > -100
-          ? r.product_variants.filter((v) => v.price_inr != null).map((v) => ({ id: v.id, price: round10(Number(v.price_inr) * (1 + n / 100)) }))
-          : [];
+        : [];
     const prices = next.map((x) => x.price);
     return { r, next, from: prices.length ? Math.min(...prices) : null, to: prices.length ? Math.max(...prices) : null };
   });
@@ -177,7 +175,6 @@ export default function AdminProducts() {
           <div className="flex flex-wrap items-center gap-2">
             <b className="mr-2 text-sm">{picked.size} selected</b>
             <Btn size="sm" kind={action === "base" ? "dark" : "light"} iconL={Tag} onClick={() => { setAction("base"); setAmount(""); }}>Set base price</Btn>
-            <Btn size="sm" kind={action === "percent" ? "dark" : "light"} iconL={Percent} onClick={() => { setAction("percent"); setAmount(""); }}>Change prices by %</Btn>
             <Btn size="sm" kind="light" iconL={Trash2} className="!text-red" onClick={() => remove([...picked])} disabled={busy}>Delete</Btn>
             <button type="button" className="ml-auto flex items-center gap-1 text-xs font-bold underline" onClick={() => { setPicked(new Set()); setAction(null); }}>
               <X size={13} aria-hidden /> Clear selection
@@ -186,25 +183,13 @@ export default function AdminProducts() {
           {action && (
             <div className="mt-3 border-t border-line2 pt-3">
               <div className="flex flex-wrap items-center gap-2 text-sm">
-                {action === "base" ? (
-                  <>
-                    <span>New base price ({baseMaterial} / cheapest option):</span>
-                    <span>₹</span>
-                    <input className="field !min-h-9 !w-36 text-right" inputMode="numeric" placeholder="e.g. 45000" value={amount} onChange={(e) => setAmount(e.target.value.replace(/\D/g, ""))} aria-label="New base price" autoFocus />
-                  </>
-                ) : (
-                  <>
-                    <span>Change every price by</span>
-                    <input className="field !min-h-9 !w-24 text-right" inputMode="numeric" placeholder="e.g. 10 or -5" value={amount} onChange={(e) => setAmount(e.target.value.replace(/[^\d-]/g, ""))} aria-label="Percent change" autoFocus />
-                    <span>%</span>
-                  </>
-                )}
+                <span>New base price ({baseMaterial}):</span>
+                <span>₹</span>
+                <input className="field !min-h-9 !w-36 text-right" inputMode="numeric" placeholder="e.g. 45000" value={amount} onChange={(e) => setAmount(e.target.value.replace(/\D/g, ""))} aria-label="New base price" autoFocus />
                 <Btn size="sm" onClick={apply} disabled={busy || !preview.some((p) => p.next.length)}>{busy ? "Saving…" : "Apply"}</Btn>
               </div>
               <p className="mt-1.5 text-[11px] text-muted">
-                {action === "base"
-                  ? "Products with your material options follow the material price index; other products keep their price steps, scaled so the cheapest option is the new base."
-                  : "Every option of the selected products goes up or down by this percentage (rounded to ₹10)."}
+                Every other material is priced from your material price index (e.g. Linen 115%, Full Leather 250%). Products without your materials keep their own price steps, scaled from the new base.
               </p>
               {preview.some((p) => p.next.length) && (
                 <ul className="mt-2 grid gap-1 text-xs sm:grid-cols-2">
