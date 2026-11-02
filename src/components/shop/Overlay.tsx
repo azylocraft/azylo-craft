@@ -2,8 +2,10 @@
 
 import clsx from "clsx";
 import { useEffect, useRef, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 
-/** Dimmed full-screen layer that locks scroll, closes on Esc / backdrop click and traps initial focus. */
+/** Dimmed full-screen layer that locks scroll, closes on Esc / backdrop click and traps initial focus.
+ *  Portalled to <body> so a sticky/transformed parent (e.g. the product gallery) can't trap it under later content. */
 export function Overlay({
   onClose,
   children,
@@ -31,7 +33,7 @@ export function Overlay({
       prev?.focus?.();
     };
   }, [onClose]);
-  return (
+  return createPortal(
     <div
       className={clsx("fixed inset-0 z-[60] bg-[rgba(20,19,17,.38)]", blur && "backdrop-blur-sm", className)}
       onMouseDown={(e) => e.target === e.currentTarget && onClose()}
@@ -39,7 +41,8 @@ export function Overlay({
       <div ref={ref} role="dialog" aria-modal="true" aria-label={label} className="contents">
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 
