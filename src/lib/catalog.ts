@@ -124,7 +124,11 @@ function colourCards(row: Row, card: ProductCardData): ProductCardData[] {
         colorHex: ofColour[0]?.color_hex ?? null,
         href: `/products/${row.slug}?colour=${colourSlug(c)}`,
         image: mediaUrl(photo.storage_path),
-        image2: mediaUrl(ofPhotos[1]?.storage_path) ?? card.image,
+        // Hover shows the opened (bed-mode) photo when there is one, else the colour's 2nd photo.
+        image2:
+          mediaUrl(
+            (ofPhotos.find((i: Row) => /bed-mode/i.test(i.storage_path)) ?? ofPhotos[1])?.storage_path,
+          ) ?? card.image,
         fromPriceInr: prices.length ? Math.min(...prices) : null,
         compareAtInr: null,
       },
