@@ -101,8 +101,14 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
   const name = text(product.name, "product name");
   const realSpaces = product.images.filter((i) => i.type === "real_space");
   // Photos tagged with a colour belong to that colour: the gallery shows the chosen colour's set
-  // (plus untagged photos). Without colour-tagged photos for the choice, every photo is shown.
-  const colourSet = isCustom ? [] : product.images.filter((i) => !i.color || i.color.toLowerCase() === color.toLowerCase());
+  // (plus untagged photos). Swatch photos of every colour are always included, so the Swatch tab
+  // shows all colour options. Without colour-tagged photos for the choice, every photo is shown.
+  const colourSet = isCustom
+    ? []
+    : [
+        ...product.images.filter((i) => !i.color || i.color.toLowerCase() === color.toLowerCase()),
+        ...product.images.filter((i) => i.type === "swatch" && i.color && i.color.toLowerCase() !== color.toLowerCase()),
+      ];
   const galleryImages = colourSet.some((i) => i.color) ? colourSet : product.images;
 
   const fmtDate = (d: Date) => d.toLocaleDateString(lang === "fr" ? "fr-FR" : "en-IN", { month: "short", day: "numeric" });
