@@ -32,7 +32,7 @@ if (!dir || !slug || !name || !collection) {
 }
 
 const COLOUR_HEX = {
-  white: "#ECEAE4", green: "#6B7A2E", red: "#A8432A", grey: "#A3A3A1", "olive green": "#5E6B3A", orange: "#C4652F", wheat: "#D6B266", beige: "#D8CBB0",
+  white: "#ECEAE4", green: "#6B7A2E", red: "#A8432A", caramel: "#B5713A", grey: "#A3A3A1", "olive green": "#5E6B3A", orange: "#C4652F", wheat: "#D6B266", beige: "#D8CBB0",
   cream: "#EFE6D2", charcoal: "#3E3D3B", black: "#1C1B1A", brown: "#6B4A33", navy: "#2F3B55", terracotta: "#B5583A",
 };
 const TYPE = { studio: "studio", swatch: "swatch", live: "real_space", detail: "detail" };
