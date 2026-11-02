@@ -146,7 +146,7 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
     return () => io.disconnect();
   }, []);
 
-  const [openAcc, setOpenAcc] = useState<Set<string>>(() => new Set(["overview", "delivery", "shipping"]));
+  const [openAcc, setOpenAcc] = useState<Set<string>>(() => new Set());
   const accProps = (key: string) => ({
     open: openAcc.has(key),
     onToggle: (o: boolean) =>
@@ -163,8 +163,8 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
       <div className="px-4 pt-6 md:px-12">
         <Crumb items={[{ label: "Home", href: "/" }, { label: "Products", href: "/collections/all" }, { label: <T text={product.name} field="product name" fallback /> }]} />
         <div className="mt-5 grid gap-8 lg:grid-cols-[1.15fr_1fr] lg:gap-12">
-          {/* Gallery column */}
-          <div className="flex min-w-0 flex-col gap-3">
+          {/* Gallery column — stays in view on desktop while the buy box scrolls */}
+          <div className="flex min-w-0 flex-col gap-3 lg:sticky lg:top-[136px] lg:self-start">
             <div className="flex flex-wrap gap-2">
               {product.videos.length > 0 && (
                 <button type="button" onClick={() => setVideo(true)} className="inline-flex h-11 items-center gap-2.5 rounded-full bg-ink px-5 text-[13px] font-bold text-white">
@@ -184,7 +184,7 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
           </div>
 
           {/* Buy box */}
-          <div ref={buyRef} className="flex flex-col gap-5 lg:sticky lg:top-40 lg:self-start">
+          <div ref={buyRef} className="flex min-w-0 flex-col gap-5">
             <Eyebrow>{t("product.eyebrow")}</Eyebrow>
             <H as="h1" className="text-[28px] md:text-[38px]">
               <T text={product.name} field="product name" fallback />
@@ -397,7 +397,7 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
                     <Missing field={`${g} FAQs`} />
                   ) : (
                     rows.map((f) => (
-                      <AccordionRow key={f.id} size="sm" defaultOpen title={<T text={f.question} field="question" fallback />}>
+                      <AccordionRow key={f.id} size="sm" title={<T text={f.question} field="question" fallback />}>
                         <Markdown source={f.answer[lang] ?? f.answer.en} field="answer" />
                       </AccordionRow>
                     ))

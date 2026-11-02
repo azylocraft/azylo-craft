@@ -4,85 +4,116 @@ import { ArrowRight, BadgeCheck, Gift, Sparkles } from "lucide-react";
 import { GiftCard } from "@/components/product/Gifts";
 import { GiftWheel } from "@/components/product/GiftWheel";
 import { Price, useShopCtx } from "@/components/shop/ShopContext";
-import { Badge, BtnLink, Eyebrow, H, P, Serif } from "@/components/ui/primitives";
+import { Badge, BtnLink, Eyebrow, P } from "@/components/ui/primitives";
 
-/** /pages/gift-cards — free gifts and bonuses with every sofa, plus gift cards (coming soon). */
+/** /pages/gift-cards — the gift clock game, the free gifts, bonuses included with every order, and gift cards. */
 export function GiftsShowcase() {
   const { settings } = useShopCtx();
   const gifts = settings.freeGifts;
   const bonuses = settings.bonusesDefault;
-  const top = gifts.reduce((m, g) => Math.max(m, g.value_inr ?? 0), 0);
-  return (
-    <div className="px-4 pt-8 md:px-12">
-      <section className="flex flex-col items-center gap-4 rounded-block bg-dark px-6 py-12 text-center text-white md:rounded-hero md:py-16">
-        <span className="flex size-14 items-center justify-center rounded-full bg-gold text-white">
-          <Gift size={26} aria-hidden />
-        </span>
-        <Eyebrow center>AZYLO · Gifts</Eyebrow>
-        <H as="h1" className="text-[34px] text-white md:text-[56px]">
-          A free gift <Serif gold>with every sofa.</Serif>
-        </H>
-        <P className="max-w-[560px] text-on-dark-muted">
-          Spin the wheel and win 2 of these with each sofa you order{top ? <> — worth up to <b className="text-white"><Price cad={top} /></b></> : null}. It&apos;s delivered with your sofa, at no
-          extra cost.
-        </P>
-        <BtnLink href="#gift-wheel" kind="white" icon={ArrowRight}>
-          Spin to win
-        </BtnLink>
-      </section>
+  const total = gifts.reduce((s, g) => s + (g.value_inr ?? 0), 0);
+  const top2 = gifts
+    .map((g) => g.value_inr ?? 0)
+    .sort((a, b) => b - a)
+    .slice(0, 2)
+    .reduce((a, b) => a + b, 0);
 
+  return (
+    <div className="mx-auto max-w-[1280px] px-4 pb-6 pt-6 md:px-12 md:pt-10">
+      {/* Title row */}
+      <header className="grid items-end gap-4 md:grid-cols-[1.3fr_1fr] md:gap-10">
+        <div className="flex flex-col gap-3">
+          <Eyebrow>azylo · gifts</Eyebrow>
+          <h1 className="text-balance text-[38px] font-[800] leading-[1.02] tracking-[-0.045em] md:text-[64px]">
+            Play once, take home <span className="text-gold">2 free gifts.</span>
+          </h1>
+        </div>
+        <P className="max-w-[420px] text-[15px] md:pb-2">
+          Spin the clock and win 2 of our gifts
+          {top2 ? (
+            <>
+              {" "}— worth up to <b className="text-ink"><Price cad={top2} /></b> —
+            </>
+          ) : null}{" "}
+          with every sofa you order. Every spin wins, and both arrive with your sofa at no extra cost.
+        </P>
+      </header>
+
+      {/* Game */}
       {gifts.length >= 2 && (
-        <section id="gift-wheel" className="mx-auto mt-10 max-w-[1100px] scroll-mt-40 rounded-hero border border-line2 bg-white px-5 py-10 md:px-10 md:py-14">
+        <section id="gift-wheel" className="mt-8 scroll-mt-40 rounded-hero border border-line2 bg-gradient-to-b from-bg2 to-white px-5 py-8 md:mt-10 md:px-12 md:py-12">
           <GiftWheel />
         </section>
       )}
 
+      {/* The gifts */}
       {gifts.length > 0 && (
-        <section className="mx-auto mt-10 grid max-w-[980px] grid-cols-2 gap-3 md:grid-cols-4">
-          {gifts.map((g) => (
-            <GiftCard key={g.key} g={g} />
-          ))}
+        <section className="mt-12 md:mt-16">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <Eyebrow>the gifts</Eyebrow>
+              <h2 className="mt-1 text-[26px] font-[800] tracking-[-0.03em] md:text-[34px]">What you can win</h2>
+            </div>
+            {total > 0 && (
+              <span className="text-sm text-muted">
+                {gifts.length} gifts · worth <Price cad={total} /> together
+              </span>
+            )}
+          </div>
+          <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+            {gifts.map((g) => (
+              <GiftCard key={g.key} g={g} />
+            ))}
+          </div>
         </section>
       )}
 
+      {/* Bonuses */}
       {bonuses.length > 0 && (
-        <section className="mx-auto mt-10 max-w-[980px] rounded-block border border-gold-line bg-white p-6 md:p-8">
-          <div className="flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-[.14em] text-gold">
-            <Sparkles size={14} aria-hidden /> Also included with every order
+        <section className="mt-12 grid gap-6 rounded-hero bg-cream p-6 md:mt-16 md:grid-cols-[0.9fr_2fr] md:items-center md:p-10">
+          <div className="flex flex-col gap-2">
+            <span className="flex items-center gap-2 text-[12.5px] text-gold">
+              <Sparkles size={14} aria-hidden /> also included
+            </span>
+            <h2 className="text-[24px] font-[800] leading-[1.1] tracking-[-0.03em] md:text-[30px]">With every order, on top of your gifts</h2>
           </div>
-          <ul className="mt-4 grid gap-3 md:grid-cols-3">
+          <ul className="grid gap-3 sm:grid-cols-3">
             {bonuses.map((b) => (
-              <li key={b.title} className="flex items-start gap-2.5 rounded-field bg-gold-soft/60 p-4 text-sm">
-                <BadgeCheck size={18} className="mt-0.5 flex-none text-green" aria-hidden />
-                <span>
-                  {b.href ? (
-                    <a href={b.href} className="font-bold underline">
-                      {b.title}
-                    </a>
-                  ) : (
-                    <b>{b.title}</b>
-                  )}
-                  {b.value_inr ? (
-                    <span className="mt-0.5 block text-xs text-muted">
-                      Worth <Price cad={b.value_inr} /> — included free
-                    </span>
-                  ) : null}
-                </span>
+              <li key={b.title} className="flex flex-col gap-2 rounded-card bg-white p-5 text-sm">
+                <BadgeCheck size={20} className="text-gold" aria-hidden />
+                {b.href ? (
+                  <a href={b.href} className="font-semibold underline underline-offset-4">
+                    {b.title}
+                  </a>
+                ) : (
+                  <b className="font-semibold">{b.title}</b>
+                )}
+                {b.value_inr ? (
+                  <span className="mt-auto text-xs text-muted">
+                    Worth <Price cad={b.value_inr} /> — included
+                  </span>
+                ) : null}
               </li>
             ))}
           </ul>
         </section>
       )}
 
-      <section className="mx-auto mt-10 flex max-w-[980px] flex-col items-start gap-3 rounded-block border border-line2 bg-white p-6 md:flex-row md:items-center md:justify-between md:p-8">
-        <div>
-          <div className="flex items-center gap-2">
-            <b className="text-lg">AZYLO gift cards</b>
-            <Badge>Coming soon</Badge>
+      {/* Gift cards */}
+      <section className="mt-6 flex flex-col items-start gap-4 rounded-hero border border-line2 bg-white p-6 md:flex-row md:items-center md:justify-between md:p-8">
+        <div className="flex items-center gap-4">
+          <span className="flex size-12 flex-none items-center justify-center rounded-full bg-gold-soft text-gold">
+            <Gift size={22} aria-hidden />
+          </span>
+          <div>
+            <div className="flex items-center gap-2">
+              <b className="text-lg font-semibold">AZYLO gift cards</b>
+              <Badge>Coming soon</Badge>
+            </div>
+            <P className="text-sm">Send a gift card to someone setting up a new home. Until then, write to us and we&apos;ll help you plan a gift.</P>
           </div>
-          <P className="text-sm">Send a gift card to someone setting up a new home. Until then, ask us — we&apos;re happy to help you plan a gift.</P>
         </div>
-        <BtnLink href="/pages/contact" kind="outline">
+        <BtnLink href="/pages/contact" kind="outline" icon={ArrowRight}>
           Contact us
         </BtnLink>
       </section>

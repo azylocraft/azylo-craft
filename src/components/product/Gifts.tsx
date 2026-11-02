@@ -22,12 +22,12 @@ export function FreeGiftPicker({ value, onChange, quantity }: { value: string | 
   const wins = (hydrated ? won : []).map((k) => gifts.find((g) => g.key === k)).filter((g): g is FreeGift => !!g);
   const hasWon = wins.length >= 2;
   return (
-    <div className="overflow-hidden rounded-tile border-2 border-dashed border-ink bg-white">
-      <div className="flex flex-wrap items-center justify-between gap-2 bg-ink px-4 py-2.5 text-white">
-        <span className="flex items-center gap-2 text-sm font-extrabold">
-          <Gift size={16} className="text-gold-line" aria-hidden /> {hasWon ? "Your 2 FREE gifts" : "Win 2 FREE gifts"}
+    <div className="overflow-hidden rounded-card border border-line bg-white">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line2 bg-bg2 px-4 py-3 text-ink">
+        <span className="flex items-center gap-2 text-sm font-semibold">
+          <Gift size={16} className="text-gold" aria-hidden /> {hasWon ? "Your 2 FREE gifts" : "Win 2 FREE gifts"}
         </span>
-        <span className="text-xs text-on-dark-muted">{until ? `With orders placed by ${until}` : "Included with this piece"}</span>
+        <span className="text-xs text-muted">{until ? `With orders placed by ${until}` : "Included with this piece"}</span>
       </div>
       {gifts.length >= 2 && <GiftSlotMachine />}
       {!hasWon && (
@@ -62,30 +62,30 @@ export function GiftCard({ g, selected, onSelect }: { g: FreeGift; selected?: bo
             <Price cad={g.value_inr} />
           </s>
         ) : null}
-        <b className="text-[15px] font-extrabold text-green">FREE</b>
+        <b className="text-[14px] font-semibold text-gold">FREE</b>
       </div>
       <div className="relative mx-2 mt-1.5 aspect-square overflow-hidden rounded-lg bg-cream">
         {g.image && <img src={g.image} alt={g.title} loading="lazy" className="size-full object-cover" />}
         {selected && (
-          <span className="absolute right-1.5 top-1.5 flex size-6 items-center justify-center rounded-full bg-green text-white">
+          <span className="absolute right-1.5 top-1.5 flex size-6 items-center justify-center rounded-full bg-gold text-white">
             <Check size={14} aria-hidden />
           </span>
         )}
       </div>
       <div className="px-2 pb-2.5 pt-1.5 text-center text-[11.5px] font-bold uppercase leading-tight tracking-wide">
         {g.title}
-        <span className="block text-[10px] font-semibold normal-case tracking-normal text-green underline">Included</span>
+        <span className="block text-[10px] font-medium normal-case tracking-normal text-gold">Included</span>
       </div>
     </>
   );
-  if (!onSelect) return <div className="rounded-field border-2 border-line bg-white">{content}</div>;
+  if (!onSelect) return <div className="rounded-field border border-line bg-white">{content}</div>;
   return (
     <button
       type="button"
       role="radio"
       aria-checked={selected}
       onClick={onSelect}
-      className={clsx("rounded-field border-2 bg-white text-left transition-colors", selected ? "border-green bg-green-soft/40" : "border-line hover:border-ink")}
+      className={clsx("rounded-field border bg-white text-left transition-colors", selected ? "border-gold bg-gold-soft/60" : "border-line hover:border-ink")}
     >
       {content}
     </button>

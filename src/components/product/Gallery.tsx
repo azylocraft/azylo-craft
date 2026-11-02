@@ -93,7 +93,7 @@ export function Gallery({ images, tone, name, ratioFrom }: { images: ProductImag
           <div className="flex touch-pan-y">
             {Array.from({ length: count }, (_, i) => (
               <button key={i} type="button" onClick={() => setZoom(i)} className="relative min-w-0 flex-[0_0_100%] cursor-zoom-in" aria-label={`Zoom image ${i + 1}`}>
-                <div className="max-h-[82vh] w-full" style={{ aspectRatio: frame }}>
+                <div className="mx-auto max-h-[82vh] w-full lg:max-h-[calc(100vh-330px)]" style={{ aspectRatio: frame }}>
                   <Media
                     src={slides?.[i]?.url}
                     alt={slides ? text(slides[i].alt, "image alt") : `${name} — photo ${i + 1}`}

@@ -84,11 +84,11 @@ export function GiftSlotMachine() {
     <div className="flex flex-col items-center gap-4 p-4 sm:flex-row sm:items-center sm:gap-6">
       {/* Machine */}
       <div className="relative flex-none" style={{ width: 300 }}>
-        <div className="rounded-[22px] bg-[#EFE7D6] p-3 shadow-[0_18px_30px_-18px_rgba(60,45,20,.5),inset_0_-4px_0_rgba(0,0,0,.06)]">
-          <div className="flex h-11 items-center justify-center rounded-[12px] bg-[#E6DCC6] shadow-[inset_0_2px_4px_rgba(0,0,0,.08)]">
+        <div className="rounded-[22px] bg-cream p-3 shadow-[0_18px_30px_-18px_rgba(20,19,17,.35),inset_0_-4px_0_rgba(0,0,0,.05)]">
+          <div className="flex h-11 items-center justify-center rounded-[12px] bg-white shadow-[inset_0_2px_4px_rgba(0,0,0,.08)]">
             <Logo size={14} />
           </div>
-          <div className="mt-3 rounded-[16px] bg-[#E6DCC6] p-2.5 shadow-[inset_0_2px_6px_rgba(0,0,0,.1)]">
+          <div className="mt-3 rounded-[16px] bg-white p-2.5 shadow-[inset_0_2px_6px_rgba(0,0,0,.1)]">
             <div className="flex gap-2">
               {reel(0)}
               {reel(1)}
@@ -96,10 +96,10 @@ export function GiftSlotMachine() {
           </div>
           <div className="mt-3 flex justify-between gap-1.5 px-1">
             {[0, 1, 2, 3].map((i) => (
-              <span key={i} className="h-3 flex-1 rounded-sm bg-[#E2D7BF] shadow-[inset_0_-2px_0_rgba(0,0,0,.08)]" />
+              <span key={i} className="h-3 flex-1 rounded-sm bg-line2 shadow-[inset_0_-2px_0_rgba(0,0,0,.08)]" />
             ))}
           </div>
-          <div className="mt-3 flex flex-col items-center rounded-[12px] bg-[#E6DCC6] py-2.5 shadow-[inset_0_2px_4px_rgba(0,0,0,.08)]">
+          <div className="mt-3 flex flex-col items-center rounded-[12px] bg-white py-2.5 shadow-[inset_0_2px_4px_rgba(0,0,0,.08)]">
             <span className="font-serif text-[22px] italic leading-none tracking-tight text-ink">Free gifts</span>
             <span className="mt-1 text-[9px] uppercase tracking-[.3em] text-ink2">with every sofa</span>
           </div>
@@ -120,7 +120,7 @@ export function GiftSlotMachine() {
           />
           <span
             aria-hidden
-            className="absolute left-1/2 h-9 w-5 -translate-x-1/2 rounded-md bg-ink shadow transition-[top] duration-300 group-enabled:group-hover:brightness-125"
+            className="absolute left-1/2 h-9 w-5 -translate-x-1/2 rounded-md bg-gold shadow transition-[top] duration-300 group-enabled:group-hover:brightness-125"
             style={{ top: lever ? 56 : 6 }}
           />
         </button>
@@ -135,7 +135,7 @@ export function GiftSlotMachine() {
               <span key={g.key} className="text-sm">
                 {g.title}
                 {g.value_inr ? (
-                  <span className="ml-1.5 text-xs text-green">
+                  <span className="ml-1.5 text-xs text-gold">
                     worth <Price cad={g.value_inr} /> — FREE
                   </span>
                 ) : null}
