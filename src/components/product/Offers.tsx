@@ -21,18 +21,19 @@ export function PriceBlock({ price, compareAt }: { price: number | null; compare
   const pct = hasDeal ? Math.round(((compareAt! - price) / compareAt!) * 100) : 0;
   return (
     <div className="flex flex-col gap-1.5" aria-live="polite">
+      {/* ↓33%  ₹75,000  ₹50,000 — discount, struck MRP, then the price you pay */}
       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+        {hasDeal && (
+          <>
+            <span className="text-[28px] font-extrabold leading-none tracking-[-0.02em] text-green">↓{pct}%</span>
+            <s className="text-[24px] font-medium leading-none text-faint decoration-1">
+              <Price cad={compareAt!} />
+            </s>
+          </>
+        )}
         <span className="text-[32px] font-extrabold leading-none tracking-[-0.02em]">
           <Price cad={price} />
         </span>
-        {hasDeal && (
-          <>
-            <s className="text-lg text-faint decoration-red/60">
-              <Price cad={compareAt!} />
-            </s>
-            <span className="rounded-full bg-red px-2.5 py-1 text-xs font-extrabold uppercase tracking-wide text-white">{pct}% off</span>
-          </>
-        )}
       </div>
       {hasDeal && (
         <span className="text-sm font-bold text-green">
