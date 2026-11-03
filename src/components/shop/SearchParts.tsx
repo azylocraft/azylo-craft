@@ -8,7 +8,7 @@ import { useT } from "@/lib/i18n";
 import { routes } from "@/lib/routes";
 import type { ProductCardData } from "@/lib/types";
 
-export const POPULAR = ["Power recliner", "Sofa bed", "Compressed sofa", "Bouclé", "Small apartment sofa", "Chaise lounge", "Smart table", "Corduroy"];
+export const POPULAR = ["Power recliner", "Sofa bed", "Bouclé"];
 
 export function SearchResultsHead({ q, total }: { q: string; total: number }) {
   const t = useT();
@@ -53,7 +53,7 @@ export function SearchEmpty({ q, suggestions }: { q: string; suggestions: Produc
         </H>
         <P className="max-w-[480px]">{t("search.noResultsSub")}</P>
         <div className="mt-1.5 flex flex-wrap justify-center gap-2">
-          {["Sofa bed", "Chaise lounge", "Floor sofa", "Recliner"].map((s) => (
+          {["Sofa bed", "Recliner", "Modular sofa", "Bouclé"].map((s) => (
             <Link key={s} href={`/search?q=${encodeURIComponent(s)}`}>
               <Chip>{s}</Chip>
             </Link>
