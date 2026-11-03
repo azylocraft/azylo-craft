@@ -276,6 +276,7 @@
     "az": "A–Z"
   },
   "listing": {
+    "allCategories": "All sofas",
     "products": "{n} products",
     "noMatchTitle": "No products match these filters",
     "noMatchSub": "Try removing a filter or two.",

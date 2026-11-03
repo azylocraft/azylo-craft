@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { CategoryChips } from "@/components/shop/CategoryChips";
 import { Media } from "@/components/shop/Media";
 import { Crumb, NoMatches, Pagination, ProductGrid, RecentlyViewed, TitleText, Toolbar } from "@/components/shop/Listing";
 import { Eyebrow, H, P } from "@/components/ui/primitives";
@@ -51,7 +52,8 @@ export default async function CollectionPage({ params, searchParams }: PageProps
             </div>
           </div>
         </div>
-        <div className="mt-8">
+        <CategoryChips className="mt-6" />
+        <div className="mt-6 md:mt-8">
           <Suspense>
             <Toolbar total={total} params={listing} facets={facets} />
           </Suspense>
