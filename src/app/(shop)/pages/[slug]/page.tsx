@@ -7,9 +7,9 @@ import { GiftsShowcase } from "@/components/pages/GiftsShowcase";
 import { ContactView } from "@/components/pages/ContactView";
 import { FaqView } from "@/components/pages/FaqView";
 import { JournalView } from "@/components/pages/JournalView";
-import { MaterialsView } from "@/components/pages/MaterialsView";
+import { MaterialsGuide } from "@/components/pages/MaterialsGuide";
 import { PolicyView } from "@/components/pages/Policy";
-import { getPage, listArticles, listFaqs, listMaterials } from "@/lib/catalog";
+import { getPage, listArticles, listFaqs } from "@/lib/catalog";
 
 export const revalidate = 60;
 
@@ -49,7 +49,7 @@ export default async function ContentPage({ params, searchParams }: PageProps<"/
     case "faq":
       return <FaqView faqs={await listFaqs()} />;
     case "sofa-materials-guide":
-      return <MaterialsView materials={await listMaterials()} />;
+      return <MaterialsGuide />;
     case "gift-cards":
       return <GiftsShowcase />;
     case "sofa-care-guide":
