@@ -165,11 +165,10 @@ export function MaterialsGuide() {
         </div>
         <div className="mt-8 grid gap-5 lg:grid-cols-[1.8fr_1fr]">
           <div className="relative">
-            <Pic src={g(`sofa-${m.img.slice(2)}`)} alt={`${m.n} upholstery`} className="aspect-[4/3] lg:aspect-auto lg:h-full lg:min-h-[560px]" />
+            <Pic src={g(m.img)} alt={`${m.n} close-up`} className="aspect-[4/3] lg:aspect-auto lg:h-full lg:min-h-[560px]" />
             <span className="absolute left-4 top-4 rounded-full bg-white px-3 py-1.5 text-[10px] font-bold uppercase tracking-[.12em]">{m.n}</span>
           </div>
-          <div className="flex flex-col bg-white">
-            <Pic src={g(m.img)} alt={`${m.n} close-up`} className="aspect-[16/10]" />
+          <div className="flex flex-col justify-center bg-white">
             <div className="flex flex-col gap-5 p-7 md:p-9">
               <h3 className="text-[34px] font-extrabold tracking-[-0.03em]">{m.n}</h3>
               <p className="text-[13.5px] leading-[1.7] text-muted">{m.d}</p>
