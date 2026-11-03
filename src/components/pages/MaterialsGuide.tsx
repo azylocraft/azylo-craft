@@ -63,7 +63,7 @@ const MATERIALS = [
   { n: "Half leather", tag: "Leather seat, matched sides", img: "m-half-leather", d: "Leather on the seat and back where you touch it, with closely colour-matched material on the sides and back panels.", rows: [["Surface", "Leather where you sit"], ["Light", "Soft leather sheen"], ["Visual feel", "Leather look, easier price"]] },
   { n: "Velvet", tag: "Rich, soft pile", img: "m-velvet", d: "A dense cut pile with a direction, so the same colour looks lighter or deeper depending on the angle.", rows: [["Surface", "Dense directional pile"], ["Light", "Shifts with angle"], ["Visual feel", "Rich and deep"]] },
   { n: "Bouclé", tag: "Cosy, looped texture", img: "m-boucle", d: "A looped yarn surface with visible relief, so light catches tiny loops and creates soft micro-shadows.", rows: [["Surface", "Looped, raised relief"], ["Light", "Scattered micro-shadows"], ["Visual feel", "Textured and cosy"]] },
-  { n: "Full leather", tag: "Top-grain, ages beautifully", img: "m-full-leather", hero: "sofa-leather", d: "Top-grain leather on every surface, with a fine natural grain that softens and develops character as it ages.", rows: [["Surface", "Smooth with fine grain"], ["Light", "Continuous highlights"], ["Visual feel", "Clean and refined"]] },
+  { n: "Full leather", tag: "Top-grain, ages beautifully", img: "m-full-leather", d: "Top-grain leather on every surface, with a fine natural grain that softens and develops character as it ages.", rows: [["Surface", "Smooth with fine grain"], ["Light", "Continuous highlights"], ["Visual feel", "Clean and refined"]] },
 ];
 
 const WOODS = [
@@ -165,7 +165,7 @@ export function MaterialsGuide() {
         </div>
         <div className="mt-8 grid gap-5 lg:grid-cols-[1.8fr_1fr]">
           <div className="relative">
-            <Pic src={g(m.hero ?? m.img)} alt={`${m.n} upholstery`} className="aspect-[4/3] lg:aspect-auto lg:h-full lg:min-h-[560px]" />
+            <Pic src={g(`sofa-${m.img.slice(2)}`)} alt={`${m.n} upholstery`} className="aspect-[4/3] lg:aspect-auto lg:h-full lg:min-h-[560px]" />
             <span className="absolute left-4 top-4 rounded-full bg-white px-3 py-1.5 text-[10px] font-bold uppercase tracking-[.12em]">{m.n}</span>
           </div>
           <div className="flex flex-col bg-white">
