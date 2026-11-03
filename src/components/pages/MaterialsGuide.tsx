@@ -58,12 +58,12 @@ const TABS = [
 ];
 
 const MATERIALS = [
-  { n: "Bouclé", img: "sw-boucle", d: "A looped yarn surface with visible relief, so light catches tiny loops and creates soft micro-shadows.", rows: [["Surface", "Looped, raised relief"], ["Light", "Scattered micro-shadows"], ["Visual feel", "Textured and cosy"]] },
-  { n: "Chenille", img: "sw-chenille", d: "A soft yarn with a short tufted pile that gives a gentle surface and subtle variation in tone.", rows: [["Surface", "Soft, lightly tufted"], ["Light", "Subtle variation"], ["Visual feel", "Warm and relaxed"]] },
-  { n: "Velvet", img: "sw-velvet", d: "A dense cut pile with a direction, so the same colour looks lighter or deeper depending on the angle.", rows: [["Surface", "Dense directional pile"], ["Light", "Shifts with angle"], ["Visual feel", "Rich and deep"]] },
-  { n: "Woven", img: "sw-woven", d: "A fabric where the yarn structure stays visible, giving a natural, crafted look.", rows: [["Surface", "Visible yarn structure"], ["Light", "Matte and even"], ["Visual feel", "Natural and textured"]] },
-  { n: "Tight weave", img: "sw-tight", d: "A compact, closely woven construction with a fine, flat surface.", rows: [["Surface", "Fine and compact"], ["Light", "Low, uniform sheen"], ["Visual feel", "Neat and tailored"]] },
-  { n: "Vegan leather", img: "sw-vegan", hero: "sofa-leather", swatch: "leather-swatch", d: "A non-textile upholstery surface with fine grain and a more continuous light response than woven or looped fabrics.", rows: [["Surface", "Smooth with fine grain"], ["Light", "More continuous highlights"], ["Visual feel", "Clean and uniform"]] },
+  { n: "Performance fabric", tag: "Kid and pet friendly", img: "m-performance-fabric", d: "A tightly woven, stain-resistant fabric made for everyday family life — it shrugs off spills, paws and daily wear.", rows: [["Surface", "Fine, tight weave"], ["Light", "Matte and even"], ["Visual feel", "Practical and clean"]] },
+  { n: "Linen", tag: "Natural, airy weave", img: "m-linen", d: "A breathable woven fabric where the natural slub of the yarn stays visible, for a relaxed, airy look.", rows: [["Surface", "Visible natural slub"], ["Light", "Soft, matte"], ["Visual feel", "Natural and relaxed"]] },
+  { n: "Half leather", tag: "Leather seat, matched sides", img: "m-half-leather", d: "Leather on the seat and back where you touch it, with closely colour-matched material on the sides and back panels.", rows: [["Surface", "Leather where you sit"], ["Light", "Soft leather sheen"], ["Visual feel", "Leather look, easier price"]] },
+  { n: "Velvet", tag: "Rich, soft pile", img: "m-velvet", d: "A dense cut pile with a direction, so the same colour looks lighter or deeper depending on the angle.", rows: [["Surface", "Dense directional pile"], ["Light", "Shifts with angle"], ["Visual feel", "Rich and deep"]] },
+  { n: "Bouclé", tag: "Cosy, looped texture", img: "m-boucle", d: "A looped yarn surface with visible relief, so light catches tiny loops and creates soft micro-shadows.", rows: [["Surface", "Looped, raised relief"], ["Light", "Scattered micro-shadows"], ["Visual feel", "Textured and cosy"]] },
+  { n: "Full leather", tag: "Top-grain, ages beautifully", img: "m-full-leather", hero: "sofa-leather", d: "Top-grain leather on every surface, with a fine natural grain that softens and develops character as it ages.", rows: [["Surface", "Smooth with fine grain"], ["Light", "Continuous highlights"], ["Visual feel", "Clean and refined"]] },
 ];
 
 const WOODS = [
@@ -92,7 +92,7 @@ const SIX = [
 ];
 
 export function MaterialsGuide() {
-  const [mat, setMat] = useState(MATERIALS.length - 1);
+  const [mat, setMat] = useState(0);
   const m = MATERIALS[mat];
   return (
     <>
@@ -169,7 +169,7 @@ export function MaterialsGuide() {
             <span className="absolute left-4 top-4 rounded-full bg-white px-3 py-1.5 text-[10px] font-bold uppercase tracking-[.12em]">{m.n}</span>
           </div>
           <div className="flex flex-col bg-white">
-            <Pic src={g(m.swatch ?? m.img)} alt={`${m.n} close-up`} className="aspect-[16/10]" />
+            <Pic src={g(m.img)} alt={`${m.n} close-up`} className="aspect-[16/10]" />
             <div className="flex flex-col gap-5 p-7 md:p-9">
               <h3 className="text-[34px] font-extrabold tracking-[-0.03em]">{m.n}</h3>
               <p className="text-[13.5px] leading-[1.7] text-muted">{m.d}</p>
@@ -196,7 +196,7 @@ export function MaterialsGuide() {
           <Head kicker="See the difference" title="Same color." accent="Different result." sub="Texture, pile, grain and surface reflectivity can substantially change how the same nominal color appears." />
           <div className="mt-12 grid gap-4 lg:grid-cols-[1.65fr_1fr_1fr]">
             <Pic src={g("same-colour")} alt="The same colour in different textures" className="aspect-[4/3] lg:aspect-auto lg:min-h-[556px]" />
-            {[["pillows", "02", "Texture vs smoothness", "Loops create stronger micro-shadows; smoother surfaces read more uniformly."], ["blocks", "03", "Light response", "Matte woven fabric, chenille and velvet do not return light in the same way."]].map(([img, n, t, d]) => (
+            {[["pillows", "02", "Texture vs smoothness", "Loops create stronger micro-shadows; smoother surfaces read more uniformly."], ["blocks", "03", "Light response", "Matte linen, performance fabric and velvet do not return light in the same way."]].map(([img, n, t, d]) => (
               <div key={n} className="flex flex-col bg-white">
                 <Pic src={g(img)} alt={t} className="aspect-[4/3]" />
                 <div className="flex flex-col gap-2 p-6">
@@ -220,7 +220,7 @@ export function MaterialsGuide() {
                 <Pic src={g(x.img)} alt={`${x.n} under side light`} className="aspect-[4/3]" />
                 <div className="px-5 py-4">
                   <div className="text-[14px] font-extrabold">{x.n}</div>
-                  <div className="text-[11.5px] text-on-dark-muted">{x.rows[0][1]}</div>
+                  <div className="text-[11.5px] text-on-dark-muted">{x.tag}</div>
                 </div>
               </div>
             ))}

@@ -409,7 +409,7 @@ export function MaterialsTeaser({ materials }: { materials: MaterialTile[] }) {
         </div>
         <div className="grid grid-cols-2 gap-2 p-2 sm:grid-cols-3 md:p-3">
           {materials.map((m) => (
-            <Link key={m.slug} href={`${routes.materials}#${m.slug}`} className="group relative overflow-hidden rounded-tile">
+            <Link key={m.slug} href={`${routes.materials}#explore-upholstery`} className="group relative overflow-hidden rounded-tile">
               <Media src={m.image} alt={text(m.name, "material name")} tone="#B7A58E" className="h-[150px] transition-transform duration-500 group-hover:scale-105 md:h-[200px]" />
               <span className="absolute inset-x-2 bottom-2 flex items-center justify-between rounded-full bg-white/92 px-3 py-1.5 text-xs font-bold text-ink">
                 {text(m.name, "material name")}
