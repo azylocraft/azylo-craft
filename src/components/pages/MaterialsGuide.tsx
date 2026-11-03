@@ -1,7 +1,6 @@
 "use client";
 
 import clsx from "clsx";
-import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { ArrowDown, ArrowRight, Info } from "lucide-react";
@@ -44,7 +43,7 @@ function Head({ kicker, title, accent, sub, dark, stack }: { kicker: string; tit
 function Pic({ src, alt, className }: { src: string; alt: string; className?: string }) {
   return (
     <div className={clsx("relative overflow-hidden bg-bg2", className)}>
-      <Image src={src} alt={alt} fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" />
+      <img src={src} alt={alt} loading="lazy" decoding="async" className="absolute inset-0 size-full object-cover" />
     </div>
   );
 }
@@ -100,9 +99,9 @@ export function MaterialsGuide() {
       {/* Hero */}
       <section className="relative overflow-hidden bg-[#2b2724] text-white">
         <div className="absolute inset-y-0 right-0 w-full md:w-[62%]">
-          <Image src={g("hero")} alt="" fill priority sizes="62vw" className="object-cover" />
+          <img src={g("hero")} alt="" fetchPriority="high" className="absolute inset-0 size-full object-cover" />
         </div>
-        <div aria-hidden className="absolute inset-0 bg-[linear-gradient(90deg,#2b2724_0%,#2b2724_34%,rgba(43,39,36,.72)_52%,rgba(43,39,36,.15)_100%)]" />
+        <div aria-hidden className="absolute inset-0 bg-[linear-gradient(90deg,#2b2724_0%,#2b2724_30%,rgba(43,39,36,.55)_48%,rgba(43,39,36,0)_72%)]" />
         <div className={clsx(WRAP, "relative flex min-h-[640px] flex-col justify-center gap-7 py-20 md:min-h-[820px]")}>
           <Kicker dark>AZYLO materials guide</Kicker>
           <h1 className="max-w-[640px] text-[54px] font-extrabold leading-[0.95] tracking-[-0.05em] md:text-[100px]">
