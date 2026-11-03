@@ -28,12 +28,12 @@ export type NavItem = { key: string; href: string };
 
 /** Header row 2 category pills, in design order. */
 export const categoryPills: NavItem[] = [
-  { key: "nav.powerReclining", href: collectionHref("power-reclining-sofas") },
-  { key: "nav.sofaBeds", href: collectionHref("convertible-sofa-beds") },
+  { key: "nav.japanese", href: collectionHref("japanese-sofas") },
   { key: "nav.modular", href: collectionHref("modular-sectional-sofas") },
   { key: "nav.fourSeater", href: collectionHref("4-seater-sofas") },
   { key: "nav.threeTwoSeater", href: collectionHref("3-2-seater-sofa-sets") },
-  { key: "nav.japanese", href: collectionHref("japanese-sofas") },
+  { key: "nav.sofaBeds", href: collectionHref("convertible-sofa-beds") },
+  { key: "nav.powerReclining", href: collectionHref("power-reclining-sofas") },
 ];
 
 /** Categories panel (spec §3.2). */
