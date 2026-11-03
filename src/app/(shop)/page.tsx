@@ -6,9 +6,12 @@ import { collectionCounts, listArticles, listCards, listMaterials } from "@/lib/
 export const revalidate = 60;
 
 const TYPES = [
-  { key: "home.tabPower", slug: "power-reclining-sofas", title: "Power Reclining Sofas" },
-  { key: "home.tabBeds", slug: "convertible-sofa-beds", title: "Convertible Sofa Beds" },
+  { key: "home.tabJapanese", slug: "japanese-sofas", title: "Japanese Sofas" },
   { key: "home.tabModular", slug: "modular-sectional-sofas", title: "Modular Sofas" },
+  { key: "home.tabFourSeater", slug: "4-seater-sofas", title: "4-Seater Sofas" },
+  { key: "home.tabThreeTwo", slug: "3-2-seater-sofa-sets", title: "3+2 Seater Sofas" },
+  { key: "home.tabBeds", slug: "convertible-sofa-beds", title: "Convertible Sofa Beds" },
+  { key: "home.tabPower", slug: "power-reclining-sofas", title: "Power Reclining Sofas" },
 ];
 
 export default async function HomePage() {

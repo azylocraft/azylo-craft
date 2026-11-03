@@ -12,13 +12,15 @@ import {
   Clock,
   Heart,
   LayoutGrid,
+  Leaf,
   MessageCircle,
-  Minimize2,
   PackageCheck,
   Play,
   Scan,
+  Sofa,
   Truck,
   Upload,
+  Zap,
 } from "lucide-react";
 import { Carousel } from "@/components/shop/Carousel";
 import { Media } from "@/components/shop/Media";
@@ -87,7 +89,14 @@ export function BestSellers({ products }: { products: ProductCardData[] }) {
 }
 
 export type TypeTab = { key: string; slug: string; title: string; count: number; products: ProductCardData[] };
-const TAB_ICONS = [Armchair, BedDouble, LayoutGrid, Minimize2];
+const TAB_ICONS: Record<string, typeof Armchair> = {
+  "japanese-sofas": Leaf,
+  "modular-sectional-sofas": LayoutGrid,
+  "4-seater-sofas": Sofa,
+  "3-2-seater-sofa-sets": Armchair,
+  "convertible-sofa-beds": BedDouble,
+  "power-reclining-sofas": Zap,
+};
 
 export function ExploreTypes({ tabs }: { tabs: TypeTab[] }) {
   const t = useT();
@@ -108,9 +117,9 @@ export function ExploreTypes({ tabs }: { tabs: TypeTab[] }) {
           {t("home.typesTrust")}
         </span>
       </div>
-      <div role="tablist" aria-label={t("home.typesTitle")} className="mt-7 grid grid-cols-2 gap-1.5 rounded-[26px] border border-line bg-white p-1.5 md:grid-cols-4 md:rounded-full">
+      <div role="tablist" aria-label={t("home.typesTitle")} className="mt-7 grid grid-cols-2 gap-1.5 rounded-[26px] border border-line bg-white p-1.5 md:grid-cols-3 lg:grid-cols-6 lg:rounded-full">
         {tabs.map((x, i) => {
-          const Icon = TAB_ICONS[i] ?? Armchair;
+          const Icon = TAB_ICONS[x.slug] ?? Armchair;
           return (
             <button
               key={x.slug}
