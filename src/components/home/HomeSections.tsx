@@ -172,7 +172,7 @@ export function NewArrivals({ products }: { products: ProductCardData[] }) {
         }
         sub={t("home.newSub")}
         right={
-          <BtnLink href={collectionHref("new-arrivals")} kind="outline" icon={ArrowRight}>
+          <BtnLink href={collectionHref("all")} kind="outline" icon={ArrowRight}>
             {t("home.viewAllNew")}
           </BtnLink>
         }

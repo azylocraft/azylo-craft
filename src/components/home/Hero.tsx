@@ -54,9 +54,6 @@ export function Hero({ featured = null }: { featured?: FeaturedProduct }) {
         <BtnLink href={collectionHref("all")} icon={ArrowRight}>
           {t("home.exploreSofas")}
         </BtnLink>
-        <BtnLink href={collectionHref("rolling-side-table-with-storage")} kind="outline">
-          {t("home.exploreTables")}
-        </BtnLink>
       </div>
       <div className="flex flex-wrap justify-center gap-x-[22px] gap-y-2 text-[12.5px] text-muted">
         {(
