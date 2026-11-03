@@ -139,7 +139,7 @@ export function JournalView({ latest, articles, page, pages, tab }: { latest: Ar
           {pages > 1 && <span className="hidden pb-3 text-[11px] font-semibold uppercase tracking-[.16em] text-faint sm:block">{t("journal.pageOf", { p: page, n: pages })}</span>}
         </div>
         <div className="grid gap-x-6 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
-          {articles.map((a) => (
+          {articles.filter((a) => a.id !== latest?.id).map((a) => (
             <Link key={a.id} href={`/blogs/${a.slug}`} className="group flex flex-col gap-4">
               <div className="overflow-hidden">
                 <Media src={a.cover} alt={text(a.title, "article title")} tone="#CBBBA3" label={a.cover ? undefined : "article cover"} className="aspect-[4/3] transition-transform duration-700 group-hover:scale-[1.03]" />
