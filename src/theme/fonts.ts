@@ -1,4 +1,4 @@
-import { Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
+import { Fraunces, Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
 
 /** Hanken Grotesk is used for everything: UI, headings and the "azylo." wordmark. */
 export const hanken = Hanken_Grotesk({
@@ -15,4 +15,12 @@ export const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
-export const fontVariables = `${hanken.variable} ${jetbrainsMono.variable}`;
+/** Editorial serif, used sparingly for italic headline accents (the Sofa Journal). */
+export const fraunces = Fraunces({
+  subsets: ["latin", "latin-ext"],
+  style: ["normal", "italic"],
+  variable: "--font-fraunces",
+  display: "swap",
+});
+
+export const fontVariables = `${hanken.variable} ${jetbrainsMono.variable} ${fraunces.variable}`;

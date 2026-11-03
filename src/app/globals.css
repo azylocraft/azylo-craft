@@ -34,6 +34,7 @@
   --font-sans: var(--font-hanken), system-ui, sans-serif;
   --font-serif: var(--font-hanken), system-ui, sans-serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+  --font-display: var(--font-fraunces), Georgia, serif;
 
   --shadow-card: var(--az-shadow-card);
   --shadow-float: var(--az-shadow-float);
