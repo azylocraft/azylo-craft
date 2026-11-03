@@ -136,8 +136,8 @@ export function AboutView({ blocks }: { blocks: Blocks }) {
             [
               ["power-reclining-sofas", "nav.powerReclining", "#E4DACA"],
               ["convertible-sofa-beds", "nav.sofaBeds", "#CDBEA6"],
-              ["small-space-sofas", "nav.smallSpace", "#D9D3C8"],
-              ["rolling-side-table-with-storage", "about.functionalTables", "#E0D8CC"],
+              ["modular-sectional-sofas", "nav.modular", "#D9D3C8"],
+              ["japanese-sofas", "nav.japanese", "#E0D8CC"],
             ] as const
           ).map(([slug, key, tone]) => (
             <Link key={slug} href={collectionHref(slug)} className="group overflow-hidden rounded-block border border-line2 bg-white">

@@ -9,7 +9,6 @@ const TYPES = [
   { key: "home.tabPower", slug: "power-reclining-sofas", title: "Power Reclining Sofas" },
   { key: "home.tabBeds", slug: "convertible-sofa-beds", title: "Convertible Sofa Beds" },
   { key: "home.tabModular", slug: "modular-sectional-sofas", title: "Modular Sofas" },
-  { key: "home.tabSmall", slug: "small-space-sofas", title: "Small-Space Sofas" },
 ];
 
 export default async function HomePage() {

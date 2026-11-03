@@ -8,7 +8,6 @@ import {
   ArrowRight,
   ChevronDown,
   ChevronRight,
-  Diamond,
   Gift,
   Globe,
   Grip,
@@ -19,7 +18,7 @@ import {
   UserRound,
   X,
 } from "lucide-react";
-import { Eyebrow, Logo, Round } from "@/components/ui/primitives";
+import { Eyebrow, Logo } from "@/components/ui/primitives";
 import { useT } from "@/lib/i18n";
 import { LANGS, usePrefs } from "@/lib/prefs";
 import { categoriesPanel, categoryPills, discoverMenu, routes } from "@/lib/routes";
@@ -28,7 +27,7 @@ import { useDismiss } from "@/lib/use-dismiss";
 import { useUi } from "@/lib/ui-store";
 import { firstName, useAuth } from "@/lib/auth";
 
-type Menu = "cat" | "disc" | "lang" | null;
+type Menu = "cat" | "lang" | null;
 
 /** Badge counts only exist in the browser (localStorage), so render 0 until mounted. */
 function useMounted() {
@@ -106,9 +105,8 @@ export function Header() {
   const [drawer, setDrawer] = useState(false);
   const close = useCallback(() => setMenu(null), []);
   const catRef = useRef<HTMLDivElement>(null);
-  const discRef = useRef<HTMLDivElement>(null);
   const langRef = useRef<HTMLDivElement>(null);
-  const refs = useMemo(() => [catRef, discRef, langRef], []);
+  const refs = useMemo(() => [catRef, langRef], []);
   useDismiss(menu !== null, refs, close);
 
   // Close menus on navigation (reset during render when the path changes).
@@ -228,33 +226,6 @@ export function Header() {
             );
           })}
         </nav>
-
-        <div ref={discRef} className="relative flex-none">
-          <button
-            type="button"
-            aria-expanded={menu === "disc"}
-            aria-controls="az-disc-panel"
-            onClick={() => toggle("disc")}
-            className="inline-flex h-9 items-center gap-2 rounded-full border border-line bg-white px-3.5 text-[12.5px] font-normal text-ink2 hover:border-ink"
-          >
-            <Diamond size={12} aria-hidden />
-            {t("header.discover")}
-            <ChevronDown size={13} aria-hidden className={clsx("transition-transform", menu === "disc" && "rotate-180")} />
-          </button>
-          {menu === "disc" && (
-            <Panel id="az-disc-panel" className="right-0 grid w-[520px] grid-cols-2 gap-1.5 p-3.5 lg:left-0 lg:right-auto">
-              {discoverMenu.map((item) => (
-                <Link key={item.key} href={item.href} className="flex gap-3.5 rounded-2xl p-3.5 hover:bg-gold-soft">
-                  <Round icon={item.icon} size={38} className="!border-gold-line !text-gold" />
-                  <span>
-                    <span className="block text-sm font-bold text-ink">{t(item.key)}</span>
-                    <span className="block text-xs text-muted">{t(item.sub)}</span>
-                  </span>
-                </Link>
-              ))}
-            </Panel>
-          )}
-        </div>
 
         <span className="flex-1" />
 

@@ -30,14 +30,10 @@ export type NavItem = { key: string; href: string };
 export const categoryPills: NavItem[] = [
   { key: "nav.powerReclining", href: collectionHref("power-reclining-sofas") },
   { key: "nav.sofaBeds", href: collectionHref("convertible-sofa-beds") },
-  { key: "nav.smallSpace", href: collectionHref("small-space-sofas") },
-  { key: "nav.compressed", href: collectionHref("compressed-sofas") },
   { key: "nav.modular", href: collectionHref("modular-sectional-sofas") },
   { key: "nav.fourSeater", href: collectionHref("4-seater-sofas") },
   { key: "nav.threeTwoSeater", href: collectionHref("3-2-seater-sofa-sets") },
   { key: "nav.japanese", href: collectionHref("japanese-sofas") },
-  { key: "nav.smartTables", href: collectionHref("rolling-side-table-with-storage") },
-  { key: "nav.newArrivals", href: collectionHref("new-arrivals") },
 ];
 
 /** Categories panel (spec §3.2). */
@@ -69,7 +65,6 @@ export const footerColumns: { title: string; links: NavItem[] }[] = [
       { key: "footer.links.powerReclining", href: collectionHref("power-reclining-sofas") },
       { key: "footer.links.sofaBeds", href: collectionHref("convertible-sofa-beds") },
       { key: "footer.links.modular", href: collectionHref("modular-sectional-sofas") },
-      { key: "footer.links.spaceSaving", href: collectionHref("small-space-sofas") },
     ],
   },
   {

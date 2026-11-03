@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Armchair, ArrowRight, BadgeDollarSign, BedDouble, CircleAlert, Package, PawPrint, Ruler, Search, TrendingUp, X } from "lucide-react";
+import { Armchair, ArrowRight, BadgeDollarSign, BedDouble, CircleAlert, PawPrint, Search, TrendingUp, X } from "lucide-react";
 import { Media } from "@/components/shop/Media";
 import { Price, T, useHydrated, useText } from "@/components/shop/ShopContext";
 import { POPULAR } from "@/components/shop/SearchParts";
@@ -20,11 +20,9 @@ import { useUi } from "@/lib/ui-store";
 type Suggestion = { id: string; slug: string; name: I18nText; price: number | null; image: string | null; tone: string | null };
 
 const NEEDS = [
-  [Ruler, "search.need.small", "small-space-sofas", "#E5DCCD"],
   [BedDouble, "search.need.sleep", "convertible-sofa-beds", "#D2C3AA"],
   [Armchair, "search.need.recline", "power-reclining-sofas", "#DED6CA"],
   [PawPrint, "search.need.pets", "all", "#C8BBA6"],
-  [Package, "search.need.box", "compressed-sofas", "#E9E3D8"],
   [BadgeDollarSign, "search.need.modular", "modular-sectional-sofas", "#D9CCB8"],
 ] as const;
 
