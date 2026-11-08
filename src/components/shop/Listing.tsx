@@ -3,19 +3,16 @@
 import clsx from "clsx";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useRef, useState } from "react";
-import { ChevronDown, ChevronRight, SearchX, SlidersHorizontal, X } from "lucide-react";
+import { ChevronRight, SearchX, X } from "lucide-react";
 import { Carousel } from "@/components/shop/Carousel";
-import { DrawerPanel, Overlay } from "@/components/shop/Overlay";
 import { GCard } from "@/components/shop/ProductCards";
 import { T, useHydrated } from "@/components/shop/ShopContext";
 import { Btn, Eyebrow, H, P } from "@/components/ui/primitives";
 import { useProductCards } from "@/lib/cart-details";
 import { useT } from "@/lib/i18n";
-import { FUNCTIONS, SORTS, type ListingParams, type Sort } from "@/lib/listing";
+import type { ListingParams } from "@/lib/listing";
 import { useShop } from "@/lib/shop-store";
 import type { I18nText, ProductCardData } from "@/lib/types";
-import { useDismiss } from "@/lib/use-dismiss";
 
 export function Crumb({ items }: { items: { label: React.ReactNode; href?: string }[] }) {
   return (
@@ -61,13 +58,10 @@ function useListingNav() {
 
 type Facets = { materials: string[]; colors: string[]; functions: string[] };
 
-export function Toolbar({ total, params, facets }: { total: number; params: ListingParams; facets: Facets }) {
+/** Product count + any active filter chips (sort menu and filter drawer were removed). */
+export function Toolbar({ total, params }: { total: number; params: ListingParams; facets?: Facets }) {
   const t = useT();
   const nav = useListingNav();
-  const [sortOpen, setSortOpen] = useState(false);
-  const [filterOpen, setFilterOpen] = useState(false);
-  const sortRef = useRef<HTMLDivElement>(null);
-  useDismiss(sortOpen, [sortRef], () => setSortOpen(false));
 
   const chips: { label: string; patch: Record<string, string | null> }[] = [];
   if (params.min) chips.push({ label: `≥ $${params.min}`, patch: { min: null } });
@@ -83,45 +77,6 @@ export function Toolbar({ total, params, facets }: { total: number; params: List
         <span className="text-[13.5px] text-muted">
           <b className="text-ink">{t("listing.products", { n: total })}</b>
         </span>
-        <div className="flex gap-2">
-          <div ref={sortRef} className="relative">
-            <button
-              type="button"
-              aria-haspopup="listbox"
-              aria-expanded={sortOpen}
-              onClick={() => setSortOpen((v) => !v)}
-              className="inline-flex h-9 items-center gap-2 rounded-full border border-line bg-white px-4 text-[13px] font-semibold hover:border-ink"
-            >
-              {t(`sort.${params.sort}`)}
-              <ChevronDown size={13} aria-hidden className={clsx("transition-transform", sortOpen && "rotate-180")} />
-            </button>
-            {sortOpen && (
-              <ul role="listbox" aria-label={t("sort.label")} className="absolute right-0 top-[calc(100%+8px)] z-30 w-[220px] rounded-tile border border-line2 bg-white p-2 shadow-float">
-                {SORTS.map((s) => (
-                  <li key={s}>
-                    <button
-                      type="button"
-                      role="option"
-                      aria-selected={params.sort === s}
-                      onClick={() => {
-                        setSortOpen(false);
-                        nav({ sort: s === "featured" ? null : s });
-                      }}
-                      className={clsx("flex h-10 w-full items-center rounded-xl px-3 text-left text-sm hover:bg-gold-soft", params.sort === s && "bg-gold-soft font-bold")}
-                    >
-                      {t(`sort.${s as Sort}`)}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-          <button type="button" onClick={() => setFilterOpen(true)} className="inline-flex h-9 items-center gap-2 rounded-full bg-ink px-4 text-[13px] font-semibold text-white">
-            <SlidersHorizontal size={14} aria-hidden />
-            {t("filters.filter")}
-            {chips.length > 0 && <span className="rounded-full bg-gold px-1.5 text-[11px]">{chips.length}</span>}
-          </button>
-        </div>
       </div>
       {chips.length > 0 && (
         <div className="mt-3.5 flex flex-wrap items-center gap-2">
@@ -136,128 +91,7 @@ export function Toolbar({ total, params, facets }: { total: number; params: List
           </button>
         </div>
       )}
-      {filterOpen && <FilterDrawer params={params} facets={facets} onClose={() => setFilterOpen(false)} onApply={nav} />}
     </>
-  );
-}
-
-function Group({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-  <fieldset className="flex flex-col gap-3 border-t border-line2 py-5">
-    <legend className="sr-only">{title}</legend>
-    <Eyebrow line={false}>{title}</Eyebrow>
-    {children}
-  </fieldset>
-  );
-}
-function Pill({ on, label, onClick }: { on: boolean; label: string; onClick: () => void }) {
-  return (
-  <button
-    type="button"
-    aria-pressed={on}
-    onClick={onClick}
-    className={clsx("inline-flex h-9 items-center rounded-full border px-4 text-[13px] font-semibold capitalize", on ? "border-ink bg-ink text-white" : "border-line bg-white text-ink2")}
-  >
-    {label}
-  </button>
-  );
-}
-
-
-function FilterDrawer({
-  params,
-  facets,
-  onClose,
-  onApply,
-}: {
-  params: ListingParams;
-  facets: Facets;
-  onClose: () => void;
-  onApply: (patch: Record<string, string | null>) => void;
-}) {
-  const t = useT();
-  const [min, setMin] = useState(params.min?.toString() ?? "");
-  const [max, setMax] = useState(params.max?.toString() ?? "");
-  const [material, setMaterial] = useState(params.material);
-  const [color, setColor] = useState(params.color);
-  const [fn, setFn] = useState(params.fn);
-  const [inStock, setInStock] = useState(params.inStock);
-  const toggle = (arr: string[], set: (v: string[]) => void, v: string) => set(arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v]);
-
-  return (
-    <Overlay onClose={onClose} label={t("filters.title")}>
-      <DrawerPanel>
-        <div className="flex items-center justify-between px-6 pb-2 pt-6">
-          <H className="text-[26px]">{t("filters.title")}</H>
-          <button type="button" aria-label={t("common.close")} onClick={onClose} className="flex size-10 items-center justify-center rounded-full border border-line bg-white">
-            <X size={16} aria-hidden />
-          </button>
-        </div>
-        <div className="flex-1 overflow-y-auto px-6">
-          <Group title={t("filters.price")}>
-            <div className="flex items-center gap-2">
-              <input inputMode="numeric" aria-label={t("filters.min")} placeholder={t("filters.min")} value={min} onChange={(e) => setMin(e.target.value.replace(/\D/g, ""))} className="h-11 w-full rounded-field border border-line bg-white px-3 text-sm" />
-              <span className="text-muted">–</span>
-              <input inputMode="numeric" aria-label={t("filters.max")} placeholder={t("filters.max")} value={max} onChange={(e) => setMax(e.target.value.replace(/\D/g, ""))} className="h-11 w-full rounded-field border border-line bg-white px-3 text-sm" />
-            </div>
-            <span className="text-[11.5px] text-faint">{t("filters.cadNote")}</span>
-          </Group>
-          {facets.materials.length > 0 && (
-            <Group title={t("filters.material")}>
-              <div className="flex flex-wrap gap-2">
-                {facets.materials.map((m) => (
-                  <Pill key={m} on={material.includes(m)} label={m} onClick={() => toggle(material, setMaterial, m)} />
-                ))}
-              </div>
-            </Group>
-          )}
-          {facets.colors.length > 0 && (
-            <Group title={t("filters.colour")}>
-              <div className="flex flex-wrap gap-2">
-                {facets.colors.map((c) => (
-                  <Pill key={c} on={color.includes(c)} label={c} onClick={() => toggle(color, setColor, c)} />
-                ))}
-              </div>
-            </Group>
-          )}
-          <Group title={t("filters.function")}>
-            <div className="flex flex-wrap gap-2">
-              {FUNCTIONS.map((f) => (
-                <Pill key={f} on={fn.includes(f)} label={t(`filters.fn.${f}`)} onClick={() => toggle(fn, setFn, f)} />
-              ))}
-            </div>
-          </Group>
-          <Group title={t("filters.availability")}>
-            <Pill on={inStock} label={t("filters.inStock")} onClick={() => setInStock(!inStock)} />
-          </Group>
-        </div>
-        <div className="flex gap-2.5 border-t border-line bg-white px-6 pb-7 pt-4">
-          <Btn
-            kind="light"
-            full
-            onClick={() => {
-              setMin("");
-              setMax("");
-              setMaterial([]);
-              setColor([]);
-              setFn([]);
-              setInStock(false);
-            }}
-          >
-            {t("filters.clearAll")}
-          </Btn>
-          <Btn
-            full
-            onClick={() => {
-              onApply({ min: min || null, max: max || null, material: material.join(","), color: color.join(","), fn: fn.join(","), stock: inStock ? "1" : null });
-              onClose();
-            }}
-          >
-            {t("filters.apply")}
-          </Btn>
-        </div>
-      </DrawerPanel>
-    </Overlay>
   );
 }
 
