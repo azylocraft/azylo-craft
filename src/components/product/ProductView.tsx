@@ -233,7 +233,8 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
             </div>
 
             {/* Model */}
-            {models.length > 0 &&
+            {/* Only one material → nothing to choose; the price alone is shown. */}
+            {models.length > 1 &&
               (models.every(([k]) => MATERIAL_INFO[k]) ? (
                 <MaterialPicker
                   materials={models.map(([k]) => k)}
