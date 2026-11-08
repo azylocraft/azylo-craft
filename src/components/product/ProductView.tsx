@@ -19,8 +19,6 @@ import {
   Truck,
 } from "lucide-react";
 import { Gallery, Lightbox } from "@/components/product/Gallery";
-import { MaterialPicker } from "@/components/product/MaterialPicker";
-import { MATERIAL_INFO } from "@/lib/material-info";
 import { VideoModal } from "@/components/product/VideoModal";
 import { PriceCompareHint, PriceComparison } from "@/components/product/PriceComparison";
 import { BuyMoreSaveMore, EmiLine, LaunchPriceTimer, LowStock, OfferStack, PriceBlock, RatingSummary, RecentBuyers, ReviewsSection, TrustBadges } from "@/components/product/Offers";
@@ -64,7 +62,12 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
     () => [...new Map(product.variants.map((v) => [keyOf(v.color), { name: v.color, hex: v.colorHex }])).entries()],
     [product.variants],
   );
-  const [model, setModel] = useState(models[0]?.[0] ?? "");
+  // Default to the cheapest material (Performance Fabric) — the base price.
+  const [model] = useState(() => {
+    const priced = product.variants.filter((v) => v.priceInr != null);
+    const cheapest = priced.reduce<(typeof priced)[number] | null>((m, v) => (!m || (v.priceInr ?? 0) < (m.priceInr ?? 0) ? v : m), null);
+    return cheapest ? keyOf(cheapest.model) : (models[0]?.[0] ?? "");
+  });
   const [color, setColor] = useState(colors[0]?.[0] ?? "");
   const [qty, setQty] = useState(1);
   const [gift, setGift] = useState<string | null>(null);
@@ -234,44 +237,7 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
               {deliveryOpen && <p className="px-4 pb-4 text-[13px] leading-relaxed text-muted">{t("product.deliveryDetailsBody")}</p>}
             </div>
 
-            {/* Model */}
-            {/* Only one material → nothing to choose; the price alone is shown. */}
-            {models.length > 1 &&
-              (models.every(([k]) => MATERIAL_INFO[k]) ? (
-                <MaterialPicker
-                  materials={models.map(([k]) => k)}
-                  selected={model}
-                  onSelect={setModel}
-                  priceOf={(m) => product.variants.find((v) => keyOf(v.model) === m && (isCustom || keyOf(v.color) === color))?.priceInr ?? product.variants.find((v) => keyOf(v.model) === m)?.priceInr ?? null}
-                  tint={isCustom ? null : (colors.find(([k]) => k === color)?.[1].hex ?? null)}
-                />
-              ) : (
-              <fieldset className="flex flex-col gap-2.5">
-                <legend className="mb-2.5 text-[13px] font-bold">
-                  {t("product.model")}: <span className="font-medium text-muted">{variant ? text(variant.model, "model") : ""}</span>
-                </legend>
-                <div className="flex flex-col gap-2">
-                  {models.map(([k, label]) => {
-                    const v = product.variants.find((x) => keyOf(x.model) === k);
-                    return (
-                      <button
-                        key={k}
-                        type="button"
-                        aria-pressed={model === k}
-                        onClick={() => setModel(k)}
-                        className={clsx(
-                          "flex min-h-12 items-center justify-between gap-3 rounded-field border px-4 py-2.5 text-left text-[13.5px] font-semibold",
-                          model === k ? "border-gold bg-gold-soft" : "border-line bg-white hover:border-ink",
-                        )}
-                      >
-                        <T text={label} field="model" fallback />
-                        <span className="flex-none text-xs text-muted">{v?.priceInr != null ? <Price cad={v.priceInr} withCode={false} /> : <Missing field="price" />}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </fieldset>
-              ))}
+            {/* No material picker: customers describe changes in the customisation box; the base (cheapest) material is used. */}
 
             {/* Colour */}
             {colors.length > 0 && (
