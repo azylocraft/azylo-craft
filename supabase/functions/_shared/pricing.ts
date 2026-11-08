@@ -3,7 +3,10 @@
 import type { SupabaseClient } from "npm:@supabase/supabase-js@2";
 
 /** `gifts`: up to 2 free-gift keys won on the gift wheel (`gift` = older single choice). */
-export type LineInput = { variantId: string; quantity: number; customColor?: boolean; gift?: string; gifts?: string[] };
+/** `note`: the customer's customisation details for this piece (free text, max 500 chars). */
+export type LineInput = { variantId: string; quantity: number; customColor?: boolean; gift?: string; gifts?: string[]; note?: string };
+
+const cleanNote = (n: unknown) => (typeof n === "string" ? n.replace(/s+/g, " ").trim().slice(0, 500) : "");
 export type Address = {
   first_name: string; last_name: string; line1: string; line2?: string | null; city: string;
   province?: string | null; postal_code: string; country: string; phone?: string | null;
@@ -44,7 +47,7 @@ export async function priceCart(db: SupabaseClient, lines: LineInput[], opts: { 
     const img = [...(v.products.product_images ?? [])].sort((a: { sort_order: number }, b: { sort_order: number }) => a.sort_order - b.sort_order)[0];
     items.push({
       product_id: v.products.id, variant_id: v.id, product_name: v.products.name_en ?? v.products.slug,
-      variant_label: [v.color_en, v.model_en].filter(Boolean).join(" / ") + (l.customColor ? " · Custom color" : ""),
+      variant_label: [v.color_en, v.model_en].filter(Boolean).join(" / ") + (l.customColor ? " · Custom color" : "") + (cleanNote(l.note) ? ` · Customisation: ${cleanNote(l.note)}` : ""),
       image_path: img?.storage_path ?? null, unit_price_inr: Number(v.price_inr), quantity: l.quantity, custom_color: !!l.customColor, is_gift: false,
     });
   }

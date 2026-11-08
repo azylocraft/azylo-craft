@@ -143,7 +143,7 @@ export function CheckoutView() {
 
   const shipErrors = addrErrors(ship);
   const addressValid = Object.keys(shipErrors).length === 0;
-  const items = useMemo(() => cart.map((l) => ({ variantId: l.variantId, quantity: l.quantity, customColor: !!l.customColor, gift: l.gift, gifts: l.gifts })), [cart]);
+  const items = useMemo(() => cart.map((l) => ({ variantId: l.variantId, quantity: l.quantity, customColor: !!l.customColor, gift: l.gift, gifts: l.gifts, note: l.note })), [cart]);
 
   // Server quote, refreshed (debounced) whenever cart, destination, shipping or code changes.
   useEffect(() => {
@@ -224,7 +224,7 @@ export function CheckoutView() {
             </span>
             <span className="min-w-0 flex-1 text-sm">
               <b className="line-clamp-1">{l.detail ? <T text={l.detail.name} field="product name" fallback /> : "…"}</b>
-              <span className="text-xs text-muted">{l.detail ? <><T text={l.detail.color} field="colour" fallback /> / <T text={l.detail.model} field="model" fallback /></> : null}{l.customColor ? " · Custom color" : ""}</span>
+              <span className="text-xs text-muted">{l.detail ? <><T text={l.detail.color} field="colour" fallback /> / <T text={l.detail.model} field="model" fallback /></> : null}{l.customColor ? " · Custom color" : ""}{l.note ? <span className="block italic">Customisation: {l.note}</span> : null}</span>
             </span>
             <span className="text-sm font-bold">{l.detail ? <Price cad={l.detail.priceInr == null ? null : l.detail.priceInr * l.quantity} withCode={false} /> : null}</span>
           </li>

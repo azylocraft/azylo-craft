@@ -296,6 +296,8 @@
     "customColor": "Couleur personnalisée",
     "customNote": "Couleur personnalisée — nous vous contacterons après la commande pour confirmer la couleur avant la fabrication.",
     "addToCart": "Ajouter au panier",
+    "customDetails": "Détails de personnalisation (facultatif)",
+    "customDetailsPlaceholder": "Indiquez les personnalisations souhaitées — taille, couleur, tissu, coussins ou autre.",
     "outOfStock": "Rupture de stock",
     "unavailable": "Indisponible",
     "noPriceNote": "cette option ne peut pas encore être commandée.",

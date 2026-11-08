@@ -125,13 +125,15 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
         })()
       : null;
 
+  const [note, setNote] = useState("");
   const add = () => {
     if (!variant || !canBuy) return;
     const chosenGift = product.freeGiftEnabled && settings.freeGifts.length ? (gift ?? settings.freeGifts[0].key) : undefined;
     // 2 gifts won on the gift wheel replace the single chosen gift.
     const won = useShop.getState().wonGifts.filter((k) => settings.freeGifts.some((g) => g.key === k));
     const wonGifts = product.freeGiftEnabled && won.length >= 2 ? won.slice(0, 2) : undefined;
-    addToCart({ variantId: variant.id, productId: product.id, quantity: qty, customColor: isCustom || undefined, gift: wonGifts ? undefined : chosenGift, gifts: wonGifts });
+    addToCart({ variantId: variant.id, productId: product.id, quantity: qty, customColor: isCustom || undefined, gift: wonGifts ? undefined : chosenGift, gifts: wonGifts, note: note.trim() || undefined });
+    setNote("");
     openDrawer("cart");
   };
 
@@ -312,6 +314,18 @@ export function ProductView({ product, related, faqs }: { product: ProductDetail
             {product.freeGiftEnabled && <FreeGiftPicker value={gift ?? settings.freeGifts[0]?.key ?? null} onChange={setGift} quantity={qty} />}
             <OfferStack price={variant?.priceInr ?? null} bonuses={[...product.bonuses, ...settings.bonusesDefault]} guaranteeDays={product.guaranteeDays} guaranteeText={product.guaranteeText} />
             <LowStock stock={variant?.stock ?? null} />
+
+            <label className="flex flex-col gap-2">
+              <span className="text-[13px] font-bold">{t("product.customDetails")}</span>
+              <textarea
+                value={note}
+                onChange={(e) => setNote(e.target.value.slice(0, 500))}
+                rows={3}
+                maxLength={500}
+                placeholder={t("product.customDetailsPlaceholder")}
+                className="w-full resize-y rounded-field border border-line bg-white px-3.5 py-3 text-[13.5px] leading-relaxed placeholder:text-faint focus:border-ink focus:outline-none"
+              />
+            </label>
 
             <div className="flex items-center gap-3">
               <Stepper value={qty} onChange={setQty} label={t("cart.quantity")} />

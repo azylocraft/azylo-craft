@@ -131,6 +131,7 @@ export function CartLines({ compact }: { compact?: boolean }) {
                 <span className="text-[11.5px] text-muted">
                   <T text={d.color} field="colour" fallback /> / <T text={d.model} field="model" fallback />
                   {l.customColor && ` · ${t("product.customColor")}`}
+                  {l.note && <span className="block italic">{t("product.customDetails")}: {l.note}</span>}
                   {(l.gifts?.length ? l.gifts : l.gift ? [l.gift] : []).map((k) => <GiftLine key={k} giftKey={k} qty={l.quantity} />)}
                 </span>
               )}

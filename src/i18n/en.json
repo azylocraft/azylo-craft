@@ -304,6 +304,8 @@
     "customColor": "Custom color",
     "customNote": "Custom colour selected — we'll contact you after ordering to confirm your colour before production starts.",
     "addToCart": "Add to cart",
+    "customDetails": "Customisation details (optional)",
+    "customDetailsPlaceholder": "Tell us the customisation details you want — size, colour, fabric, cushions or anything else.",
     "outOfStock": "Out of stock",
     "unavailable": "Unavailable",
     "noPriceNote": "this option can't be ordered yet.",

@@ -12,6 +12,8 @@ export type CartLine = {
   gift?: string;
   /** The 2 gifts won on the gift wheel, included with this piece. */
   gifts?: string[];
+  /** Customisation details the customer typed on the product page. */
+  note?: string;
 };
 
 type ShopState = {
@@ -57,7 +59,7 @@ export const useShop = create<ShopState>()(
           if (!existing) return { cart: [...s.cart, line] };
           return {
             cart: s.cart.map((l) =>
-              l.variantId === line.variantId ? { ...l, quantity: Math.min(10, l.quantity + line.quantity) } : l,
+              l.variantId === line.variantId ? { ...l, quantity: Math.min(10, l.quantity + line.quantity), note: line.note || l.note } : l,
             ),
           };
         }),
