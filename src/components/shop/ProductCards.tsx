@@ -141,7 +141,6 @@ export function GCard({ p }: { p: ProductCardData; /** @deprecated cards use a 4
         </Media>
         <div className="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-0.5 px-2 pt-2.5 sm:px-3 sm:pt-3.5">
           <OffPrice p={p} size="text-[13px] sm:text-[15px]" />
-          {p.reviewCount > 0 && <span className="text-[10.5px] text-muted">★ {p.reviewCount}</span>}
         </div>
         <TileArrow size={32} />
       </Link>
