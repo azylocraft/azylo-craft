@@ -417,7 +417,6 @@ export function ReviewsSection({ reviews, writeButton }: { reviews: Review[]; wr
                   <MapPin size={11} aria-hidden /> {r.location}
                 </>
               )}
-              · {new Date(r.createdAt).toLocaleDateString("en-IN", { month: "short", year: "numeric" })}
             </span>
           </li>
         ))}
